@@ -1,0 +1,5 @@
+{
+    "port": 28015,
+    "host": "db",
+    "db":"REMORA"
+}

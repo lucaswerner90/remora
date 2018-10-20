@@ -1,0 +1,86 @@
+{
+    "ADAETH": {
+        "against": "ETH",
+        "alarm": 100000,
+        "name": "ADA",
+        "volumeDifference": 50
+    },
+    "BCCETH": {
+        "against": "ETH",
+        "alarm": 100000,
+        "name": "BCC",
+        "volumeDifference": 50
+    },
+    "BCNETH": {
+        "against": "ETH",
+        "alarm": 100000,
+        "name": "BCN",
+        "volumeDifference": 50
+    },
+    "BNBETH": {
+        "against": "ETH",
+        "alarm": 100000,
+        "name": "BNB",
+        "volumeDifference": 50
+    },
+    "EOSETH": {
+        "against": "ETH",
+        "alarm": 100000,
+        "name": "EOS",
+        "volumeDifference": 50
+    },
+    "ICXETH": {
+        "against": "ETH",
+        "alarm": 100000,
+        "name": "ICX",
+        "volumeDifference": 50
+    },
+    "IOSTETH": {
+        "against": "ETH",
+        "alarm": 100000,
+        "name": "IOST",
+        "volumeDifference": 50
+    },
+    "LOOMETH": {
+        "against": "ETH",
+        "alarm": 100000,
+        "name": "LOOM",
+        "volumeDifference": 50
+    },
+    "LTCETH": {
+        "against": "ETH",
+        "alarm": 100000,
+        "name": "LTC",
+        "volumeDifference": 50
+    },
+    "ONTETH": {
+        "against": "ETH",
+        "alarm": 100000,
+        "name": "ONT",
+        "volumeDifference": 50
+    },
+    "TRXETH": {
+        "against": "ETH",
+        "alarm": 100000,
+        "name": "TRX",
+        "volumeDifference": 50
+    },
+    "XRPETH": {
+        "against": "ETH",
+        "alarm": 100000,
+        "name": "XRP",
+        "volumeDifference": 50
+    },
+    "XVGETH": {
+        "against": "ETH",
+        "alarm": 100000,
+        "name": "XVG",
+        "volumeDifference": 50
+    },
+    "ZILETH": {
+        "against": "ETH",
+        "alarm": 100000,
+        "name": "ZIL",
+        "volumeDifference": 50
+    }
+}
