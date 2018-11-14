@@ -1,5 +1,5 @@
 import * as GDAX from 'gdax';
-import Coin from '../../coin/Coin';
+import Coin from '../coin/Coin';
 
 // Load the coins config
 const USD_COINS = require('../../../config/exchanges/gdax/coins_usd.json');
