@@ -14,53 +14,22 @@ services:
     depends_on: 
       - redis
 
-  # socketio_2:
-  #   build: ./socketio
-  #   hostname: socketio_2
-  #   restart: always
-  #   environment:
-  #     - PORT=4501
-  #     - REDIS_HOST=redis
-  #   depends_on: 
-  #     - redis
-
-  # socketio_3:
-  #   build: ./socketio
-  #   hostname: socketio_3
-  #   restart: always
-  #   environment:
-  #     - PORT=4502
-  #     - REDIS_HOST=redis
-  #   depends_on: 
-  #     - redis
-
-
-
   redis:
     build: ./redis
     hostname: redis
     restart: always
 
-
-
-  # EXECUTE BINANCE SERVER FOR USDT
-  binance_exchange_usdt:
-    build: ./exchange_server
-    hostname: binance_exchange_usdt
+  mongodb:
+    image: mongo
     restart: always
     environment:
-      - PORT=8001
-      - DEDICATED_TO=BINANCE
-      - MAIN_COIN=USDT
-      - REDIS_HOST=redis
-      - NODE_ENV=production
-    depends_on:
-      - redis
-    links:
-      - redis
-  
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: REMORA
+    volumes: 
+      - ./mongodb/data:/data/db
 
-  # # EXECUTE BINANCE SERVER FOR ETH
+  # EXECUTE BINANCE SERVER FOR ETH
   binance_exchange_eth:
     build: ./exchange_server
     hostname: binance_exchange_eth
@@ -75,48 +44,3 @@ services:
       - redis
     links:
       - redis
-
-
-  # EXECUTE GDAX SERVER FOR USD
-  # gdax_exchange_usd:
-  #   build: ./exchange_server
-  #   hostname: gdax_exchange_usd
-  #   restart: always
-  #   environment:
-  #     - PORT=8202
-  #     - DEDICATED_TO=GDAX
-  #     - MAIN_COIN=USD
-  #     - DB_HOST=database
-  #     - DB_PORT=28015
-  #     - REDIS_HOST=redis
-  #     - NODE_ENV=production
-  #   depends_on:
-  #     - redis
-  # 
-  #   links:
-  #     - redis
-  # 
-
-  # news_server:
-  #   build: ./news_server
-  #   restart: always
-  #   environment:
-  #     - REDIS_HOST=redis
-  #     - NODE_ENV=production
-  #   depends_on:
-  #     - redis
-  #   links:
-  #     - redis
-
-  # # EXECUTE NGINX SERVER
-  # nginx:
-  #   build: .
-  #   restart: always
-  #   ports:
-  #     - "4000:80"
-  #   volumes:
-  #     - ./packages/public/client/build:/usr/share/nginx/html
-  #   links:
-  #     - socketio_1
-  #     - socketio_2
-  #     - socketio_3
