@@ -1,5 +1,5 @@
 import * as Binance from 'node-binance-api';
-import Coin from '../../coin/Coin';
+import Coin from '../coin/Coin';
 
 // Load the coins config
 const ETH_COINS = require('../../../config/exchanges/binance/coins_eth.json');
