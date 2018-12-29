@@ -14,23 +14,33 @@ export default class Coin {
   private _whaleOrders: TCoinWhaleOrders = { buy: {}, sell:{} };
   private _alarm: TCoinAlarm;
   private _exchange: string;
-  private against: string;
-  private currentVolumeDifference: number = 0;
+  private _currentVolumeDifference: number = 0;
   private _lastBuyVolume: number = 0;
   private _lastSellVolume: number = 0;
+  private _priceChange24hr: number = -1;
+  private _against: string;
   constructor(symbol: string = '', { alarm = { order : 0, volume : 0 } }, against = 'USD', exchange: string = '') {
     this.symbol = symbol;
-    this.against = against;
+    this._against = against;
     this._alarm = alarm;
     this._exchange = exchange;
 
     this._redisKeys = {
-      NEAR_BUY_ORDER: `${this.exchange}_${this.symbol}_${this.against}_buy_near_order`,
-      NEAR_SELL_ORDER: `${this.exchange}_${this.symbol}_${this.against}_sell_near_order`,
-      PRICES_LIST: `${this.exchange}_${this.symbol}_${this.against}_prices_list`,
-      LATEST_PRICE: `${this.exchange}_${this.symbol}_${this.against}_latest_price`,
-      VOLUME_DIFFERENCE: `${this.exchange}_${this.symbol}_${this.against}_volume_difference`,
+      NEAR_BUY_ORDER: `${this.exchange}_${this.symbol}_${this._against}_buy_near_order`,
+      NEAR_SELL_ORDER: `${this.exchange}_${this.symbol}_${this._against}_sell_near_order`,
+      PRICES_LIST: `${this.exchange}_${this.symbol}_${this._against}_prices_list`,
+      LATEST_PRICE: `${this.exchange}_${this.symbol}_${this._against}_latest_price`,
+      VOLUME_DIFFERENCE: `${this.exchange}_${this.symbol}_${this._against}_volume_difference`,
     };
+  }
+  public set priceChange24hr(newValue:number) {
+    if (!isNaN(newValue) && isFinite(newValue)) {
+      this._priceChange24hr = newValue;
+    }
+  }
+
+  public get priceChange24hr() {
+    return this._priceChange24hr;
   }
 
   public get currentVolumes() {
@@ -54,7 +64,7 @@ export default class Coin {
   }
 
   public get existsVolumeDifference() {
-    return this.currentVolumeDifference > this.alarm.volume;
+    return this._currentVolumeDifference > this.alarm.volume;
   }
 
   public get tendency() {
@@ -247,8 +257,8 @@ export default class Coin {
     const sellVolume = this._lastSellVolume;
     const currentVolumeDifference = Math.abs(Math.round(((buyVolume >= sellVolume ? buyVolume / sellVolume : sellVolume / buyVolume)) * 100) - 100);
 
-    if (currentVolumeDifference !== this.currentVolumeDifference) {
-      this.currentVolumeDifference = currentVolumeDifference;
+    if (currentVolumeDifference !== this._currentVolumeDifference) {
+      this._currentVolumeDifference = currentVolumeDifference;
 
       const redisValue = JSON.stringify(this.getVolumeProperties());
       redis.setVolumeDifferenceValue(this._redisKeys.VOLUME_DIFFERENCE, redisValue);
@@ -282,7 +292,7 @@ export default class Coin {
       actualPrice: this.actualPrice,
       name: this.symbol,
       tendency: this.tendency,
-      currentVolumeDifference: this.currentVolumeDifference,
+      currentVolumeDifference: this._currentVolumeDifference,
     };
   }
 

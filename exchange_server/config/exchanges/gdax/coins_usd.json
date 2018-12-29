@@ -1,19 +1,19 @@
 {
-    "BTC": {
+    "BTC-USD": {
         "name": "BTC",
         "alarm":{
             "order": 100000,
             "volume": 50
         }
     },
-    "ETH": {
+    "ETH-USD": {
         "name": "ETH",
         "alarm":{
             "order": 100000,
             "volume": 50
         }
     },
-    "LTC": {
+    "LTC-USD": {
         "name": "LTC",
         "alarm":{
             "order": 100000,

@@ -51,7 +51,7 @@ export default class BinanceConnection extends ExchangeConnection{
 
   createCoinWebSockets(coin: Coin) {
     // Gets the last chart price of the coin
-    Binance.websockets.chart(coin.symbol, BinanceConnection.TIMES.MIN['15MIN'], (symbol, interval, chart) => {
+    Binance.websockets.chart(coin.symbol, BinanceConnection.TIMES.MIN['15MIN'], (symbol: any, interval: any, chart: { [x: string]: any; }) => {
       const tick = Binance.last(chart);
       const last = chart[tick].close;
       coin.actualPrice = parseFloat(last);
@@ -75,6 +75,10 @@ export default class BinanceConnection extends ExchangeConnection{
       const buyOrders = Binance.sortBids(depth.bids, BinanceConnection.NUM_NEAR_ORDERS);
       const sellOrders = Binance.sortAsks(depth.asks, BinanceConnection.NUM_NEAR_ORDERS);
       this.coinsArray[coinName].updateOrders({ sellOrders, buyOrders });
+    });
+
+    Binance.websockets.prevDay([coin.symbol], (error: any, { percentChange }) => {
+      coin.priceChange24hr = percentChange;
     });
 
   }

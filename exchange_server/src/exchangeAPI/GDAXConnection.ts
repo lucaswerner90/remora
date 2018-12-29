@@ -41,7 +41,7 @@ export default class GDAXConnection extends ExchangeConnection{
   private exchangeAPIClient: GDAX.PublicClient;
 
   constructor(mainCoin: string = 'USD') {
-    super(mainCoin, 'gdax');
+    super(mainCoin, 'GDAX');
   }
 
   /**
@@ -76,9 +76,28 @@ export default class GDAXConnection extends ExchangeConnection{
    * @memberof GDAXConnection
    */
   createCoinWebSockets(coin: Coin) {
-    const updateTime: number = 5 * 1000;
-    this.createPricesListInterval(coin, updateTime);
+    const updateTime: number = 6 * 1000;
+    this.createPricesListInterval(coin, updateTime * 5);
     this.createOrderBookInterval(coin, updateTime);
+    this.createPriceChangeInterval(coin, updateTime * 5);
+  }
+
+  private createPriceChangeInterval(coin: Coin, updateTime: number): any {
+    return setInterval(() => {
+      this.exchangeAPIClient.getProductHistoricRates(coin.symbol, { granularity: GDAXConnection.TIMES['1DAY'] }, (error, response, data) => {
+        if (data && data.length && coin.actualPrice) {
+          const open = parseFloat(data[0][3]);
+          let difference = 0;
+          if (open > coin.actualPrice) {
+            difference = (Math.abs(open - coin.actualPrice) / coin.actualPrice) * 100;
+          } else {
+            difference = (Math.abs(open - coin.actualPrice) / coin.actualPrice) * -100;
+          }
+          difference = Math.round(difference * 100) / 100;
+          coin.priceChange24hr = difference;
+        }
+      });
+    }, updateTime);
   }
 
   /**
@@ -101,11 +120,14 @@ export default class GDAXConnection extends ExchangeConnection{
     return setInterval(() => {
       this.exchangeAPIClient.getProductHistoricRates(coin.symbol, chartPriceConfig, (error, response, data) => {
         if (data && data.length) {
-          coin.actualPrice = parseFloat(data[0][4]);
-          const historicalDate = data.slice(1).reverse();
-          // Create the price list
-          const newPrices = historicalDate.map(chartTick => chartTick[4]);
-          coin.pricesList = newPrices;
+          const actualPrice = parseFloat(data[0][4]);
+          if (isFinite(actualPrice) && isNaN(actualPrice) === false) {
+            coin.actualPrice = parseFloat(data[0][4]);
+            const historicalDate = data.slice(1).reverse();
+            // Create the price list
+            const newPrices = historicalDate.map(chartTick => chartTick[4]);
+            coin.pricesList = newPrices;
+          }
         }
       });
     }, updateTime);

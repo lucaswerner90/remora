@@ -45,16 +45,17 @@ export default class ExchangeConnection {
    */
   protected _coinsList: TCoinProperties[];
 
-  constructor(mainCoin:string, name:string) {
+  constructor(mainCoin: string, name: string) {
+    console.log(`Starting new ${name} server connection for ${mainCoin}`);
     this._name = name;
     this._mainCoin = mainCoin;
     this.config();
     this.coinsList = this.getCoins(this.mainCoin);
 
     // This is only for informative purposses, it shows the different coins and its properties/orders
-    setInterval(() => {
-      this.refreshTable();
-    }, 10 * 1000);
+    // setInterval(() => {
+    //   this.refreshTable();
+    // }, 10 * 1000);
   }
   protected get mainCoin() {
     return this._mainCoin;
