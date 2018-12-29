@@ -121,7 +121,7 @@ export default class GDAXConnection extends ExchangeConnection{
       this.exchangeAPIClient.getProductHistoricRates(coin.symbol, chartPriceConfig, (error, response, data) => {
         if (data && data.length) {
           const actualPrice = parseFloat(data[0][4]);
-          if (isFinite(actualPrice) && isNaN(actualPrice) === false) {
+          if (isFinite(actualPrice) && !isNaN(actualPrice)) {
             coin.actualPrice = parseFloat(data[0][4]);
             const historicalDate = data.slice(1).reverse();
             // Create the price list

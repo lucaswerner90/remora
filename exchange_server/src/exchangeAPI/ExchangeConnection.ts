@@ -112,25 +112,25 @@ export default class ExchangeConnection {
     }, updateTime);
   }
 
-  private refreshTable() {
-    const volumeDifferenceTableData = Object.keys(this.coinsArray)
-      .filter(coinName => this.coinsArray[coinName].existsVolumeDifference)
-      .map(coinName => this.coinsArray[coinName].getVolumeProperties());
-    const orderBuyTableData = Object.keys(this.coinsArray)
-      .filter(coinName => this.coinsArray[coinName].containsBuyOrders())
-      .map(coinName => this.coinsArray[coinName].getOrdersProperties('buy'));
-    const orderSellTableData = Object.keys(this.coinsArray)
-      .filter(coinName => this.coinsArray[coinName].containsSellOrders())
-      .map(coinName => this.coinsArray[coinName].getOrdersProperties('sell'));
-    console.clear();
-    console.log('');
-    console.log(`${this.name.toUpperCase()} Volume Difference`);
-    console.table(volumeDifferenceTableData);
-    console.log(`${this.name.toUpperCase()} Coin Buy Orders`);
-    console.table(orderBuyTableData);
-    console.log(`${this.name.toUpperCase()} Coin Sell Orders`);
-    console.table(orderSellTableData);
-  }
+  // private refreshTable() {
+  //   const volumeDifferenceTableData = Object.keys(this.coinsArray)
+  //     .filter(coinName => this.coinsArray[coinName].existsVolumeDifference)
+  //     .map(coinName => this.coinsArray[coinName].getVolumeProperties());
+  //   const orderBuyTableData = Object.keys(this.coinsArray)
+  //     .filter(coinName => this.coinsArray[coinName].containsBuyOrders())
+  //     .map(coinName => this.coinsArray[coinName].getOrdersProperties('buy'));
+  //   const orderSellTableData = Object.keys(this.coinsArray)
+  //     .filter(coinName => this.coinsArray[coinName].containsSellOrders())
+  //     .map(coinName => this.coinsArray[coinName].getOrdersProperties('sell'));
+  //   console.clear();
+  //   console.log('');
+  //   console.log(`${this.name.toUpperCase()} Volume Difference`);
+  //   console.table(volumeDifferenceTableData);
+  //   console.log(`${this.name.toUpperCase()} Coin Buy Orders`);
+  //   console.table(orderBuyTableData);
+  //   console.log(`${this.name.toUpperCase()} Coin Sell Orders`);
+  //   console.table(orderSellTableData);
+  // }
 
   /**
    *
