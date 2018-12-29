@@ -12,7 +12,7 @@ stages:
 test:
   stage: test
   tags:
-    - docker
+    - development
   only:
     - develop
     - production
