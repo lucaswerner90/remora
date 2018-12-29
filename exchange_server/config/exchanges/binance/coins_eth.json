@@ -1,86 +1,100 @@
 {
     "ADAETH": {
-        "against": "ETH",
-        "alarm": 100000,
         "name": "ADA",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
     },
     "BCCETH": {
-        "against": "ETH",
-        "alarm": 100000,
         "name": "BCC",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
     },
     "BCNETH": {
-        "against": "ETH",
-        "alarm": 100000,
         "name": "BCN",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
     },
     "BNBETH": {
-        "against": "ETH",
-        "alarm": 100000,
         "name": "BNB",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
     },
     "EOSETH": {
-        "against": "ETH",
-        "alarm": 100000,
         "name": "EOS",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
     },
     "ICXETH": {
-        "against": "ETH",
-        "alarm": 100000,
         "name": "ICX",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
     },
     "IOSTETH": {
-        "against": "ETH",
-        "alarm": 100000,
         "name": "IOST",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
     },
     "LOOMETH": {
-        "against": "ETH",
-        "alarm": 100000,
         "name": "LOOM",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
     },
     "LTCETH": {
-        "against": "ETH",
-        "alarm": 100000,
         "name": "LTC",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
     },
     "ONTETH": {
-        "against": "ETH",
-        "alarm": 100000,
         "name": "ONT",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
     },
     "TRXETH": {
-        "against": "ETH",
-        "alarm": 100000,
         "name": "TRX",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
     },
     "XRPETH": {
-        "against": "ETH",
-        "alarm": 100000,
         "name": "XRP",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
     },
     "XVGETH": {
-        "against": "ETH",
-        "alarm": 100000,
         "name": "XVG",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
     },
     "ZILETH": {
-        "against": "ETH",
-        "alarm": 100000,
         "name": "ZIL",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
     }
 }

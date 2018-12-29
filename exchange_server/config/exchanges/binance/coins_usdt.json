@@ -1,39 +1,45 @@
 {
     "BTCUSDT": {
-        "against": "USDT",
-        "alarm": 100000,
         "name": "BTC",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 50
+        }
     },
     "TRXUSDT": {
-        "against": "USDT",
-        "alarm": 100000,
         "name": "TRX",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 50
+        }
     },
     "ETHUSDT": {
-        "against": "USDT",
-        "alarm": 100000,
         "name": "ETH",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 50
+        }
     },
     "LTCUSDT": {
-        "against": "USDT",
-        "alarm": 100000,
         "name": "LTC",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 50
+        }
     },
     "XRPUSDT": {
-        "against": "USDT",
-        "alarm": 100000,
         "name": "XRP",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 50
+        }
     },
     "BNBUSDT": {
-        "against": "USDT",
-        "alarm": 100000,
         "name": "BNB",
-        "volumeDifference": 50
+        "alarm":{
+            "order": 100000,
+            "volume": 50
+        }
     }
 
 }

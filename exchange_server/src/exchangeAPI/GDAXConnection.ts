@@ -1,76 +1,71 @@
 import * as GDAX from 'gdax';
 import Coin from '../coin/Coin';
+import { TCoinProperties } from '../commonTypes';
+import ExchangeConnection from './ExchangeConnection';
 
 // Load the coins config
 const USD_COINS = require('../../config/exchanges/gdax/coins_usd.json');
 
-interface ICoinsArray {
-  [propName: string]: Coin;
-}
+/**
+ * Connection to the GDAX exchange
+ *
+ * @export
+ * @class GDAXConnection
+ * @extends {ExchangeConnection}
+ */
+export default class GDAXConnection extends ExchangeConnection{
 
-interface ICoinProperties {
-  name: string;
-  alarm: number;
-  against: string;
-  volumeDifference: number;
-}
-
-export default class GDAXConnection {
-
-  private coinsArray: ICoinsArray = {};
-  private exchangeAPIClient = new GDAX.PublicClient();
-  private mainCoin: string = 'USD';
-  private _coinsList: ICoinProperties[];
-
-  constructor(mainCoin: string = 'USD') {
-    this.mainCoin = mainCoin;
-    // Get the specific coins for the server instance
-    this.coinsList = this.getCoins(this.mainCoin);
-  }
-
-  private set coinsList(newValue: ICoinProperties[]) {
-    this._coinsList = newValue;
-    // Once we have the coins for the instance we need to initialize both the coin object and the websockets associated to it
-    Object.keys(this._coinsList).forEach((coin: string) => {
-      this.createCoinConfiguration(coin, this._coinsList[coin]);
-    });
-  }
   /**
    *
-   * Init the coin configuration. Open websockets, add it to coinsArray.
-   *
+   * different times that could be used within the intervals/websockets
    * @private
-   * @param {string} [coin=""]
+   * @static
    * @memberof GDAXConnection
    */
-  private createCoinConfiguration(coin: string = '', coinProperties: ICoinProperties) {
-    this.coinsArray[coin] = new Coin(coin, coinProperties, 'gdax');
-    this.createCoinWebSockets(this.coinsArray[coin]);
-    this.createCoinIntervals(this.coinsArray[coin]);
+  private static TIMES = {
+    '1MIN': 60,
+    '5MIN': 300,
+    '15MIN': 900,
+    '1HOUR': 3600,
+    '6HOURS': 21600,
+    '1DAY': 86400,
+  };
+
+  /**
+   *
+   * Client connection to the GDAX API
+   * @private
+   * @type {GDAX.PublicClient}
+   * @memberof GDAXConnection
+   */
+  private exchangeAPIClient: GDAX.PublicClient;
+
+  constructor(mainCoin: string = 'USD') {
+    super(mainCoin, 'gdax');
+  }
+
+  /**
+   *
+   * Initializes the GDAX configuration
+   * @memberof GDAXConnection
+   */
+  config() {
+    this.exchangeAPIClient = new GDAX.PublicClient();
   }
   /**
    *
-   * Return the coins that are going to be used by the server instances
+   * Return the coins that are going to be used by the server instance from the JSON file
    * @param {string} mainCoin
    * @returns
    * @memberof GDAXConnection
    */
-  private getCoins(mainCoin: string): ICoinProperties[] {
+  getCoins(mainCoin: string): TCoinProperties[] {
     switch (mainCoin) {
       case 'USD':
         return USD_COINS;
       default:
         break;
     }
-  }
-
-  private createCoinIntervals(coin: Coin) {
-    const updateTime: number = 20 * 1000;
-    return setInterval(() => {
-      if (coin.actualPrice) {
-        coin.calculateVolumeDifference();
-      }
-    }, updateTime);
   }
 
   /**
@@ -80,7 +75,7 @@ export default class GDAXConnection {
    * @param {string} coin
    * @memberof GDAXConnection
    */
-  private createCoinWebSockets(coin: Coin) {
+  createCoinWebSockets(coin: Coin) {
     const updateTime: number = 5 * 1000;
     this.createPricesListInterval(coin, updateTime);
     this.createOrderBookInterval(coin, updateTime);
@@ -100,7 +95,7 @@ export default class GDAXConnection {
    * @returns
    * @memberof GDAXConnection
    */
-  private createPricesListInterval(coin: Coin, updateTime: number) {
+  createPricesListInterval(coin: Coin, updateTime: number) {
     const chartPriceConfig = { granularity: GDAXConnection.TIMES['5MIN'] };
     // Gets the last chart price of the coin
     return setInterval(() => {
@@ -110,7 +105,7 @@ export default class GDAXConnection {
           const historicalDate = data.slice(1).reverse();
           // Create the price list
           const newPrices = historicalDate.map(chartTick => chartTick[4]);
-          coin.updatePricesList(newPrices);
+          coin.pricesList = newPrices;
         }
       });
     }, updateTime);
@@ -139,7 +134,7 @@ export default class GDAXConnection {
   * @returns
   * @memberof GDAXConnection
   */
-  private createOrderBookInterval(coin: Coin, updateTime: number) {
+  createOrderBookInterval(coin: Coin, updateTime: number) {
     const orderBookConfig = { level: 2 };
     return setInterval(() => {
       this.exchangeAPIClient.getProductOrderBook(coin.symbol, orderBookConfig, (error, response, data) => {
@@ -164,17 +159,6 @@ export default class GDAXConnection {
         }
       });
     }, updateTime);
-  }
-
-  static get TIMES() {
-    return {
-      '1MIN': 60,
-      '5MIN': 300,
-      '15MIN': 900,
-      '1HOUR': 3600,
-      '6HOURS': 21600,
-      '1DAY': 86400,
-    };
   }
 
 }
