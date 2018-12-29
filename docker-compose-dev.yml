@@ -18,29 +18,31 @@ services:
     build: ./redis
     hostname: redis
     restart: always
+    ports: 
+    - "6379:6379"
 
-  mongodb:
-    image: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-      MONGO_INITDB_DATABASE: REMORA
-    volumes: 
-      - ./mongodb/data:/data/db
+  # mongodb:
+  #   image: mongo
+  #   restart: always
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: root
+  #     MONGO_INITDB_ROOT_PASSWORD: example
+  #     MONGO_INITDB_DATABASE: REMORA
+  #   volumes: 
+  #     - ./mongodb/data:/data/db
 
-  # EXECUTE BINANCE SERVER FOR ETH
-  binance_exchange_eth:
-    build: ./exchange_server
-    hostname: binance_exchange_eth
-    restart: always
-    environment:
-      - PORT=8002
-      - DEDICATED_TO=BINANCE
-      - MAIN_COIN=ETH
-      - REDIS_HOST=redis
-      - NODE_ENV=production
-    depends_on:
-      - redis
-    links:
-      - redis
+  # EXECUTE GDAX SERVER FOR USD
+  # gdax_exchange_usd:
+  #   build: ./exchange_server
+  #   hostname: gdax_exchange_usd
+  #   restart: always
+  #   environment:
+  #     - PORT=8202
+  #     - DEDICATED_TO=GDAX
+  #     - MAIN_COIN=USD
+  #     - REDIS_HOST=redis
+  #     - NODE_ENV=production
+  #   depends_on:
+  #     - redis
+  #   links:
+  #     - redis

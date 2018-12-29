@@ -2,8 +2,8 @@ import * as Binance from 'node-binance-api';
 import Coin from '../coin/Coin';
 
 // Load the coins config
-const ETH_COINS = require('../../../config/exchanges/binance/coins_eth.json');
-const USDT_COINS = require('../../../config/exchanges/binance/coins_usdt.json');
+const ETH_COINS = require('../../config/exchanges/binance/coins_eth.json');
+const USD_COINS = require('../../config/exchanges/binance/coins_usdt.json');
 
 interface ICoinsArray {
   [propName: string]: Coin;
@@ -18,50 +18,53 @@ interface ICoinProperties {
 
 export default class BinanceConnection {
 
-  private COINS_ARRAY: ICoinsArray = {};
+  private coinsArray: ICoinsArray = {};
   private static NUM_NEAR_ORDERS: number = 200;
-  private static MAIN_COIN: string = 'USDT';
-  constructor(mainCoin: string = 'USDT') {
+  private mainCoin: string = 'USD';
+  private _coinsList: ICoinProperties[];
 
-        // Init the common behaviour for every binance server
+  constructor(mainCoin: string = 'USD') {
+
+    // Init the common behaviour for every binance server
     this.config();
 
-    BinanceConnection.MAIN_COIN = mainCoin;
-        // Get the specific coins for the server instance
-    const listOfCoins = this.getCoins(BinanceConnection.MAIN_COIN);
+    this.mainCoin = mainCoin;
+    // Get the specific coins for the server instance
+    this.coinsList = this.getCoins(this.mainCoin);
+  }
 
-        // Once we have the coins for the instance we need to initialize both the coin object and the websockets associated to it
-    Object.keys(listOfCoins).forEach((coin: string) => {
-      this.createCoinConfiguration(coin);
+  private set coinsList(newValue: ICoinProperties[]) {
+    this._coinsList = newValue;
+    // Once we have the coins for the instance we need to initialize both the coin object and the websockets associated to it
+    Object.keys(this._coinsList).forEach((coin: string) => {
+      this.createCoinConfiguration(coin, this._coinsList[coin]);
     });
+  }
+  /**
+   *
+   * Init the coin configuration. Open websockets, add it to coinsArray.
+   *
+   * @private
+   * @param {string} [coin=""]
+   * @memberof BinanceConnection
+   */
+  private createCoinConfiguration(coin:string= '', coinProperties: ICoinProperties) {
+    this.coinsArray[coin] = new Coin(coin, coinProperties, 'binance');
+    this.createWebSockets(this.coinsArray[coin]);
+    this.createIntervals(this.coinsArray[coin]);
+  }
 
-  }
-    /**
-     *
-     * Init the coin configuration. Open websockets, add it to COINS_ARRAY.
-     *
-     * @private
-     * @param {string} [coin=""]
-     * @memberof BinanceConnection
-     */
-  private createCoinConfiguration(coin:string= '') {
-    const coinProperties: ICoinProperties = this.getCoins(BinanceConnection.MAIN_COIN)[coin];
-    const coinURL = `https://www.binance.com/tradeDetail.html?symbol=${coinProperties.name}_${coinProperties.against}`;
-    this.COINS_ARRAY[coin] = new Coin(coinProperties.name, coin, coinURL, coinProperties.alarm, coinProperties.against, coinProperties.volumeDifference, 'binance');
-    this.createWebSockets(coin);
-    this.createIntervals(coin);
-  }
-    /**
-     *
-     * Return the coins that are going to be used by the server instances
-     * @param {string} mainCoin
-     * @returns
-     * @memberof BinanceConnection
-     */
-  public getCoins(mainCoin: string) {
+  /**
+   *
+   * Return the coins that are going to be used by the server instances
+   * @param {string} mainCoin
+   * @returns
+   * @memberof BinanceConnection
+   */
+  private getCoins(mainCoin: string) {
     switch (mainCoin) {
-      case 'USDT':
-        return USDT_COINS;
+      case 'USD':
+        return USD_COINS;
       case 'ETH':
         return ETH_COINS;
       default:
@@ -69,26 +72,26 @@ export default class BinanceConnection {
     }
   }
 
-  private createIntervals(coin: string) {
-        // Every 10sec we call the volume difference function to calculate posible differences between bids/asks
+  private createIntervals(coin: Coin) {
+    // Every 10sec we call the volume difference function to calculate posible differences between bids/asks
     const updateTime: number = 20 * 1000;
     setInterval(() => {
-      if (this.COINS_ARRAY[coin].actualPrice) {
-        this.COINS_ARRAY[coin].calculateVolumeDifference();
+      if (coin.actualPrice) {
+        coin.calculateVolumeDifference();
         this.refreshTable();
       }
-    },          updateTime);
+    }, updateTime);
   }
   private refreshTable() {
-    const volumeDifferenceTableData = Object.keys(this.COINS_ARRAY)
-            .filter(coinName => this.COINS_ARRAY[coinName].existsVolumeDifference)
-            .map(coinName => this.COINS_ARRAY[coinName].getVolumeProperties());
-    const orderBuyTableData = Object.keys(this.COINS_ARRAY)
-            .filter(coinName => this.COINS_ARRAY[coinName].containsBuyOrders())
-            .map(coinName => this.COINS_ARRAY[coinName].getOrdersProperties('buy'));
-    const orderSellTableData = Object.keys(this.COINS_ARRAY)
-            .filter(coinName => this.COINS_ARRAY[coinName].containsSellOrders())
-            .map(coinName => this.COINS_ARRAY[coinName].getOrdersProperties('sell'));
+    const volumeDifferenceTableData = Object.keys(this.coinsArray)
+            .filter(coinName => this.coinsArray[coinName].existsVolumeDifference)
+            .map(coinName => this.coinsArray[coinName].getVolumeProperties());
+    const orderBuyTableData = Object.keys(this.coinsArray)
+            .filter(coinName => this.coinsArray[coinName].containsBuyOrders())
+            .map(coinName => this.coinsArray[coinName].getOrdersProperties('buy'));
+    const orderSellTableData = Object.keys(this.coinsArray)
+            .filter(coinName => this.coinsArray[coinName].containsSellOrders())
+            .map(coinName => this.coinsArray[coinName].getOrdersProperties('sell'));
     console.clear();
     console.log('');
     console.log('Binance Volume Difference Table Data');
@@ -99,30 +102,32 @@ export default class BinanceConnection {
     console.table(orderSellTableData);
   }
 
-  private createWebSockets(coin: string) {
+  private createWebSockets(coin: Coin) {
         // Gets the last chart price of the coin
-    Binance.websockets.chart(coin, BinanceConnection.TIMES.MIN['15MIN'], (symbol, interval, chart) => {
+    Binance.websockets.chart(coin.symbol, BinanceConnection.TIMES.MIN['15MIN'], (symbol, interval, chart) => {
       const tick = Binance.last(chart);
       const last = chart[tick].close;
-      this.COINS_ARRAY[symbol].actualPrice = parseFloat(last);
-            // Update coin prices.
+      coin.actualPrice = parseFloat(last);
+
+      // Update coin prices.
       const newPrices = [];
       Object.keys(chart).forEach((tick) => {
         const chartTick = chart[tick];
         const price = parseFloat(chartTick.close);
         newPrices.push(price);
       });
+
       if (newPrices.length) {
-        this.COINS_ARRAY[symbol].updatePricesList(newPrices);
+        coin.updatePricesList(newPrices);
       }
 
     });
 
         // Gets the bids/asks for a specific coin
-    Binance.websockets.depthCache([coin], (coinName: string, depth: { bids: any, asks: any }) => {
+    Binance.websockets.depthCache([coin.symbol], (coinName: string, depth: { bids: any, asks: any }) => {
       const buyOrders = Binance.sortBids(depth.bids, BinanceConnection.NUM_NEAR_ORDERS);
       const sellOrders = Binance.sortAsks(depth.asks, BinanceConnection.NUM_NEAR_ORDERS);
-      this.COINS_ARRAY[coinName].updateOrders({ sellOrders, buyOrders });
+      this.coinsArray[coinName].updateOrders({ sellOrders, buyOrders });
     });
 
   }

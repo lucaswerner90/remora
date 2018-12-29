@@ -1,17 +1,17 @@
 {
-    "BTC-USD": {
+    "BTC": {
         "against": "USD",
         "alarm": 100000,
         "name": "BTC",
         "volumeDifference": 50
     },
-    "ETH-USD": {
+    "ETH": {
         "against": "USD",
         "alarm": 100000,
         "name": "ETH",
         "volumeDifference": 50
     },
-    "LTC-USD": {
+    "LTC": {
         "against": "USD",
         "alarm": 100000,
         "name": "LTC",

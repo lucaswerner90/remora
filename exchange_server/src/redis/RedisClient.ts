@@ -32,6 +32,10 @@ export default class RedisClient {
     this.clientPublisher.publish('volume_difference', value);
     this.client.set(key, value);
   }
+  public setLatestPrice(key: string, value: string) {
+    this.clientPublisher.publish('latest_price', value);
+    this.client.set(key, value);
+  }
   public setPricesList(key: string, value: string) {
     this.clientPublisher.publish('price_list', value);
     this.client.set(key, value);

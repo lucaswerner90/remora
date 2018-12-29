@@ -82,6 +82,43 @@ docker swarm init
 docker-compose -f <docker-compose-file> push
 docker stack deploy --compose-file <docker-compose-file> remora
 ```
+### Run only an exchange server
+In order to improve the time of development, you can run a simple docker-compose file and run an exchange server in development mode.
+
+The docker-compose-dev file should look like this:
+
+```sh
+version: "3"
+
+services:
+
+  socketio_1:
+    build: ./socketio
+    hostname: socketio_1
+    restart: always
+    environment:
+      - PORT=4500
+      - REDIS_HOST=redis
+    depends_on: 
+      - redis
+
+  redis:
+    build: ./redis
+    hostname: redis
+    restart: always
+    ports: 
+    - "6379:6379"
+
+```
+So you're only running Redis and SocketIO which are the components needed for the exchange server to run.
+
+Now, you can run:
+
+```sh
+yarn run start-dev
+```
+
+This will run the nodemon package directly from TypeScript. You can compile the code as usual ( using the "compile" or "compile-live" task) before running the server if you want. The default configuration will be taken if you don't specify any.
 
 ### Microservices development
 

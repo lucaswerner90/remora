@@ -9,11 +9,12 @@ interface ICoinWhaleOrder {
 const redis: RedisClient = new RedisClient();
 export default class Coin {
   public actualPrice: number = 0;
+  public symbol: string;
+  private against: string;
   private whaleBuyOrders: ICoinWhaleOrder;
   private whaleSellOrders: ICoinWhaleOrder;
   private currentVolumeDifference: number = 0;
   private exchange: string;
-  private symbol: string;
   private alarm: number;
   private volumeDifference: number;
   private lastBuyVolume: number = 0;
@@ -21,12 +22,19 @@ export default class Coin {
   private orderTendency: string;
   private nearPositionBuy: number;
   private nearPositionSell: number;
-  public redisKeys: { NEAR_BUY_ORDER: string, NEAR_SELL_ORDER: string, PRICES_LIST: string, VOLUME_DIFFERENCE: string };
+  public redisKeys: {
+    NEAR_BUY_ORDER: string,
+    NEAR_SELL_ORDER: string,
+    PRICES_LIST: string,
+    VOLUME_DIFFERENCE: string,
+    LATEST_PRICE: string,
+  };
   public pricesList: any = { prices: [], time: [] };
   public existsVolumeDifference: boolean;
 
-  constructor(name: string = '', symbol: string = '', url: string = '', alarm: number = 0, against: string = '', volumeDifference: number = 0, exchange: string = '') {
+  constructor(symbol: string = '', { alarm = 0, volumeDifference = 0 , against = 'USD' }, exchange: string = '') {
     this.symbol = symbol;
+    this.against = against;
     this.alarm = alarm;
     this.exchange = exchange;
     this.volumeDifference = volumeDifference;
@@ -34,20 +42,21 @@ export default class Coin {
     this.whaleSellOrders = {};
 
     this.redisKeys = {
-      NEAR_BUY_ORDER: `${this.exchange}_${this.symbol}_buy_near_order`,
-      NEAR_SELL_ORDER: `${this.exchange}_${this.symbol}_sell_near_order`,
-      PRICES_LIST: `${this.exchange}_${this.symbol}_prices_list`,
-      VOLUME_DIFFERENCE: `${this.exchange}_${this.symbol}_volume_difference`,
+      NEAR_BUY_ORDER: `${this.exchange}_${this.symbol}${this.against}_buy_near_order`,
+      NEAR_SELL_ORDER: `${this.exchange}_${this.symbol}${this.against}_sell_near_order`,
+      PRICES_LIST: `${this.exchange}_${this.symbol}${this.against}_prices_list`,
+      LATEST_PRICE: `${this.exchange}_${this.symbol}${this.against}_latest_price`,
+      VOLUME_DIFFERENCE: `${this.exchange}_${this.symbol}${this.against}_volume_difference`,
     };
   }
 
   /**
    * Updates the prices list for the coin and updates the Redis key that contains the list
    *
-   * @param {*} {prices,time}
+   * @param {[]} {prices}
    * @memberof Coin
    */
-  updatePricesList(prices = []) {
+  public updatePricesList(prices: number[] = []) {
     this.pricesList = prices;
     // Set the new value for the redis key's last order
     const redisValue = JSON.stringify({ symbol: this.symbol, exchange: this.exchange, prices: this.pricesList });

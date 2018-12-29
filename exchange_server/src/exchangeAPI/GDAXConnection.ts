@@ -2,7 +2,7 @@ import * as GDAX from 'gdax';
 import Coin from '../coin/Coin';
 
 // Load the coins config
-const USD_COINS = require('../../../config/exchanges/gdax/coins_usd.json');
+const USD_COINS = require('../../config/exchanges/gdax/coins_usd.json');
 
 interface ICoinsArray {
   [propName: string]: Coin;
@@ -17,36 +17,36 @@ interface ICoinProperties {
 
 export default class GDAXConnection {
 
-  private COINS_ARRAY: ICoinsArray = {};
-  private static GDAXClient = new GDAX.PublicClient();
-  private static MAIN_COIN: string = 'USDT';
-  constructor(mainCoin: string = 'USDT') {
+  private coinsArray: ICoinsArray = {};
+  private exchangeAPIClient = new GDAX.PublicClient();
+  private mainCoin: string = 'USD';
+  private _coinsList: ICoinProperties[];
 
-    GDAXConnection.MAIN_COIN = mainCoin;
+  constructor(mainCoin: string = 'USD') {
+    this.mainCoin = mainCoin;
     // Get the specific coins for the server instance
-    const listOfCoins = this.getCoins(GDAXConnection.MAIN_COIN);
+    this.coinsList = this.getCoins(this.mainCoin);
+  }
 
+  private set coinsList(newValue: ICoinProperties[]) {
+    this._coinsList = newValue;
     // Once we have the coins for the instance we need to initialize both the coin object and the websockets associated to it
-    Object.keys(listOfCoins).forEach((coin: string) => {
-      this.createCoinConfiguration(coin);
+    Object.keys(this._coinsList).forEach((coin: string) => {
+      this.createCoinConfiguration(coin, this._coinsList[coin]);
     });
-
   }
   /**
    *
-   * Init the coin configuration. Open websockets, add it to COINS_ARRAY.
+   * Init the coin configuration. Open websockets, add it to coinsArray.
    *
    * @private
    * @param {string} [coin=""]
    * @memberof GDAXConnection
    */
-  private createCoinConfiguration(coin: string = '') {
-    const coinProperties: ICoinProperties = this.getCoins(GDAXConnection.MAIN_COIN)[coin];
-    const coinURL = `https://pro.coinbase.com/trade/${coinProperties.name}-${coinProperties.against}`;
-
-    this.COINS_ARRAY[coin] = new Coin(coinProperties.name, coin, coinURL, coinProperties.alarm, coinProperties.against, coinProperties.volumeDifference, 'gdax');
-    this.createWebSockets(coin);
-    this.createIntervals(coin);
+  private createCoinConfiguration(coin: string = '', coinProperties: ICoinProperties) {
+    this.coinsArray[coin] = new Coin(coin, coinProperties, 'gdax');
+    this.createCoinWebSockets(this.coinsArray[coin]);
+    this.createCoinIntervals(this.coinsArray[coin]);
   }
   /**
    *
@@ -55,7 +55,7 @@ export default class GDAXConnection {
    * @returns
    * @memberof GDAXConnection
    */
-  public getCoins(mainCoin: string) {
+  private getCoins(mainCoin: string): ICoinProperties[] {
     switch (mainCoin) {
       case 'USD':
         return USD_COINS;
@@ -64,61 +64,85 @@ export default class GDAXConnection {
     }
   }
 
-  private createIntervals(coin: string) {
-    // Every 10sec we call the volume difference function to calculate posible differences between bids/asks
+  private createCoinIntervals(coin: Coin) {
     const updateTime: number = 20 * 1000;
-    setInterval(() => {
-      if (this.COINS_ARRAY[coin].actualPrice) {
-        this.COINS_ARRAY[coin].calculateVolumeDifference();
+    return setInterval(() => {
+      if (coin.actualPrice) {
+        coin.calculateVolumeDifference();
       }
     }, updateTime);
   }
 
-  private createWebSockets(coin: string) {
-    // Gets the last chart price of the coin
-    setInterval(() => {
-      /**
-       * Example of response from getProductHistoricRates
-       *
-       *  [
-              [ time, low, high, open, close, volume ],
-              [ 1415398768, 0.32, 4.2, 0.35, 4.2, 12.3 ],
-              ...
-          ]
-       *
-      */
-      GDAXConnection.GDAXClient.getProductHistoricRates(coin, { granularity: GDAXConnection.TIMES['5MIN'] }, (error, response, data) => {
-        if (data && data.length) {
-          this.COINS_ARRAY[coin].actualPrice = parseFloat(data[0][4]);
-          const historicalDate = data.slice(1).reverse();
+  /**
+   *
+   *
+   * @private
+   * @param {string} coin
+   * @memberof GDAXConnection
+   */
+  private createCoinWebSockets(coin: Coin) {
+    const updateTime: number = 5 * 1000;
+    this.createPricesListInterval(coin, updateTime);
+    this.createOrderBookInterval(coin, updateTime);
+  }
 
+  /**
+   *
+   * Example of response from getProductHistoricRates
+      [
+          [ time, low, high, open, close, volume ],
+          [ 1415398768, 0.32, 4.2, 0.35, 4.2, 12.3 ],
+          ...
+      ]
+   * @private
+   * @param {string} coin
+   * @param {number} updateTime
+   * @returns
+   * @memberof GDAXConnection
+   */
+  private createPricesListInterval(coin: Coin, updateTime: number) {
+    const chartPriceConfig = { granularity: GDAXConnection.TIMES['5MIN'] };
+    // Gets the last chart price of the coin
+    return setInterval(() => {
+      this.exchangeAPIClient.getProductHistoricRates(coin.symbol, chartPriceConfig, (error, response, data) => {
+        if (data && data.length) {
+          coin.actualPrice = parseFloat(data[0][4]);
+          const historicalDate = data.slice(1).reverse();
           // Create the price list
-          // tslint:disable-next-line:ter-arrow-parens
-          const newPrices = historicalDate.map((chartTick) => chartTick[4]);
-          this.COINS_ARRAY[coin].updatePricesList(newPrices);
+          const newPrices = historicalDate.map(chartTick => chartTick[4]);
+          coin.updatePricesList(newPrices);
         }
       });
-    }, 20 * 1000);
+    }, updateTime);
+  }
 
-    /**
-     *
-     * Get the coin orders.
-     *
-     * We need to send two objects:
-     * - One contains the sell orders
-     * - The other contains the buy orders
-     *
-     * The key for those objects NEEDS to be a number that indicates the price of the order
-     * The value MUST be the quantity of the COIN that belongs to the order
-     *
-     * Example:
-     *  This is an order that says: At price 7000 I want to sell 30 coins.
-     *  sellOrders[7000] = 30
-     *
-     *  The amount involved in that order is calculated that way: 7000 * 30 ---> 210.000 (WHALE ORDER)
-     * */
-    setInterval(() => {
-      GDAXConnection.GDAXClient.getProductOrderBook(coin, { level: 2 }, (error, response, data) => {
+  /**
+  *
+  *
+  * Get the coin orders.
+  *
+  * We need to send two objects:
+  * - One contains the sell orders
+  * - The other contains the buy orders
+  *
+  * The key for those objects NEEDS to be a number that indicates the price of the order
+  * The value MUST be the quantity of the COIN that belongs to the order
+  *
+  * Example:
+  *  This is an order that says: At price 7000 I want to sell 30 coins.
+  *  sellOrders[7000] = 30
+  *
+  *  The amount involved in that order is calculated that way: 7000 * 30 ---> 210.000 (WHALE ORDER)
+  * @private
+  * @param {string} coin
+  * @param {number} updateTime
+  * @returns
+  * @memberof GDAXConnection
+  */
+  private createOrderBookInterval(coin: Coin, updateTime: number) {
+    const orderBookConfig = { level: 2 };
+    return setInterval(() => {
+      this.exchangeAPIClient.getProductOrderBook(coin.symbol, orderBookConfig, (error, response, data) => {
         if (data) {
           const buyOrders = {};
           const sellOrders = {};
@@ -135,12 +159,11 @@ export default class GDAXConnection {
             buyOrders[price] = size;
           }
           if (Object.keys(buyOrders).length && Object.keys(sellOrders).length) {
-            this.COINS_ARRAY[coin].updateOrders({ sellOrders, buyOrders });
+            coin.updateOrders({ sellOrders, buyOrders });
           }
         }
       });
-    }, 3000);
-
+    }, updateTime);
   }
 
   static get TIMES() {
