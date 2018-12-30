@@ -1,14 +1,17 @@
 import * as redis from 'redis';
-import { Express, Application } from 'express';
+import * as express from 'express';
+import * as socketIo from 'socket.io';
 
+const configJson = require('./../config/config.json');
 const PORT:number = parseInt(process.env.PORT) || 4500;
 
 const REDIS_CONFIGURATION = {
   host: process.env.REDIS_HOST || 'localhost',
-    // tslint:disable-next-line:radix
   port: parseInt(process.env.REDIS_PORT) || 6379,
 };
 
+const app: express.Express = express();
+const server = app.listen(PORT);
 /**
  *
  *
@@ -22,7 +25,7 @@ class SocketIOServer {
    * @private
    * @memberof SocketIOServer
    */
-  private ioServer;
+  private ioServer = socketIo.listen(server);
 
   /**
    *
@@ -32,39 +35,42 @@ class SocketIOServer {
    * @memberof SocketIOServer
    */
   private redisSubscriber: redis.RedisClient = redis.createClient(REDIS_CONFIGURATION);
+
+  private channelList: string[] = configJson.channelList;
+
   constructor() {
-    const express: Express = require('express');
-    const app: Application = express();
-    const server = app.listen(PORT);
-    this.ioServer = require('socket.io').listen(server);
     this.initConnection();
     this.initRedisSubscriber();
   }
+
   private initRedisSubscriber() {
-    this.redisSubscriber.on('ready', () => {
-      console.log('SocketIO redis publisher has been connected! :D ');
-    });
 
-    this.redisSubscriber.on('message', (channel, message) => {
-      const messageParsed = JSON.parse(message);
-      if (messageParsed.exchange) {
-        const finalChannel = `${messageParsed.exchange}_${channel}`;
-        this.ioServer.sockets.emit(finalChannel, messageParsed);
-      } else {
-        this.ioServer.sockets.emit(channel, messageParsed);
-      }
-    });
+    this.redisSubscriber.on('ready', this.redisOnConnect.bind(this));
+    this.redisSubscriber.on('message', this.redisOnMessage.bind(this));
 
-    this.redisSubscriber.subscribe('new_order');
-    this.redisSubscriber.subscribe('volume_difference');
-    this.redisSubscriber.subscribe('price_list');
-    this.redisSubscriber.subscribe('last_news');
+    for (let i = 0; i < this.channelList.length; i++) {
+      this.redisSubscriber.subscribe(this.channelList[i]);
+    }
   }
   private initConnection() {
     console.log(`Listening on port: ${PORT}`);
     this.ioServer.on('connection', () => {
       console.log('New connection detected!');
     });
+  }
+
+  private redisOnConnect() {
+    console.log('SocketIO redis publisher has been connected! :D ');
+  }
+
+  private redisOnMessage(channel:string, message:string) {
+    const messageParsed = JSON.parse(message);
+    if (messageParsed.exchange) {
+      const finalChannel = `${messageParsed.exchange}_${channel}`;
+      this.ioServer.sockets.emit(finalChannel, messageParsed);
+    } else {
+      this.ioServer.sockets.emit(channel, messageParsed);
+    }
   }
 }
 

@@ -10,9 +10,11 @@
   },
   "devDependencies": {
     "@types/chai": "^4.1.6",
+    "@types/express": "^4.16.0",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.11.7",
     "@types/redis": "^2.8.7",
+    "@types/socket.io": "^2.1.2",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
     "nodemon": "^1.18.9",
@@ -24,8 +26,9 @@
   },
   "scripts": {
     "start": "node ./dist/index.js",
+    "start-dev": "nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
     "lint": "./node_modules/.bin/tslint -p tsconfig.json",
     "compile": "./node_modules/.bin/tsc",
-    "compile-server": "./node_modules/.bin/tsc --watch"
+    "compile-live": "./node_modules/.bin/tsc --watch"
   }
 }
