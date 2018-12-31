@@ -18,10 +18,10 @@ export default class Coin {
   private _lastBuyVolume: number = 0;
   private _lastSellVolume: number = 0;
   private _priceChange24hr: number = -1;
-  private _against: string;
+  // private _against: string;
   constructor(symbol: string = '', { alarm = { order : 0, volume : 0 } }, against = 'USD', exchange: string = '') {
     this.symbol = symbol;
-    this._against = against;
+    // this._against = against;
     this._alarm = alarm;
     this._exchange = exchange;
 
