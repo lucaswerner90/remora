@@ -26,16 +26,22 @@ export default class Coin {
     this._exchange = exchange;
 
     this._redisKeys = {
-      NEAR_BUY_ORDER: `${this.exchange}_${this.symbol}_${this._against}_buy_near_order`,
-      NEAR_SELL_ORDER: `${this.exchange}_${this.symbol}_${this._against}_sell_near_order`,
-      PRICES_LIST: `${this.exchange}_${this.symbol}_${this._against}_prices_list`,
-      LATEST_PRICE: `${this.exchange}_${this.symbol}_${this._against}_latest_price`,
-      VOLUME_DIFFERENCE: `${this.exchange}_${this.symbol}_${this._against}_volume_difference`,
+      NEAR_BUY_ORDER: `${this.exchange}_${this.symbol}_buy_near_order`,
+      NEAR_SELL_ORDER: `${this.exchange}_${this.symbol}_sell_near_order`,
+      PRICES_LIST: `${this.exchange}_${this.symbol}_prices_list`,
+      LATEST_PRICE: `${this.exchange}_${this.symbol}_latest_price`,
+      VOLUME_DIFFERENCE: `${this.exchange}_${this.symbol}_volume_difference`,
+      PRICE_CHANGE_24HR: `${this.exchange}_${this.symbol}_price_change_24hr`,
     };
+  }
+  public get id() {
+    return `${this.symbol}_${this.exchange}`;
   }
   public set priceChange24hr(newValue:number) {
     if (!isNaN(newValue) && isFinite(newValue)) {
       this._priceChange24hr = newValue;
+      const redisValue = JSON.stringify({ symbol: this.symbol, exchange: this.exchange, price: this._priceChange24hr });
+      redis.setPriceChange(this._redisKeys.PRICE_CHANGE_24HR, redisValue);
     }
   }
 
@@ -74,7 +80,7 @@ export default class Coin {
   public set actualPrice(newValue: number) {
     if (newValue > 0) {
       this._actualPrice = newValue;
-      const redisValue = JSON.stringify({ symbol: this.symbol, exchange: this.exchange, price: this._actualPrice });
+      const redisValue = JSON.stringify({ id: this.id, symbol: this.symbol, exchange: this.exchange, price: this._actualPrice });
       redis.setLatestPrice(this._redisKeys.LATEST_PRICE, redisValue);
     }
   }
@@ -92,7 +98,7 @@ export default class Coin {
   public set pricesList(prices: TPricesList) {
     this._pricesList = prices;
     // Set the new value for the redis key's last order
-    const redisValue = JSON.stringify({ symbol: this.symbol, exchange: this.exchange, prices: this._pricesList });
+    const redisValue = JSON.stringify({ id: this.id, symbol: this.symbol, exchange: this.exchange, prices: this._pricesList });
     redis.setPricesList(this._redisKeys.PRICES_LIST, redisValue);
   }
 
@@ -288,15 +294,16 @@ export default class Coin {
 
   public getVolumeProperties() {
     return {
+      id: this.id,
       exchange: this.exchange,
       actualPrice: this.actualPrice,
-      name: this.symbol,
+      symbol: this.symbol,
       tendency: this.tendency,
       currentVolumeDifference: this._currentVolumeDifference,
     };
   }
 
-  public getOrdersProperties(type = 'buy') {
+  public getOrdersProperties(type: 'buy' | 'sell' = 'buy') {
     const orderInfo: any = {};
     orderInfo.name = this.symbol;
     orderInfo.exchange = this.exchange;

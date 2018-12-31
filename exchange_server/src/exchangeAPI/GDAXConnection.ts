@@ -41,7 +41,7 @@ export default class GDAXConnection extends ExchangeConnection{
   private exchangeAPIClient: GDAX.PublicClient;
 
   constructor(mainCoin: string = 'USD') {
-    super(mainCoin, 'GDAX');
+    super(mainCoin, 'gdax');
   }
 
   /**
