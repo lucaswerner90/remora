@@ -18,10 +18,10 @@ export default class Coin {
   private _lastBuyVolume: number = 0;
   private _lastSellVolume: number = 0;
   private _priceChange24hr: number = -1;
-  // private _against: string;
+  private _against: string;
   constructor(symbol: string = '', { alarm = { order : 0, volume : 0 } }, against = 'USD', exchange: string = '') {
     this.symbol = symbol;
-    // this._against = against;
+    this._against = against;
     this._alarm = alarm;
     this._exchange = exchange;
 
@@ -33,6 +33,9 @@ export default class Coin {
       VOLUME_DIFFERENCE: `${this.exchange}_${this.symbol}_volume_difference`,
       PRICE_CHANGE_24HR: `${this.exchange}_${this.symbol}_price_change_24hr`,
     };
+  }
+  public get against() {
+    return this._against;
   }
   public get id() {
     return `${this.symbol}_${this.exchange}`;
