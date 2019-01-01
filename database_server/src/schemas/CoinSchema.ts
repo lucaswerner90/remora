@@ -6,21 +6,26 @@ const MongoSchema = mongoose.Schema;
 const schema = {
   _id: {
     type: String,
-    required:true,
+    required: true,
+    default: '',
   },
   symbol: {
     type: String,
     required: true,
+    default: '',
   },
   exchange: {
     type: String,
     required: true,
+    enum: ['binance', 'gdax'],
   },
   price: {
     type: Number,
     min: 0,
   },
-  listOfPrices: [Number],
+  listOfPrices: {
+    type: [Number],
+  },
   tendency: {
     type: String,
     enum: ['buy', 'sell'],
@@ -31,7 +36,7 @@ const schema = {
 };
 
 export default class CoinSchema extends Schema{
-  private static model = mongoose.model('coinModel', new MongoSchema(schema));
+  private static model = mongoose.model('coinModel', new MongoSchema(schema, { versionKey: false }));
   constructor(channel: string, message: {}) {
     super(channel, message);
     this.writeToDB();
