@@ -8,7 +8,10 @@
     "express-graphql": "^0.6.12",
     "fast-json-stringify": "^1.9.1",
     "graphql": "^14.0.2",
+    "graphql-yoga": "^1.16.9",
     "newsapi": "^2.4.0",
+    "prisma": "^1.23.2",
+    "prisma-client-lib": "^1.23.2",
     "redis": "^2.8.0"
   },
   "devDependencies": {
