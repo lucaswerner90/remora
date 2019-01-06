@@ -4,23 +4,40 @@ services:
 
 
 
-  socketio_1:
-    build: ./socketio
-    hostname: socketio_1
-    restart: always
-    environment:
-      - PORT=4500
-      - REDIS_HOST=redis
-    depends_on: 
-      - redis
+  # socketio_1:
+  #   build: ./socketio
+  #   hostname: socketio_1
+  #   restart: always
+  #   environment:
+  #     - PORT=4500
+  #     - REDIS_HOST=redis
+  #   depends_on: 
+  #     - redis
+  #   ports:
+  #     - "4500:4500"
 
   redis:
-    build: ./redis
+    build: ./microservices/redis
     hostname: redis
     restart: always
     ports: 
     - "6379:6379"
-
+  
+  # EXECUTE BINANCE SERVER FOR USDT
+  binance_exchange_usd:
+    build: ./microservices/exchange_server
+    hostname: binance_exchange_usd
+    restart: always
+    environment:
+      - PORT=8001
+      - DEDICATED_TO=BINANCE
+      - MAIN_COIN=USD
+      - REDIS_HOST=redis
+      - NODE_ENV=production
+    depends_on:
+      - redis
+    links:
+      - redis
   # mongodb:
   #   image: mongo
   #   restart: always
@@ -28,21 +45,23 @@ services:
   #     MONGO_INITDB_ROOT_USERNAME: root
   #     MONGO_INITDB_ROOT_PASSWORD: example
   #     MONGO_INITDB_DATABASE: REMORA
+  #   ports: 
+  #     - "27017:27017"
   #   volumes: 
   #     - ./mongodb/data:/data/db
 
   # EXECUTE GDAX SERVER FOR USD
-  # gdax_exchange_usd:
-  #   build: ./exchange_server
-  #   hostname: gdax_exchange_usd
-  #   restart: always
-  #   environment:
-  #     - PORT=8202
-  #     - DEDICATED_TO=GDAX
-  #     - MAIN_COIN=USD
-  #     - REDIS_HOST=redis
-  #     - NODE_ENV=production
-  #   depends_on:
-  #     - redis
-  #   links:
-  #     - redis
+  gdax_exchange_usd:
+    build: ./microservices/exchange_server
+    hostname: gdax_exchange_usd
+    restart: always
+    environment:
+      - PORT=8202
+      - DEDICATED_TO=GDAX
+      - MAIN_COIN=USD
+      - REDIS_HOST=redis
+      - NODE_ENV=production
+    depends_on:
+      - redis
+    links:
+      - redis

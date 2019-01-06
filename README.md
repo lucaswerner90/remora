@@ -27,6 +27,8 @@ REMORA uses a number of open source projects to work properly (and we try to be 
 * [TSLint](https://palantir.github.io/tslint/)
 * [Yarn](https://yarnpkg.com/)
 * [React](https://reactjs.org/)
+* [NextJS](https://nextjs.org)
+* [MongoDB](https://mongodb.com)
 
 ## Development
 
@@ -282,10 +284,21 @@ docker-compose -f docker-compose-dev.yml restart <container_name>
 * Docker Swarm:
     * https://www.youtube.com/watch?v=m6WgX_LBtEk
     * https://github.com/tsmean/docker-tutorial/tree/master/4_docker-swarm-and-stack
-
-
+* ReactJS:
+    * https://www.youtube.com/watch?v=sBws8MSXN7A&t=5030s
+* NodeJS with Passport:
+    * https://www.youtube.com/watch?v=6FOq4cUdH8k
+* MongoDB:
+    * https://www.youtube.com/watch?v=pWbMrx5rVBE
+* ReactJS & GraphQL:
+    * https://www.youtube.com/watch?v=SEMTj8w04Z8&list=PLillGF-RfqbZrjw48EXLdM4dsOhURCLZx
+* ApexCharts:
+    * https://www.youtube.com/watch?v=JxEyXOlSgV0
+* Redux with React:
+    * https://www.youtube.com/watch?v=93p3LxR9xfM
 ## Continuous Development / Continuous integration
 
+### To production
 Honestly, nobody wants to reset the servers everytime we need to update the application, and we know that, so in order to be able to provide a simple pipeline for all developers there's a file that does all that magic for us:
 
 [Link to the Pipelines section in Gitlab](https://gitlab.com/lucaswerner90/REMORA/pipelines)
