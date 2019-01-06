@@ -314,9 +314,10 @@ export default class Coin {
     switch (type) {
       case 'buy':
         if (this.nearPositionBuy) {
-          const { id, quantity, createdAt, lastPosition } = this.whaleOrders.buy[this.nearPositionBuy].toJSON();
+          const { id, quantity, createdAt, lastPosition, type } = this.whaleOrders.buy[this.nearPositionBuy].toJSON();
           orderInfo.id = id;
           orderInfo.details = {
+            type,
             createdAt,
             quantity: Math.round(quantity),
             price: this.nearPositionBuy,

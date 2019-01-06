@@ -65,11 +65,20 @@ class SocketIOServer {
 
   private redisOnMessage(channel:string, message:string) {
     const messageParsed = JSON.parse(message);
+    messageParsed.type = channel;
+
     if (messageParsed.exchange) {
-      const finalChannel = `${messageParsed.exchange}_${channel}`;
+      const finalChannel = `${messageParsed.exchange}_${messageParsed.symbol || messageParsed.name}`;
+
+      // In order to not to send unnecesary information, we just delete the following properties
+      // as the client doesn't need them
+      messageParsed.name = undefined;
+      messageParsed.symbol = undefined;
+      messageParsed.id = undefined;
+      messageParsed.exchange = undefined;
+
       this.ioServer.sockets.emit(finalChannel, messageParsed);
-    } else {
-      this.ioServer.sockets.emit(channel, messageParsed);
+      this.ioServer.sockets.emit(messageParsed.exchange, messageParsed);
     }
   }
 }
