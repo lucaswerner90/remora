@@ -3,10 +3,10 @@ import * as express from 'express';
 import * as socketIo from 'socket.io';
 
 const configJson = require('./../config/config.json');
-const PORT:number = parseInt(process.env.PORT) || 4500;
+const PORT:number = parseInt(process.env.PORT) || 5000;
 
 const REDIS_CONFIGURATION = {
-  host: process.env.REDIS_HOST || 'localhost',
+  host: 'redis',
   port: parseInt(process.env.REDIS_PORT) || 6379,
 };
 
@@ -70,15 +70,9 @@ class SocketIOServer {
     if (messageParsed.exchange) {
       const finalChannel = `${messageParsed.exchange}_${messageParsed.symbol || messageParsed.name}`;
 
-      // In order to not to send unnecesary information, we just delete the following properties
-      // as the client doesn't need them
-      messageParsed.name = undefined;
-      messageParsed.symbol = undefined;
-      messageParsed.id = undefined;
-      messageParsed.exchange = undefined;
-
       this.ioServer.sockets.emit(finalChannel, messageParsed);
       this.ioServer.sockets.emit(messageParsed.exchange, messageParsed);
+      this.ioServer.sockets.emit(`${messageParsed.exchange}_${messageParsed.type}`, messageParsed);
     }
   }
 }

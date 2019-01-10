@@ -42,7 +42,9 @@ export default class OrderSchema extends Schema{
   private static model = mongoose.model('orderModel', new MongoSchema(schema, { versionKey: false }));
   constructor(channel:string, message:string) {
     super(channel, message);
-    this.writeToDB();
+    if (this.info) {
+      this.writeToDB();
+    }
   }
 
   writeToDB() {

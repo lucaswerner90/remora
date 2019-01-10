@@ -2,7 +2,7 @@ FROM node:alpine
 
 WORKDIR /
 RUN apk update && apk upgrade && \
-  apk add --no-cache bash git openssh
+    apk add --no-cache bash git openssh
 
 COPY . .
 
@@ -10,4 +10,4 @@ COPY . .
 RUN yarn
 RUN yarn run lint
 RUN yarn run compile
-CMD yarn start
+CMD yarn run start

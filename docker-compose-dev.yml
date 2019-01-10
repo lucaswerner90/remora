@@ -2,66 +2,58 @@ version: "3"
 
 services:
 
-
-
-  # socketio_1:
-  #   build: ./socketio
-  #   hostname: socketio_1
-  #   restart: always
-  #   environment:
-  #     - PORT=4500
-  #     - REDIS_HOST=redis
-  #   depends_on: 
-  #     - redis
-  #   ports:
-  #     - "4500:4500"
-
   redis:
     build: ./microservices/redis
-    hostname: redis
     restart: always
     ports: 
-    - "6379:6379"
-  
-  # EXECUTE BINANCE SERVER FOR USDT
+      - "6379"
+
   binance_exchange_usd:
     build: ./microservices/exchange_server
-    hostname: binance_exchange_usd
     restart: always
     environment:
-      - PORT=8001
-      - DEDICATED_TO=BINANCE
+      - DEDICATED_TO=binance
       - MAIN_COIN=USD
-      - REDIS_HOST=redis
-      - NODE_ENV=production
+      - NODE_ENV=dev
+    command: yarn run start-dev
+    volumes:
+      - ./microservices/exchange_server/src:/src
+    ports:
+      - "7000"
     depends_on:
       - redis
-    links:
-      - redis
-  # mongodb:
-  #   image: mongo
-  #   restart: always
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: root
-  #     MONGO_INITDB_ROOT_PASSWORD: example
-  #     MONGO_INITDB_DATABASE: REMORA
-  #   ports: 
-  #     - "27017:27017"
-  #   volumes: 
-  #     - ./mongodb/data:/data/db
 
-  # EXECUTE GDAX SERVER FOR USD
-  gdax_exchange_usd:
-    build: ./microservices/exchange_server
-    hostname: gdax_exchange_usd
+  socketio:
+    build: ./microservices/socketio
     restart: always
-    environment:
-      - PORT=8202
-      - DEDICATED_TO=GDAX
-      - MAIN_COIN=USD
-      - REDIS_HOST=redis
-      - NODE_ENV=production
+    command: yarn run start-dev
+    volumes:
+      - ./microservices/socketio/src:/src
+    ports:
+      - "5000"
     depends_on:
       - redis
-    links:
+  
+  # EXECUTE DATABASE SERVER FOR BINANCE
+  database_binance:
+    build: ./microservices/database_server
+    restart: always
+    command: yarn run start-dev
+    volumes:
+      - ./microservices/database_server/src:/src
+    environment:
+      - EXCHANGE=binance
+      - NODE_ENV=dev
+    depends_on:
       - redis
+
+  nginx:
+    build: ./microservices/nginx
+    volumes: 
+      - ./microservices/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./microservices/nginx/static:/var/www
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on: 
+      - socketio

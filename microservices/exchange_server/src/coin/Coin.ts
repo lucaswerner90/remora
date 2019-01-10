@@ -43,7 +43,7 @@ export default class Coin {
   public set priceChange24hr(newValue:number) {
     if (!isNaN(newValue) && isFinite(newValue)) {
       this._priceChange24hr = newValue;
-      const redisValue = JSON.stringify({ symbol: this.symbol, exchange: this.exchange, price: this._priceChange24hr });
+      const redisValue = JSON.stringify({ id: this.id, symbol: this.symbol, exchange: this.exchange, price: this._priceChange24hr });
       redis.setPriceChange(this._redisKeys.PRICE_CHANGE_24HR, redisValue);
     }
   }
@@ -99,7 +99,7 @@ export default class Coin {
    * @memberof Coin
    */
   public set pricesList(prices: TPricesList) {
-    this._pricesList = prices;
+    this._pricesList = prices.splice(prices.length - 100, prices.length - 1);
     // Set the new value for the redis key's last order
     const redisValue = JSON.stringify({ id: this.id, symbol: this.symbol, exchange: this.exchange, prices: this._pricesList });
     redis.setPricesList(this._redisKeys.PRICES_LIST, redisValue);
@@ -121,7 +121,6 @@ export default class Coin {
       for (const [_price, _properties] of Object.entries(newOrdersArray.orders)) {
         const price: any = _price;
         const properties: any = _properties;
-
         if (!whaleOrdersArray[price]) {
           // If the order doesn't exist previously, we create a new one.
           whaleOrdersArray[price] = new Order(this, type, parseFloat(properties.value), properties.position);
@@ -133,6 +132,7 @@ export default class Coin {
           // Right now, we're not interested in the current order position but we could use it in a future
           if (properties.position !== whaleOrdersArray[price].lastPosition) {
             whaleOrdersArray[price].lastPosition = properties.position;
+            hasBeenModified = true;
           }
           if (Math.round(properties.value) !== Math.round(whaleOrdersArray[price].quantity)) {
             whaleOrdersArray[price].quantity = Math.round(properties.value);
@@ -170,7 +170,6 @@ export default class Coin {
     // Detect possible whale orders
     const newBuyOrders = this._detectWhaleOrders(buyOrders);
     const newSellOrders = this._detectWhaleOrders(sellOrders);
-
     // Assign the coin volume for both buy and sell orders
     this._lastBuyVolume = newBuyOrders.sumVolume;
     this._lastSellVolume = newSellOrders.sumVolume;
@@ -205,21 +204,36 @@ export default class Coin {
    * @memberof Coin
    */
   private updateNearOrders() {
+
     if (this.containsBuyOrders()) {
-      this.nearPositionBuy = Math.max(...Object.keys(this.whaleOrders.buy).map(key => parseFloat(key)));
+      const validKeys = Object.keys(this.whaleOrders.buy)
+        .map(key => parseFloat(key))
+        .filter(key => key <= this.actualPrice);
+      const newPosition = Math.max(...validKeys);
+      this.nearPositionBuy = newPosition;
+    } else {
+      this.nearPositionBuy = -1;
     }
+
     if (this.containsSellOrders()) {
-      this.nearPositionSell = Math.min(...Object.keys(this.whaleOrders.sell).map(key => parseFloat(key)));
+      const validKeys = Object.keys(this.whaleOrders.sell)
+        .map(key => parseFloat(key))
+        .filter(key => key >= this.actualPrice);
+      this.nearPositionSell = Math.min(...validKeys);
+    } else {
+      this.nearPositionSell = -1;
     }
   }
 
   public set nearPositionSell(newValue: number) {
-    if (newValue > -1) {
-      this._nearPositionSell = newValue;
+    this._nearPositionSell = newValue;
+    if (newValue > -1 && this.whaleOrders.sell[this.nearPositionSell]) {
       if (this.whaleOrders.sell[this.nearPositionSell].toJSON) {
         const redisValue = JSON.stringify(this.getOrdersProperties('sell'));
         redis.setOrderValue(this._redisKeys.NEAR_SELL_ORDER, redisValue);
       }
+    } else {
+      redis.setOrderValue(this._redisKeys.NEAR_SELL_ORDER, JSON.stringify({}));
     }
   }
   public get nearPositionSell(): number {
@@ -227,12 +241,14 @@ export default class Coin {
   }
 
   public set nearPositionBuy(newValue: number) {
-    if (newValue > -1) {
-      this._nearPositionBuy = newValue;
+    this._nearPositionBuy = newValue;
+    if (newValue > -1 && this.whaleOrders.buy[this.nearPositionBuy]) {
       if (this.whaleOrders.buy[this.nearPositionBuy].toJSON) {
         const redisValue = JSON.stringify(this.getOrdersProperties('buy'));
         redis.setOrderValue(this._redisKeys.NEAR_BUY_ORDER, redisValue);
       }
+    } else {
+      redis.setOrderValue(this._redisKeys.NEAR_BUY_ORDER, JSON.stringify({}));
     }
   }
   public get nearPositionBuy(): number {
@@ -313,7 +329,7 @@ export default class Coin {
     orderInfo.type = type;
     switch (type) {
       case 'buy':
-        if (this.nearPositionBuy) {
+        if (this.nearPositionBuy > 0) {
           const { id, quantity, createdAt, lastPosition, type } = this.whaleOrders.buy[this.nearPositionBuy].toJSON();
           orderInfo.id = id;
           orderInfo.details = {
@@ -329,10 +345,11 @@ export default class Coin {
         break;
 
       default:
-        if (this.nearPositionSell) {
+        if (this.nearPositionSell > 0) {
           const { id, quantity, createdAt, lastPosition } = this.whaleOrders.sell[this.nearPositionSell].toJSON();
           orderInfo.id = id;
           orderInfo.details = {
+            type,
             createdAt,
             quantity: Math.round(quantity),
             price: this.nearPositionSell,
@@ -347,12 +364,12 @@ export default class Coin {
     return orderInfo;
   }
   public containsOrders() {
-    return Object.keys(this.whaleOrders.buy).length || Object.keys(this.whaleOrders.sell).length;
+    return this.containsBuyOrders() || this.containsSellOrders();
   }
   public containsBuyOrders() {
-    return Object.keys(this.whaleOrders.buy).length;
+    return Object.keys(this.whaleOrders.buy).length > 0;
   }
   public containsSellOrders() {
-    return Object.keys(this.whaleOrders.sell).length;
+    return Object.keys(this.whaleOrders.sell).length > 0;
   }
 }

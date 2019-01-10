@@ -6,7 +6,7 @@ import MongoConnection from './db/MongoConnection';
 const configJson = require('./../config/config.json');
 
 const REDIS_CONFIGURATION = {
-  host: process.env.REDIS_HOST || 'localhost',
+  host: 'redis',
   port: parseInt(process.env.REDIS_PORT) || 6379,
 };
 
@@ -38,7 +38,6 @@ class DBServerConnection {
   private redisOnMessage(channel: string, message: string) {
     const messageParsed = JSON.parse(message);
     if (messageParsed.exchange === this._exchange) {
-
       switch (channel) {
         case 'order':
           new OrderSchema(channel, messageParsed);

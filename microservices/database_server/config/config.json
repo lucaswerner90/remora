@@ -15,7 +15,6 @@
     "price_change_24hr",
     "volume_difference",
     "price_list",
-    "latest_price",
-    "last_news"
+    "latest_price"
   ]
 }

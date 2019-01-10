@@ -115,7 +115,7 @@ export default class GDAXConnection extends ExchangeConnection{
    * @memberof GDAXConnection
    */
   createPricesListInterval(coin: Coin, updateTime: number) {
-    const chartPriceConfig = { granularity: GDAXConnection.TIMES['5MIN'] };
+    const chartPriceConfig = { granularity: GDAXConnection.TIMES['1MIN'] };
     // Gets the last chart price of the coin
     return setInterval(() => {
       this.exchangeAPIClient.getProductHistoricRates(coin.symbol, chartPriceConfig, (error, response, data) => {

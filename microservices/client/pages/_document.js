@@ -25,6 +25,11 @@ class MyDocument extends Document {
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"
           />
+          <meta name="description" content=""/>
+          <meta name="author" content=""/>
+          <meta name="viewport" content="width=device-width, initial-scale=1"/>
+          <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+          <link rel="icon" href="favicon.ico" type="im</link>age/x-icon"/>
         </Head>
         <body>
           <Main />

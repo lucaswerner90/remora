@@ -6,18 +6,18 @@ const MongoSchema = mongoose.Schema;
 const schema = {
   _id: {
     type: String,
-    required: true,
     default: '',
   },
   symbol: {
     type: String,
-    required: true,
     default: '',
   },
   exchange: {
     type: String,
-    required: true,
     enum: ['binance', 'gdax'],
+  },
+  priceChange24hr: {
+    type: Number,
   },
   price: {
     type: Number,
@@ -39,11 +39,16 @@ export default class CoinSchema extends Schema{
   private static model = mongoose.model('coinModel', new MongoSchema(schema, { versionKey: false }));
   constructor(channel: string, message: {}) {
     super(channel, message);
-    this.writeToDB();
+    if (this.info) {
+      this.writeToDB();
+    }
   }
 
   writeToDB() {
     switch (this.channel) {
+      case 'price_change_24hr':
+        this.writePriceChange(this.info);
+        break;
       case 'latest_price':
         this.writeLatestPrice(this.info);
         break;
@@ -57,8 +62,15 @@ export default class CoinSchema extends Schema{
     }
   }
 
+  private writePriceChange({ id, symbol, exchange, price }) {
+    CoinSchema.model.findByIdAndUpdate(id, { symbol, exchange, priceChange24hr: parseFloat(price) }, this._writeOptions, (err, res) => {
+      if (err) {
+        console.trace(err);
+      }
+    });
+  }
   private writeLatestPrice({ id, symbol, exchange, price }) {
-    CoinSchema.model.findByIdAndUpdate(id, { symbol, exchange, price }, this._writeOptions, (err, res) => {
+    CoinSchema.model.findByIdAndUpdate(id, { symbol, exchange, price: parseFloat(price) }, this._writeOptions, (err, res) => {
       if (err) {
         console.trace(err);
       }
@@ -72,8 +84,8 @@ export default class CoinSchema extends Schema{
       }
     });
   }
-  private writeVolumeDifference({ id, exchange, actualPrice, tendency, symbol, currentVolumeDifference }) {
-    CoinSchema.model.findByIdAndUpdate(id, { symbol, exchange, tendency, currentVolumeDifference, price: actualPrice }, this._writeOptions, (err, res) => {
+  private writeVolumeDifference({ id, tendency, symbol, exchange, currentVolumeDifference }) {
+    CoinSchema.model.findByIdAndUpdate(id, { symbol, exchange, tendency, currentVolumeDifference }, this._writeOptions, (err, res) => {
       if (err) {
         console.trace(err);
       }
