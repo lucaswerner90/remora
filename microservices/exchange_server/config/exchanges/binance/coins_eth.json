@@ -1,0 +1,100 @@
+{
+    "ADAETH": {
+        "name": "ADA",
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
+    },
+    "BCCETH": {
+        "name": "BCC",
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
+    },
+    "BCNETH": {
+        "name": "BCN",
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
+    },
+    "BNBETH": {
+        "name": "BNB",
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
+    },
+    "EOSETH": {
+        "name": "EOS",
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
+    },
+    "ICXETH": {
+        "name": "ICX",
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
+    },
+    "IOSTETH": {
+        "name": "IOST",
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
+    },
+    "LOOMETH": {
+        "name": "LOOM",
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
+    },
+    "LTCETH": {
+        "name": "LTC",
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
+    },
+    "ONTETH": {
+        "name": "ONT",
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
+    },
+    "TRXETH": {
+        "name": "TRX",
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
+    },
+    "XRPETH": {
+        "name": "XRP",
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
+    },
+    "XVGETH": {
+        "name": "XVG",
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
+    },
+    "ZILETH": {
+        "name": "ZIL",
+        "alarm":{
+            "order": 100000,
+            "volume": 100
+        }
+    }
+}

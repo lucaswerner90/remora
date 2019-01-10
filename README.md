@@ -27,6 +27,8 @@ REMORA uses a number of open source projects to work properly (and we try to be 
 * [TSLint](https://palantir.github.io/tslint/)
 * [Yarn](https://yarnpkg.com/)
 * [React](https://reactjs.org/)
+* [NextJS](https://nextjs.org)
+* [MongoDB](https://mongodb.com)
 
 ## Development
 
@@ -82,6 +84,43 @@ docker swarm init
 docker-compose -f <docker-compose-file> push
 docker stack deploy --compose-file <docker-compose-file> remora
 ```
+### Run only an exchange server
+In order to improve the time of development, you can run a simple docker-compose file and run an exchange server in development mode.
+
+The docker-compose-dev file should look like this:
+
+```sh
+version: "3"
+
+services:
+
+  socketio_1:
+    build: ./socketio
+    hostname: socketio_1
+    restart: always
+    environment:
+      - PORT=4500
+      - REDIS_HOST=redis
+    depends_on: 
+      - redis
+
+  redis:
+    build: ./redis
+    hostname: redis
+    restart: always
+    ports: 
+    - "6379:6379"
+
+```
+So you're only running Redis and SocketIO which are the components needed for the exchange server to run.
+
+Now, you can run:
+
+```sh
+yarn run start-dev
+```
+
+This will run the nodemon package directly from TypeScript. You can compile the code as usual ( using the "compile" or "compile-live" task) before running the server if you want. The default configuration will be taken if you don't specify any.
 
 ### Microservices development
 
@@ -245,10 +284,21 @@ docker-compose -f docker-compose-dev.yml restart <container_name>
 * Docker Swarm:
     * https://www.youtube.com/watch?v=m6WgX_LBtEk
     * https://github.com/tsmean/docker-tutorial/tree/master/4_docker-swarm-and-stack
-
-
+* ReactJS:
+    * https://www.youtube.com/watch?v=sBws8MSXN7A&t=5030s
+* NodeJS with Passport:
+    * https://www.youtube.com/watch?v=6FOq4cUdH8k
+* MongoDB:
+    * https://www.youtube.com/watch?v=pWbMrx5rVBE
+* ReactJS & GraphQL:
+    * https://www.youtube.com/watch?v=SEMTj8w04Z8&list=PLillGF-RfqbZrjw48EXLdM4dsOhURCLZx
+* ApexCharts:
+    * https://www.youtube.com/watch?v=JxEyXOlSgV0
+* Redux with React:
+    * https://www.youtube.com/watch?v=93p3LxR9xfM
 ## Continuous Development / Continuous integration
 
+### To production
 Honestly, nobody wants to reset the servers everytime we need to update the application, and we know that, so in order to be able to provide a simple pipeline for all developers there's a file that does all that magic for us:
 
 [Link to the Pipelines section in Gitlab](https://gitlab.com/lucaswerner90/REMORA/pipelines)
