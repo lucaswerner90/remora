@@ -25,7 +25,8 @@ step-deploy-production:
     - master
   script:
     - docker-compose down --remove-orphans
-    - docker-compose up -p remora -d --build
+    - docker system prune -a -f
+    - docker-compose -p remora up --build -d  
   tags:
     - production
   when: manual
