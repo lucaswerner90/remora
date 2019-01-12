@@ -38,14 +38,14 @@ export class FavoritesList extends Component {
         url: 'https://binance.com/en/trade/pro/LTC_USDT',
         exchange: 'binance'
       },
-      {
-        id: 'XRPUSDT',
-        name: 'Ripple',
-        against: '$',
-        coinSymbol: 'XRP',
-        url: 'https://binance.com/en/trade/pro/BTC_USDT',
-        exchange: 'binance'
-      },
+      // {
+      //   id: 'XRPUSDT',
+      //   name: 'Ripple',
+      //   against: '$',
+      //   coinSymbol: 'XRP',
+      //   url: 'https://binance.com/en/trade/pro/BTC_USDT',
+      //   exchange: 'binance'
+      // },
     ],
   };
   render() {
@@ -64,12 +64,28 @@ export class FavoritesList extends Component {
       </Grid>
 
     );
+    let tileSize = 12;
+    switch (favorites.length) {
+      case 1:
+        tileSize = 12;
+        break;
+      case 2:
+        tileSize = 6;
+        break;
+    
+      case 3:
+        tileSize = 4;
+        break;
+    
+      default:
+        break;
+    }
     return (
       <Grid container className={classes.root} spacing={24}>
         {header}
         <Grid item xs={12}>
           <Grid container className={classes.root} spacing={24}>
-            {renderList(favorites, 4, { showExchange: true, isFavorite: true })}
+            {renderList(favorites, tileSize, { showExchange: true, isFavorite: true })}
           </Grid>
         </Grid>
         

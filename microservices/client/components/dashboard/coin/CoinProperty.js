@@ -15,7 +15,9 @@ export class CoinProperty extends Component {
   }
 
   render() {
-    const { value = '-', label } = this.props;
+    const { value = '-', label = '', symbol = '' } = this.props;
+    const textColor = value > 0 ? 'green' : 'red';
+    
     return (
       <Grid container style={{ flexGrow: 1 }} spacing={0}>
         <Grid item xs={12}>
@@ -24,8 +26,8 @@ export class CoinProperty extends Component {
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography style={{ color: 'grey', fontSize: '0.625rem' }} align="center" variant="body1">
-            {value}
+          <Typography style={{ color: textColor}} align="center" variant="body1">
+            {value? `${value}${symbol}`: '-'}
           </Typography>
         </Grid>
       </Grid>

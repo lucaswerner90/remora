@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import dynamic from 'next/dynamic';
 import { withStyles } from '@material-ui/core/styles';
-import red from '@material-ui/core/colors/red';
 import lightBlue from '@material-ui/core/colors/lightBlue';
-import lightGreen from '@material-ui/core/colors/lightGreen';
 import grey from '@material-ui/core/colors/grey';
 import Paper from '@material-ui/core/Paper';
 
@@ -29,8 +27,41 @@ class GenericPriceChart extends Component {
     super(props, `${props.exchange}_${props.coinID}_price_list`);
   }
   render() {
-    const { prices = [], previousValue = 0 } = this.props;
-    const priceIncreased = prices.length ? Math.abs(prices[prices.length - 1] - previousValue) > 0 : false;
+    const { prices = [], buy: buyOrder = {}, sell: sellOrder = {} } = this.props;
+    const buyOrderAnnotation = buyOrder && buyOrder.price ? {
+      y: buyOrder.price,
+      borderColor: '#00E396',
+      label: {
+        position: 'left',
+        offsetX: 100,
+        offsetY: 13,
+        borderColor: '#00E396',
+        style: {
+          color: '#fff',
+          background: '#00E396',
+          fontFamily: 'Roboto',
+          fontSize: '0.5rem'
+        },
+        text: `Buy at ${buyOrder.price}$`,
+      }
+    } : {};
+    const sellOrderAnnotation = sellOrder && sellOrder.price ? {
+      y: sellOrder.price,
+      borderColor: '#FF4560',
+      label: {
+        position: 'left',
+        offsetX: 100,
+        offsetY: 0,
+        borderColor: '#FF4560',
+        style: {
+          color: '#fff',
+          background: '#FF4560',
+          fontFamily: 'Roboto',
+          fontSize: '0.5rem'
+        },
+        text: `Sell at ${sellOrder.price}$`,
+      }
+    } : {};
     const { classes } = this.props;
     const fakeDivs = <div className={classes.fake} />;
     const graphOptions = {
@@ -64,6 +95,9 @@ class GenericPriceChart extends Component {
             show: false
           }
         },
+        annotations: {
+          yaxis: [buyOrderAnnotation, sellOrderAnnotation],
+        },
         markers: {
           size: 0,
         },
@@ -88,7 +122,7 @@ class GenericPriceChart extends Component {
           series={graphOptions.series}
           type="line"
           width="100%"
-          height="100px"
+          height="200px"
         />
       );
     }

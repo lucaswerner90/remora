@@ -1,13 +1,11 @@
 import React from 'react';
 import SocketComponent from './SocketComponent';
-import { Grid, Typography, Card, CardContent, CardActions, IconButton } from '@material-ui/core';
-import StarIcon from '@material-ui/icons/Star';
-import StarBorderIcon from '@material-ui/icons/StarBorder';
+import { Grid, Typography, Card, CardContent, CardActions } from '@material-ui/core';
+
 
 import CoinProperty from '../dashboard/coin/CoinProperty';
 import GenericPriceChart from '../dashboard/coin/GenericPriceChart';
 import CoinCardButtons from '../dashboard/coin/CoinCardButtons';
-import CoinStatus from '../dashboard/coin/CoinStatus';
 
 export class CoinSocketComponent extends SocketComponent {
   state = {
@@ -53,14 +51,13 @@ export class CoinSocketComponent extends SocketComponent {
     const { coin, tileSize, showExchange, isFavorite } = this.props;
     const { exchange = '', against = '$', coinSymbol = '', url = '', name = '', id = '' } = coin;
 
-    const { price, pricesList, priceChange, volumeDifference, buyOrder, sellOrder } = this.state;
-
-    let sentiment = 0;
-    if (priceChange > 0) sentiment++;
-    if (buyOrder.quantity) sentiment++;
-    if (volumeDifference > 0) sentiment++;
-    if (!sellOrder.quantity) sentiment++;
-
+    const { price = 0, pricesList = [], priceChange = 0, volumeDifference = '', buyOrder = {}, sellOrder = {} } = this.state;
+    
+    let hasPriceIncreased = false;
+    if (pricesList.length) {
+      const lastPrice = pricesList[pricesList.length - 1] - pricesList[pricesList.length - 2];
+      hasPriceIncreased = lastPrice > 0;
+    }
     return (
       <Grid key={`${name}_${id}`} item xs={tileSize}>
         <Card>
@@ -78,33 +75,24 @@ export class CoinSocketComponent extends SocketComponent {
                 </Typography>
               </Grid>
               <Grid item xs={4} style={{ textAlign: 'right' }}>
-                {isFavorite ?
-                  <IconButton style={{ padding: '4px' }} aria-label="Remove from favorites">
-                    <StarIcon fontSize="small" />
-                  </IconButton>
-                  :
-                  <IconButton style={{ padding: '4px' }} aria-label="Add to favorites">
-                    <StarBorderIcon fontSize="small" />
-                  </IconButton>
-                }
+                <Typography style={{color: hasPriceIncreased ? 'green' : 'red'}} variant="body1">
+                  <strong>{`${price ? price : '...'}${against}`}</strong>
+                </Typography>
+              </Grid>
+              
+              <Grid item xs={6} style={{ textAlign: 'right' }}>
+                <CoinProperty value={volumeDifference} symbol="%" label="Volume difference" />
               </Grid>
 
-              <Grid item xs={3} style={{ textAlign: 'right' }}>
-                <CoinStatus value={sentiment}/>
+              <Grid item xs={6} style={{ textAlign: 'right' }}>
+                <CoinProperty value={priceChange} symbol="%" label="Price 24hr"/>
               </Grid>
-              <Grid item xs={3} style={{ textAlign: 'right' }}>
-                <CoinProperty value={`${priceChange}%`} label="Price 24hr"/>
-              </Grid>
-              <Grid item xs={3} style={{ textAlign: 'right' }}>
-                <CoinProperty value={`${volumeDifference}%`} label="Vol. difference"/>
-              </Grid>
-              <Grid item xs={3} style={{ textAlign: 'right' }}>
-                <CoinProperty value={`${price}${against}`} label="Price"/>
-              </Grid>
+              
 
               <Grid item xs={12}>
-                <GenericPriceChart prices={pricesList} />
+                <GenericPriceChart prices={pricesList} buy={buyOrder} sell={sellOrder}/>
               </Grid>
+
             </Grid>
           </CardContent>
           <CardActions>

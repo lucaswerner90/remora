@@ -44,7 +44,7 @@ export class ExchangesList extends Component {
           },
           {
             id: 'BTCUSDT',
-            name: 'Bitecoin',
+            name: 'Bitcoin',
             against: '$',
             coinSymbol: 'BTC',
             url: 'https://binance.com/en/trade/pro/BTC_USDT',
