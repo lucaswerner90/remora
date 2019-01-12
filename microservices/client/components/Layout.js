@@ -8,7 +8,9 @@ import Footer from './Footer';
 
 const styles = () => ({
   root: {
-    flexGrow: 1,
+    width: "100%",
+    maxWidth:'1080px',
+    margin: "0 auto",
   },
 });
 
@@ -16,15 +18,18 @@ class Layout extends Component {
   render() {
     const { classes } = this.props;
     return (
-      <div className={classes.root}>
-        <Header
-         />
+      <div style={{ background: 'white' }}>
         <Grid container className={classes.root} spacing={24}>
+          <Grid item xs={12}>
+            <Header/>
+          </Grid>
           <Grid item xs={12}>
             {this.props.children}
           </Grid>
+          <Grid item xs={12}>
+            <Footer />
+          </Grid>
         </Grid>
-        <Footer />
       </div>
     )
   }

@@ -6,4 +6,4 @@ COPY . /opt/app
 
 RUN npm install
 RUN npm run build
-RUN npm run start
+CMD NODE_ENV=production && npm run prod

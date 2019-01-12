@@ -66,13 +66,33 @@ class SocketIOServer {
   private redisOnMessage(channel:string, message:string) {
     const messageParsed = JSON.parse(message);
     messageParsed.type = channel;
-
     if (messageParsed.exchange) {
-      const finalChannel = `${messageParsed.exchange}_${messageParsed.symbol || messageParsed.name}`;
-
-      this.ioServer.sockets.emit(finalChannel, messageParsed);
+      const finalChannel = `${messageParsed.exchange}_${messageParsed.symbol || messageParsed.name}_${channel}`;
       this.ioServer.sockets.emit(messageParsed.exchange, messageParsed);
       this.ioServer.sockets.emit(`${messageParsed.exchange}_${messageParsed.type}`, messageParsed);
+
+      let finalData = messageParsed;
+      switch (messageParsed.type) {
+        case 'latest_price':
+          finalData = messageParsed.price;
+          break;
+        case 'price_change_24hr':
+          finalData = messageParsed.price;
+          break;
+        case 'price_list':
+          finalData = messageParsed.prices;
+          break;
+        case 'order':
+          finalData = { id: messageParsed.id, details: messageParsed.details };
+          break;
+        case 'volume_difference':
+          finalData = { tendency: messageParsed.tendency, currentVolumeDifference: messageParsed.currentVolumeDifference };
+          break;
+        default:
+          break;
+      }
+      this.ioServer.sockets.emit(finalChannel, finalData);
+
     }
   }
 }

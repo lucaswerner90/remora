@@ -2,6 +2,14 @@ version: "3"
 
 services:
 
+  nextjs:
+    build: ./microservices/client
+    restart: always
+    volumes:
+      - ./microservices/client:/opt/app
+    ports: 
+      - "3000"
+
   redis:
     build: ./microservices/redis
     restart: always
@@ -45,3 +53,4 @@ services:
       - "80:80"
     depends_on: 
       - socketio
+      - nextjs

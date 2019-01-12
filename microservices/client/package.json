@@ -6,6 +6,8 @@
     "@material-ui/core": "latest",
     "@material-ui/icons": "^3.0.1",
     "apexcharts": "^2.6.0",
+    "compression": "^1.7.3",
+    "express": "^4.16.4",
     "jss": "latest",
     "next": "latest",
     "prop-types": "latest",
@@ -17,9 +19,10 @@
     "socket.io-client": "^2.2.0"
   },
   "scripts": {
-    "dev": "next",
+    "dev": "node server.js",
     "build": "next build",
     "export": "next export",
-    "start": "next start"
+    "prod":"NODE_ENV=production node server.js",
+    "start": "npm run build && npm run prod"
   }
 }
