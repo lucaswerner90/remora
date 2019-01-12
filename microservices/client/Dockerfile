@@ -1,9 +1,11 @@
 FROM node:alpine
 
-RUN mkdir -p /opt/app
-WORKDIR /opt/app
-COPY . /opt/app
+WORKDIR /
+RUN apk update && apk upgrade && \
+  apk add --no-cache bash git openssh
 
-RUN npm install
-RUN npm run build
-CMD NODE_ENV=production && npm run prod
+COPY . .
+
+RUN yarn
+RUN yarn run build
+CMD NODE_ENV=production && yarn run prod

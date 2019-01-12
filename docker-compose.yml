@@ -5,8 +5,6 @@ services:
   nextjs:
     build: ./microservices/client
     restart: always
-    volumes:
-      - ./microservices/client:/opt/app
     ports: 
       - "3000"
 
