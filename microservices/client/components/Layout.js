@@ -1,5 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
+
+import { Provider } from 'react-redux';
+import store from '../redux/store';
+
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 
@@ -19,17 +23,19 @@ class Layout extends Component {
     const { classes } = this.props;
     return (
       <div style={{ background: 'white' }}>
-        <Grid container className={classes.root} spacing={24}>
-          <Grid item xs={12}>
-            <Header/>
+        <Provider store={store}>
+          <Grid container className={classes.root} spacing={24}>
+            <Grid item xs={12}>
+              <Header/>
+            </Grid>
+            <Grid item xs={12}>
+              {this.props.children}
+            </Grid>
+            <Grid item xs={12}>
+              <Footer />
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            {this.props.children}
-          </Grid>
-          <Grid item xs={12}>
-            <Footer />
-          </Grid>
-        </Grid>
+        </Provider>
       </div>
     )
   }

@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
+
+import { connect } from 'react-redux';
+import { createPost } from '../../../redux/actions/userPreferencesActions';
+
 import { withStyles } from '@material-ui/core/styles';
 import { Grid, Typography } from '@material-ui/core';
-import coinRender from '../common/CoinRender';
+import CoinSocketComponent from '../../common/CoinSocketComponent';
 
 const styles = theme => ({
   root: {
@@ -9,7 +13,11 @@ const styles = theme => ({
   },
 });
 
-
+const renderList = (coinsArray = [], tileSize = 3, {showExchange = false}) => {
+  return coinsArray.map(coin =>
+    <CoinSocketComponent key={coin.id} coin={coin} tileSize={tileSize} showExchange={showExchange} isFavorite={true}/>
+  );
+}
 export class FavoritesList extends Component {
   state = {
     favorites: [
@@ -17,6 +25,7 @@ export class FavoritesList extends Component {
         id: 'ETHUSDT',
         name: 'Ethereum',
         against: '$',
+        isFavorite: true,
         coinSymbol: 'ETH',
         url: 'https://binance.com/en/trade/pro/ETH_USDT',
         exchange: 'binance'
@@ -24,9 +33,17 @@ export class FavoritesList extends Component {
       {
         id: 'LTCUSDT',
         name: 'Litecoin',
-        against: '$',
+        isFavorite: true,against: '$',
         coinSymbol: 'LTC',
         url: 'https://binance.com/en/trade/pro/LTC_USDT',
+        exchange: 'binance'
+      },
+      {
+        id: 'XRPUSDT',
+        name: 'Ripple',
+        against: '$',
+        coinSymbol: 'XRP',
+        url: 'https://binance.com/en/trade/pro/BTC_USDT',
         exchange: 'binance'
       },
     ],
@@ -34,17 +51,31 @@ export class FavoritesList extends Component {
   render() {
     const { classes } = this.props;
     const { favorites } = this.state;
+    // const post = {
+    //   title: this.state.title,
+    //   body: this.state.body
+    // };
+    // this.props.createPost(post);
+    const header = (
+      <Grid item xs={12}>
+        <Typography variant="h4">
+          <strong>Favorites</strong>
+        </Typography>
+      </Grid>
+
+    );
     return (
       <Grid container className={classes.root} spacing={24}>
+        {header}
         <Grid item xs={12}>
-          <Typography variant="h4">
-            <strong>Favorites</strong>
-          </Typography>
+          <Grid container className={classes.root} spacing={24}>
+            {renderList(favorites, 4, { showExchange: true, isFavorite: true })}
+          </Grid>
         </Grid>
-        {coinRender(favorites, 4, { showExchange: true })}
+        
       </Grid>
     )
   }
 }
 
-export default withStyles(styles)(FavoritesList);
+export default connect(null, { createPost })(withStyles(styles)(FavoritesList));

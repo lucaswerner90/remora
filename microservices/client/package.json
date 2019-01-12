@@ -8,13 +8,19 @@
     "apexcharts": "^2.6.0",
     "compression": "^1.7.3",
     "express": "^4.16.4",
+    "isomorphic-unfetch": "^3.0.0",
     "jss": "latest",
     "next": "latest",
+    "next-redux-wrapper": "^2.1.0",
     "prop-types": "latest",
     "react": "latest",
     "react-apexcharts": "^1.2.1",
-    "react-dom": "latest",
+    "react-dom": "^16.7.0",
     "react-jss": "^8.1.0",
+    "react-redux": "^6.0.0",
+    "redux": "^4.0.1",
+    "redux-devtools-extension": "^2.13.7",
+    "redux-thunk": "^2.3.0",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0"
   },
@@ -22,7 +28,7 @@
     "dev": "node server.js",
     "build": "next build",
     "export": "next export",
-    "prod":"NODE_ENV=production node server.js",
+    "prod": "NODE_ENV=production node server.js",
     "start": "npm run build && npm run prod"
   }
 }

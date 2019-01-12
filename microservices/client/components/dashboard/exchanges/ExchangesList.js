@@ -1,14 +1,23 @@
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import { Grid, Typography, Card, CardContent } from '@material-ui/core';
-import coinRender from '../common/CoinRender';
+import { Grid, Typography } from '@material-ui/core';
+import CoinSocketComponent from '../../common/CoinSocketComponent';
 
 const styles = theme => ({
   root: {
     flexGrow:1
   },
 });
-
+const renderList = (coinsArray = [], tileSize = 3, { showExchange = false, isFavorite = false }) => {
+  return coinsArray.map(coin =>
+    <CoinSocketComponent key={`${coin.id}_${Math.random()}`}
+      coin={coin}
+      tileSize={tileSize}
+      showExchange={showExchange}
+      isFavorite={isFavorite}
+    />
+  );
+}
 export class ExchangesList extends Component {
   state = {
     exchanges: {
@@ -66,7 +75,7 @@ export class ExchangesList extends Component {
                 <strong>{exchange.name.toUpperCase()}</strong>
               </Typography>
             </Grid>
-            {coinRender(exchange.coins, 3, {showExchange: false})}
+            {renderList(exchange.coins, 3, {showExchange: false, isFavorite: true})}
           </Grid>
         </Grid>
 

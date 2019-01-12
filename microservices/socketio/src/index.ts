@@ -67,31 +67,29 @@ class SocketIOServer {
     const messageParsed = JSON.parse(message);
     messageParsed.type = channel;
     if (messageParsed.exchange) {
-      const finalChannel = `${messageParsed.exchange}_${messageParsed.symbol || messageParsed.name}_${channel}`;
-      this.ioServer.sockets.emit(messageParsed.exchange, messageParsed);
-      this.ioServer.sockets.emit(`${messageParsed.exchange}_${messageParsed.type}`, messageParsed);
+      const finalChannel = `${messageParsed.exchange}_${messageParsed.symbol || messageParsed.name}`;
 
-      let finalData = messageParsed;
+      let finalData: any = {};
       switch (messageParsed.type) {
         case 'latest_price':
-          finalData = messageParsed.price;
+          finalData = { price: messageParsed.price };
           break;
         case 'price_change_24hr':
-          finalData = messageParsed.price;
+          finalData = { price: messageParsed.price };
           break;
         case 'price_list':
-          finalData = messageParsed.prices;
+          finalData = { pricesList: messageParsed.prices };
           break;
         case 'order':
-          finalData = { id: messageParsed.id, details: messageParsed.details };
+          finalData = { id: messageParsed.id, ...messageParsed.details };
           break;
         case 'volume_difference':
-          finalData = { tendency: messageParsed.tendency, currentVolumeDifference: messageParsed.currentVolumeDifference };
+          finalData = { tendency: messageParsed.tendency, volumeDifference: messageParsed.currentVolumeDifference };
           break;
         default:
           break;
       }
-      this.ioServer.sockets.emit(finalChannel, finalData);
+      this.ioServer.sockets.emit(finalChannel, { type: messageParsed.type, info: finalData });
 
     }
   }

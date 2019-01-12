@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import getConfig from 'next/config';
 
 const { publicRuntimeConfig } = getConfig();
-const { backend = 'localhost:80' } = publicRuntimeConfig;
+const { backend = 'localhost:8080' } = publicRuntimeConfig;
 
 export class SocketComponent extends Component {
   onSocketData = () => { };
