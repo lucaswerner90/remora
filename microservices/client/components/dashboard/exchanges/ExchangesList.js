@@ -75,7 +75,7 @@ export class ExchangesList extends Component {
                 <strong>{exchange.name.toUpperCase()}</strong>
               </Typography>
             </Grid>
-            {renderList(exchange.coins, 3, {showExchange: false, isFavorite: true})}
+            {renderList(exchange.coins, 3, {showExchange: false, isFavorite: false})}
           </Grid>
         </Grid>
 

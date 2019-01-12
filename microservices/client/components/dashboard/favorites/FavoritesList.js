@@ -61,6 +61,9 @@ export class FavoritesList extends Component {
         <Typography variant="h4">
           <strong>Favorites</strong>
         </Typography>
+        <Typography variant="body1">
+          Add coins to your favorites and get access to more info faster.
+        </Typography>
       </Grid>
 
     );
