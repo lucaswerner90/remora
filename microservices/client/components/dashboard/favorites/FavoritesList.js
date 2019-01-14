@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
-import { connect } from 'react-redux';
-import { createPost } from '../../../redux/actions/userPreferencesActions';
-
-import { withStyles } from '@material-ui/core/styles';
 import { Grid, Typography } from '@material-ui/core';
 import CoinSocketComponent from '../../common/CoinSocketComponent';
 
-const styles = theme => ({
-  root: {
-    flexGrow: 1
-  },
+
+import { connect } from 'react-redux';
+import { getFavorites } from '../../../redux/actions/coinActions';
+
+const mapStateToProps = state => ({
+  favorites: state.coin.favorites,
 });
 
 const renderList = (coinsArray = [], tileSize = 3, {showExchange = false}) => {
@@ -19,43 +18,20 @@ const renderList = (coinsArray = [], tileSize = 3, {showExchange = false}) => {
   );
 }
 export class FavoritesList extends Component {
-  state = {
-    favorites: [
-      {
-        id: 'ETHUSDT',
-        name: 'Ethereum',
-        against: '$',
-        isFavorite: true,
-        coinSymbol: 'ETH',
-        url: 'https://binance.com/en/trade/pro/ETH_USDT',
-        exchange: 'binance'
-      },
-      {
-        id: 'LTCUSDT',
-        name: 'Litecoin',
-        isFavorite: true,against: '$',
-        coinSymbol: 'LTC',
-        url: 'https://binance.com/en/trade/pro/LTC_USDT',
-        exchange: 'binance'
-      },
-      // {
-      //   id: 'XRPUSDT',
-      //   name: 'Ripple',
-      //   against: '$',
-      //   coinSymbol: 'XRP',
-      //   url: 'https://binance.com/en/trade/pro/BTC_USDT',
-      //   exchange: 'binance'
-      // },
-    ],
+
+  static propTypes = {
+    favorites: PropTypes.arrayOf(PropTypes.object).isRequired
   };
+  static defaultProps = {
+    favorites:[]
+  }
+
+  componentDidUpdate() {
+    this.props.getFavorites();
+  }
+
   render() {
-    const { classes } = this.props;
-    const { favorites } = this.state;
-    // const post = {
-    //   title: this.state.title,
-    //   body: this.state.body
-    // };
-    // this.props.createPost(post);
+    const { favorites } = this.props;
     const header = (
       <Grid item xs={12}>
         <Typography variant="h4">
@@ -67,34 +43,41 @@ export class FavoritesList extends Component {
       </Grid>
 
     );
-    let tileSize = 12;
-    switch (favorites.length) {
-      case 1:
-        tileSize = 12;
-        break;
-      case 2:
-        tileSize = 6;
-        break;
     
-      case 3:
-        tileSize = 4;
-        break;
-    
-      default:
-        break;
-    }
     return (
-      <Grid container className={classes.root} spacing={24}>
+      <Grid container style={{flexGrow:1}} spacing={24}>
         {header}
-        <Grid item xs={12}>
-          <Grid container className={classes.root} spacing={24}>
-            {renderList(favorites, tileSize, { showExchange: true, isFavorite: true })}
-          </Grid>
-        </Grid>
-        
+        {(() => {
+          if (favorites && favorites.length) {
+            let tileSize = 12;
+            switch (favorites.length) {
+              case 1:
+                tileSize = 12;
+                break;
+              case 2:
+                tileSize = 6;
+                break;
+
+              case 3:
+                tileSize = 4;
+                break;
+
+              default:
+                break;
+            }
+            return (
+              <Grid item xs={12}>
+                <Grid container style={{flexGrow:1}} spacing={24}>
+                  {renderList(favorites, tileSize, { showExchange: true, isFavorite: true })}
+                </Grid>
+              </Grid>
+            );
+          }
+          return null;
+        })()}
       </Grid>
-    )
+    );
   }
 }
 
-export default connect(null, { createPost })(withStyles(styles)(FavoritesList));
+export default connect(mapStateToProps, { getFavorites })(FavoritesList);

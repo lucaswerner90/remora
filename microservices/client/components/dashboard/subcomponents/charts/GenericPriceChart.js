@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 import { withStyles } from '@material-ui/core/styles';
 import lightBlue from '@material-ui/core/colors/lightBlue';
@@ -21,13 +22,37 @@ const styles = theme => ({
     },
   },
 });
-
 class GenericPriceChart extends Component {
+  static propTypes = {
+    prices: PropTypes.array.isRequired,
+    buyOrder: PropTypes.object.isRequired,
+    sellOrder: PropTypes.object.isRequired,
+    isFavorite: PropTypes.bool.isRequired
+  }
+
+  static defaultProps = {
+    prices: [],
+    buyOrder: {},
+    sellOrder: {},
+    isFavorite: false
+  }
+
   constructor(props) {
     super(props, `${props.exchange}_${props.coinID}_price_list`);
   }
+
+  shouldComponentUpdate(nextProps = {buyOrder:{}, sellOrder:{}, prices:[]}) {
+    const { buyOrder = {}, sellOrder = {}, prices = [] } = this.props;
+    const differentBuyOrder = buyOrder && buyOrder.price && (buyOrder.price !== nextProps.buyOrder.price);
+    const differentSellOrder = sellOrder && sellOrder.price && (sellOrder.price !== nextProps.sellOrder.price);
+    const differentPrice = prices.length && nextProps.prices.length && (prices[prices.length - 1] !== nextProps.prices[prices.length - 1]);
+    
+    const rerender = differentBuyOrder || differentSellOrder || differentPrice;
+    return rerender;
+  }
+
   render() {
-    const { prices = [], buy: buyOrder = {}, sell: sellOrder = {} } = this.props;
+    const { prices = [], buy: buyOrder = {}, sell: sellOrder = {}, isFavorite } = this.props;
     const buyOrderAnnotation = buyOrder && buyOrder.price ? {
       y: buyOrder.price,
       borderColor: '#00E396',
@@ -66,21 +91,20 @@ class GenericPriceChart extends Component {
     const fakeDivs = <div className={classes.fake} />;
     const graphOptions = {
       options: {
+        tooltip: {
+          enabled:false,
+        },
         chart: {
           toolbar: {
             show: false
           },
-
-        },
-        tooltip: {
-          show: false,
         },
         yaxis: {
           axisBorder: {
             show: false,
           },
-          min: Math.min(...prices),
-          max: Math.max(...prices),
+          min: Math.min(...prices) * 0.99,
+          max: Math.max(...prices) * 1.01,
         },
         xaxis: {
           labels: {
@@ -106,7 +130,6 @@ class GenericPriceChart extends Component {
           width: 2
         },
         colors: [lightBlue[300]],
-        // colors: [priceIncreased ? lightGreen[300] : red[300]],
         grid: {
           show: false,
         },
@@ -122,7 +145,7 @@ class GenericPriceChart extends Component {
           series={graphOptions.series}
           type="line"
           width="100%"
-          height="200px"
+          height={isFavorite ? "200px" : "100px"}
         />
       );
     }
