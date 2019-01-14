@@ -26,6 +26,18 @@ const getTimeAgo = (date = new Date()) => {
   return `Created ${difference} seconds ago`;
 }
 
+const textStyle = { color: 'grey', fontSize: '0.625rem' };
+
+const renderOrderInfo = ({price='-',quantity='-',type=''}, against='') => {
+  return (
+    <Grid item xs={12}>
+      <Typography style={{ ...textStyle, fontSize: '0.75rem' }}>
+        <strong>{type === 'buy' ? 'BUY' : 'SELL'}</strong> {`at ${price}${against} for `}<strong>{`${quantity}$`}</strong>
+      </Typography>
+    </Grid>
+  );
+}
+
 
 export class CoinSocketComponent extends SocketComponent {
   
@@ -99,7 +111,7 @@ export class CoinSocketComponent extends SocketComponent {
                 <Typography variant="body1">
                   <strong>{name}</strong> ({coinSymbol})
                     {showExchange ?
-                      <span style={{ color: 'grey', fontSize: '0.625rem', marginLeft: '4px' }}>
+                      <span style={{ ...textStyle, marginLeft: '4px' }}>
                         {exchange.toUpperCase()}
                       </span>
                     : null}
@@ -125,25 +137,14 @@ export class CoinSocketComponent extends SocketComponent {
               </Grid>
               {(() => {
                 if (buyOrder.price) {
-                  return (
-                    <Grid item xs={12}>
-                      <Typography color="inherit" variant="body2">
-                        LAST BUY ORDER
-                      </Typography>
-                      <Typography color="inherit" variant="body2">
-                        {getTimeAgo(new Date(buyOrder.createdAt))}
-                      </Typography>
-                    </Grid>
-                  );
+                  return renderOrderInfo(buyOrder,against)
                 }
-                return null;
               })()}
-              
-              <Grid item xs={12}>
-                <Typography color="inherit" variant="h6">
-                  SELL ORDER
-                </Typography>
-              </Grid>
+              {(() => {
+                if (sellOrder.price) {
+                  renderOrderInfo(sellOrder, against)
+                }
+              })()}
             </Grid>
           </CardContent>
           <CardActions>

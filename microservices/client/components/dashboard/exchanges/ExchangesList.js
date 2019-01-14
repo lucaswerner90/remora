@@ -3,6 +3,14 @@ import { withStyles } from '@material-ui/core/styles';
 import { Grid, Typography } from '@material-ui/core';
 import CoinSocketComponent from '../../common/CoinSocketComponent';
 
+
+import { connect } from 'react-redux';
+import { getExchangesInfo } from '../../../redux/actions/exchangeActions';
+
+const mapStateToProps = state => ({
+  exchanges: state.exchange,
+});
+
 const styles = theme => ({
   root: {
     flexGrow:1
@@ -19,74 +27,39 @@ const renderList = (coinsArray = [], tileSize = 3, { showExchange = false, isFav
   );
 }
 export class ExchangesList extends Component {
-  state = {
-    exchanges: {
-      binance: {
-        name: 'Binance',
-        against: '$',
-        url: 'https://binance.com',
-        coins: [
-          {
-            id: 'ETHUSDT',
-            coinSymbol: 'ETH',
-            name: 'Ethereum',
-            against: '$',
-            url: 'https://binance.com/en/trade/pro/ETH_USDT',
-            exchange: 'binance'
-          },
-          {
-            id: 'LTCUSDT',
-            name: 'Litecoin',
-            against: '$',
-            coinSymbol: 'LTC',
-            url: 'https://binance.com/en/trade/pro/LTC_USDT',
-            exchange: 'binance'
-          },
-          {
-            id: 'BTCUSDT',
-            name: 'Bitcoin',
-            against: '$',
-            coinSymbol: 'BTC',
-            url: 'https://binance.com/en/trade/pro/BTC_USDT',
-            exchange: 'binance'
-          },
-          {
-            id: 'XRPUSDT',
-            name: 'Ripple',
-            against: '$',
-            coinSymbol: 'XRP',
-            url: 'https://binance.com/en/trade/pro/BTC_USDT',
-            exchange: 'binance'
-          },
-        ]
-      }
-    }
-  };
+  componentWillMount() {
+    this.props.getExchangesInfo();
+  }
+  componentWillReceiveProps(nextProps) {
+    console.log(nextProps);
+  }
+  shouldComponentUpdate(nextProps) {
+    return Object.keys(this.props.exchanges) !== Object.keys(nextProps.exchanges);
+  }
   render() {
-    const { classes } = this.props;
-    const exchanges = Object.keys(this.state.exchanges);
-    const exchangesRender = (exchanges = []) => {
-      const mapExchanges = exchanges.map(e => this.state.exchanges[e]);
-      return mapExchanges.map(exchange =>
-        <Grid item key={exchange.name} xs={12}>
+    const { classes = {}, exchanges = {} } = this.props;
+    const exchangesName = Object.keys(exchanges);
+    const exchangesRender = (exch = []) => {
+      const mapExchanges = exch.map(e => exchanges[e]);
+      return mapExchanges.map(({name = '', coins = []}) =>
+        <Grid item key={name} xs={12}>
           <Grid container className={classes.root} spacing={8}>
             <Grid item xs={12}>
               <Typography variant="h6">
-                <strong>{exchange.name.toUpperCase()}</strong>
+                <strong>{name.toUpperCase()}</strong>
               </Typography>
             </Grid>
-            {renderList(exchange.coins, 3, {showExchange: false, isFavorite: false})}
+            {renderList(coins, 3, {showExchange: false, isFavorite: false})}
           </Grid>
         </Grid>
-
       );
     };
     return (
       <Grid container className={classes.root} spacing={24}>
-        {exchangesRender(exchanges)}
+        {exchangesRender(exchangesName)}
       </Grid>
     )
   }
 }
 
-export default withStyles(styles)(ExchangesList);
+export default connect(mapStateToProps, {getExchangesInfo})(withStyles(styles)(ExchangesList));

@@ -1,5 +1,5 @@
 
-import { SELECT_COIN_DETAIL, GET_ALL_FAVORITES } from '../actions/types';
+import { SELECT_COIN_DETAIL, GET_ALL_FAVORITES, UPDATE_COIN_INFO } from '../actions/types';
 
 const initialState = {
   selected: {},
@@ -23,19 +23,39 @@ const initialState = {
       exchange: 'binance'
     },
   ],
+  'binance': {
+    'ETHUSDT': {
+      'price':0
+    }
+  }
 };
 
 
 export default (state = initialState, action) => {
-  switch (action.type) {
+  const { type, payload } = action;
+  switch (type) {
     case SELECT_COIN_DETAIL:
       return {
         ...state,
-        selected: action.payload
+        selected: payload
       };
+    case UPDATE_COIN_INFO:
+      console.log(payload);
+      // return {
+      //   ...state,
+      //   info: {
+      //     ...state.info,
+      //     [payload.exchange]: {
+      //       ...state.info[payload.exchange],
+      //       [payload.id]: {
+      //         ...state.info[payload.exchange][payload.id],
+      //         ...payload
+      //       }
+      //     }
+      //   }
+      // };
     case GET_ALL_FAVORITES:
-      return state.favorites;
-      break;
+      return {...state};
     default:
       return state;
   }

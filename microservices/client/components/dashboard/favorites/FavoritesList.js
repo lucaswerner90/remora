@@ -26,12 +26,12 @@ export class FavoritesList extends Component {
     favorites:[]
   }
 
-  componentDidUpdate() {
+  componentWillMount() {
     this.props.getFavorites();
   }
 
   render() {
-    const { favorites } = this.props;
+    const { favorites = [] } = this.props;
     const header = (
       <Grid item xs={12}>
         <Typography variant="h4">
@@ -41,7 +41,6 @@ export class FavoritesList extends Component {
           Add coins to your favorites and get access to more info faster.
         </Typography>
       </Grid>
-
     );
     
     return (
@@ -49,26 +48,10 @@ export class FavoritesList extends Component {
         {header}
         {(() => {
           if (favorites && favorites.length) {
-            let tileSize = 12;
-            switch (favorites.length) {
-              case 1:
-                tileSize = 12;
-                break;
-              case 2:
-                tileSize = 6;
-                break;
-
-              case 3:
-                tileSize = 4;
-                break;
-
-              default:
-                break;
-            }
             return (
               <Grid item xs={12}>
                 <Grid container style={{flexGrow:1}} spacing={24}>
-                  {renderList(favorites, tileSize, { showExchange: true, isFavorite: true })}
+                  {renderList(favorites, 4, { showExchange: true, isFavorite: true })}
                 </Grid>
               </Grid>
             );
