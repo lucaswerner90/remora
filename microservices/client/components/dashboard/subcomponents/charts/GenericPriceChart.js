@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 import { withStyles } from '@material-ui/core/styles';
 import lightBlue from '@material-ui/core/colors/lightBlue';
-import grey from '@material-ui/core/colors/grey';
 import Paper from '@material-ui/core/Paper';
 
 const Chart = dynamic(import('react-apexcharts'), { ssr: false });
@@ -11,9 +10,11 @@ const Chart = dynamic(import('react-apexcharts'), { ssr: false });
 const styles = theme => ({
   paper: {
     boxShadow: 'none',
+    background: 'transparent'
   },
   fake: {
-    backgroundColor: grey[100],
+    backgroundColor: '#3ca5c4',
+    background: 'linear-gradient(to right, #757f9a, #d7dde8);',
     height: theme.spacing.unit,
     margin: theme.spacing.unit * 2,
     // Selects every two elements among any group of siblings.
@@ -55,34 +56,34 @@ class GenericPriceChart extends Component {
     const { prices = [], buy: buyOrder = {}, sell: sellOrder = {}, isFavorite } = this.props;
     const buyOrderAnnotation = buyOrder && buyOrder.price ? {
       y: buyOrder.price,
-      borderColor: '#00E396',
+      borderColor: '#72CAA8',
       label: {
         position: 'left',
         offsetX: 100,
         offsetY: 13,
-        borderColor: '#00E396',
+        borderColor: '#72CAA8',
         style: {
           color: '#fff',
-          background: '#00E396',
+          background: '#72CAA8',
           fontFamily: 'Roboto',
-          fontSize: '0.5rem'
+          fontSize: '0.625rem'
         },
         text: `Buy at ${buyOrder.price}$`,
       }
     } : {};
     const sellOrderAnnotation = sellOrder && sellOrder.price ? {
       y: sellOrder.price,
-      borderColor: '#FF4560',
+      borderColor: '#334887',
       label: {
         position: 'left',
         offsetX: 100,
         offsetY: 0,
-        borderColor: '#FF4560',
+        borderColor: '#334887',
         style: {
           color: '#fff',
-          background: '#FF4560',
+          background: '#334887',
           fontFamily: 'Roboto',
-          fontSize: '0.5rem'
+          fontSize: '0.625rem'
         },
         text: `Sell at ${sellOrder.price}$`,
       }
@@ -126,12 +127,24 @@ class GenericPriceChart extends Component {
           size: 0,
         },
         stroke: {
-          curve: 'straight',
-          width: 2
+          curve: 'smooth',
+          width: 3
         },
         colors: [lightBlue[300]],
         grid: {
           show: false,
+        },
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shade: 'light',
+            gradientToColors: ['white'],
+            shadeIntensity: 0.5,
+            type: 'horizontal',
+            opacityFrom: 0,
+            opacityTo: 1,
+            stops: [0, 100]
+          },
         },
       },
       series: [{

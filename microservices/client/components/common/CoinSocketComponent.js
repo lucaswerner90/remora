@@ -2,14 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import SocketComponent from './SocketComponent';
 import { Grid, Typography, Card, CardContent, CardActions } from '@material-ui/core';
-import red from '@material-ui/core/colors/red';
-import green from '@material-ui/core/colors/green';
 
 
 import CoinProperty from '../dashboard/subcomponents/CoinProperty';
 import GenericPriceChart from '../dashboard/subcomponents/charts/GenericPriceChart';
 import CoinCardButtons from '../dashboard/subcomponents/CoinCardButtons';
-
 
 const getTimeAgo = (date = new Date()) => {
   const now = Date.now();
@@ -26,18 +23,27 @@ const getTimeAgo = (date = new Date()) => {
   return `Created ${difference} seconds ago`;
 }
 
-const textStyle = { color: 'grey', fontSize: '0.625rem' };
+const textStyle = { color: 'white', fontSize: '0.625rem' };
 
-const renderOrderInfo = ({price='-',quantity='-',type=''}, against='') => {
-  return (
-    <Grid item xs={12}>
-      <Typography style={{ ...textStyle, fontSize: '0.75rem' }}>
-        <strong>{type === 'buy' ? 'BUY' : 'SELL'}</strong> {`at ${price}${against} for `}<strong>{`${quantity}$`}</strong>
-      </Typography>
-    </Grid>
-  );
+const renderOrderInfo = ({ price = 0, quantity = '-', type = '' }, against = '') => {
+  if (price) {
+    return (
+      <Grid item xs={12}>
+        <Typography style={{ ...textStyle, fontSize: '0.75rem' }}>
+          {`${price}${against} for `}<strong>{`${quantity}$`}</strong>
+        </Typography>
+      </Grid>
+    );
+  }else{
+    return (
+      <Grid item xs={12}>
+        <Typography style={{ ...textStyle, fontSize: '0.75rem' }}>
+          {`No ${type} order for now...`}
+        </Typography>
+      </Grid>
+    );
+  }
 }
-
 
 export class CoinSocketComponent extends SocketComponent {
   
@@ -101,11 +107,12 @@ export class CoinSocketComponent extends SocketComponent {
       const lastPrice = pricesList[pricesList.length - 1] - pricesList[pricesList.length - 2];
       hasPriceIncreased = lastPrice > 0;
     }
+
     return (
       <Grid key={`${name}_${id}`} item xs={tileSize}>
-        <Card>
+        <Card style={{ background: 'transparent' }}>
           <CardContent>
-            <Grid container style={{ flexGrow: 1 }} spacing={isFavorite ? 16:0}>
+            <Grid container style={{ flexGrow: 1 }} spacing={isFavorite ? 24:8}>
 
               <Grid item xs={8}>
                 <Typography variant="body1">
@@ -118,7 +125,7 @@ export class CoinSocketComponent extends SocketComponent {
                 </Typography>
               </Grid>
               <Grid item xs={4} style={{ textAlign: 'right' }}>
-                <Typography style={{color: hasPriceIncreased ? green[500] : red[500]}} variant="body1">
+                <Typography style={{color: hasPriceIncreased ? '#72CAA8' : 'white'}} variant="body1">
                   <strong>{`${price ? price : '...'}${against}`}</strong>
                 </Typography>
               </Grid>
@@ -131,20 +138,23 @@ export class CoinSocketComponent extends SocketComponent {
                 <CoinProperty value={Math.round(parseFloat(priceChange)*100)/100} symbol="%" label="Price 24hr"/>
               </Grid>
               
+              
 
               <Grid item xs={12}>
                 <GenericPriceChart isFavorite={isFavorite} prices={pricesList} buy={buyOrder} sell={sellOrder}/>
               </Grid>
-              {(() => {
-                if (buyOrder.price) {
-                  return renderOrderInfo(buyOrder,against)
-                }
-              })()}
-              {(() => {
-                if (sellOrder.price) {
-                  renderOrderInfo(sellOrder, against)
-                }
-              })()}
+              <Grid item xs={6}>
+                <Typography variant="body2">
+                  Buy
+                </Typography>
+                { renderOrderInfo(buyOrder, against) }
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2">
+                  Sell
+                </Typography>
+                {renderOrderInfo(sellOrder, against)}
+              </Grid>
             </Grid>
           </CardContent>
           <CardActions>

@@ -23,11 +23,6 @@ const initialState = {
       exchange: 'binance'
     },
   ],
-  'binance': {
-    'ETHUSDT': {
-      'price':0
-    }
-  }
 };
 
 

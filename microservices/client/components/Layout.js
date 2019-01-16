@@ -13,20 +13,27 @@ import Footer from './Footer';
 const styles = () => ({
   root: {
     width: "100%",
-    maxWidth:'1080px',
+    maxWidth:'1200px',
     margin: "0 auto",
   },
 });
+
+const background = {
+  background: '#005C97',
+  background: '-webkit-linear-gradient(to right, #363795, #005C97)',
+  background: 'linear-gradient(to right, #363795, #005C97)'
+}
+
 
 class Layout extends Component {
   render() {
     const { classes } = this.props;
     return (
-      <div style={{ background: 'white' }}>
-        <Provider store={store}>
+      <Provider store={store}>
+        <Grid container style={{...background}}>
           <Grid container className={classes.root} spacing={24}>
             <Grid item xs={12}>
-              <Header/>
+              <Header />
             </Grid>
             <Grid item xs={12}>
               {this.props.children}
@@ -35,9 +42,9 @@ class Layout extends Component {
               <Footer />
             </Grid>
           </Grid>
-        </Provider>
-      </div>
-    )
+        </Grid>
+      </Provider>
+    );
   }
 }
 Layout.propTypes = {

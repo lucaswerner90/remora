@@ -5,10 +5,16 @@ import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import CoinDetailView from '../subcomponents/CoinDetailView';
 
+const styleButton = {
+  background: '#449ff7',
+  borderRadius: '20px',
+  border: 0,
+  fontSize: '10px',
+  color: 'white',
+  padding: '0 20px',
+};
 const styles = theme => ({
   form: {
     display: 'flex',
@@ -49,7 +55,7 @@ class CoinDetailDialog extends React.Component {
     const { coin } = this.props;
     return (
       <React.Fragment>
-        <Button color="primary" onClick={this.handleClickOpen}>
+        <Button style={{ ...styleButton}} onClick={this.handleClickOpen}>
           See more
         </Button>
         <Dialog

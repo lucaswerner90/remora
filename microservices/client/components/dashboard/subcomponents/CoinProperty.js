@@ -6,9 +6,6 @@ import { Grid, Typography } from '@material-ui/core';
 import red from '@material-ui/core/colors/red';
 import green from '@material-ui/core/colors/green';
 
-import { connect } from 'react-redux';
-import { fetchExchangesInfo } from '../../../redux/actions/exchangeActions';
-
 const mapStateToProps = state => ({
   exchange: state.exchange,
 });
@@ -29,7 +26,7 @@ export class CoinProperty extends Component {
 
   render() {
     const { value = '-', label = '', symbol = '' } = this.props;
-    const textColor = value > 0 ? green[300] : red[300];
+    const textColor = value > 0 ? '#72CAA8' : 'white';
     
     return (
       <Grid container style={{ flexGrow: 1 }} spacing={0}>
