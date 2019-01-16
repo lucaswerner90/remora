@@ -13,16 +13,16 @@ const theme = createMuiTheme({
     useNextVariants: true,
     color: 'white',
     body1: {
-      color: 'white'
+      color: 'white',
+      fontSize: '0.875rem'
     },
     body2: {
-      color: 'white'
-    },
-    body2: {
-      color: 'white'
+      color: 'white',
+      fontWeight: 300
     },
     h4: {
-      color: 'white'
+      color: 'white',
+      fontWeight: 100
     },
     h5: {
       color: 'white',
