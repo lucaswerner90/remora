@@ -304,8 +304,8 @@ export default class Coin {
     if (currentVolumeDifference !== this._currentVolumeDifference) {
       this._currentVolumeDifference = currentVolumeDifference;
 
-      const redisValue = JSON.stringify(this.getVolumeProperties());
-      redis.setVolumeDifferenceValue(this._redisKeys.VOLUME_DIFFERENCE, redisValue);
+      const redisValue = { ...this._commonRedisProperties, volumeDifference: this._currentVolumeDifference };
+      redis.setVolumeDifferenceValue(this._redisKeys.VOLUME_DIFFERENCE, JSON.stringify(redisValue));
     }
 
     return currentVolumeDifference;

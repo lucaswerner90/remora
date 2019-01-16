@@ -25,7 +25,9 @@ export class CoinCardButtons extends Component {
   selectCoin = () => {
     this.props.selectCoin(this.props.coin.id);
   }
-  
+  shouldComponentUpdate(nextProps) {
+    return false;
+  }
   render() {
     return (
       <Grid container alignItems="flex-end">

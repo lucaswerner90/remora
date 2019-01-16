@@ -88,6 +88,8 @@ export class CoinSocketComponent extends SocketComponent {
 
     const { price = 0, pricesList = [], priceChange = 0, volumeDifference = '', buyOrder = {}, sellOrder = {} } = this.state;
 
+    // The updated coin info contains both the static properties 
+    // and the ones coming from the socket!
     const updatedCoinInfo = { ...this.state, ...coin };
 
     let hasPriceIncreased = false;
