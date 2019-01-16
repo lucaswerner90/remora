@@ -49,13 +49,13 @@ export default class RedisClient {
     this.client.set(key, value);
   }
 
-  public async getOrderValue(key: string) {
+  public async getKeyValue(key: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.client.get(key, (err, reply) => {
         if (err) {
           reject(err);
         }
-        resolve(reply);
+        resolve(JSON.parse(reply));
       });
     });
   }

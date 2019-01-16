@@ -10,12 +10,15 @@ import CoinCardButtons from '../dashboard/subcomponents/CoinCardButtons';
 
 const textStyle = { color: 'white', fontSize: '0.625rem' };
 
-const renderOrderInfo = ({ price = 0, quantity = '-', type = '' }, against = '') => {
+const renderOrderInfo = ({ price = 0, hasBeenExecuted = false, currentValues = { quantity: 0}, type = '' }, against = '') => {
   if (price) {
     return (
       <Grid item xs={12}>
         <Typography style={{ ...textStyle, fontSize: '0.75rem' }}>
-          {`${price}${against} for `}<strong>{`${quantity}$`}</strong>
+          <strong>{`Executed: ${hasBeenExecuted ? 'Not yet' : 'Yes!'}`}</strong>
+        </Typography>
+        <Typography style={{ ...textStyle, fontSize: '0.75rem' }}>
+          {`${price}${against} for `}<strong>{`${currentValues.quantity}$`}</strong>
         </Typography>
       </Grid>
     );
@@ -52,8 +55,8 @@ export class CoinSocketComponent extends SocketComponent {
   constructor(props) {
     super(props, `${props.coin.id}`);
   }
-  onSocketData = ({ info = {}, type = '' }) => {
-    switch (type) {
+  onSocketData = ({ info = {}, message = '' }) => {
+    switch (message) {
       case 'volume_difference':
         this.setState({ ...this.state, ...info });
         break;

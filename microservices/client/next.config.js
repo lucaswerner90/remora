@@ -1,7 +1,8 @@
 module.exports = {
   exportPathMap: function () {
     return {
-      '/dashboard': { page: '/dashboard' }
+      '/dashboard': { page: '/dashboard' },
+      '/signin': { page: '/signin' },
     }
   },
   publicRuntimeConfig: { // Will be available on both server and client

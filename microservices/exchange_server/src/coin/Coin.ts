@@ -6,7 +6,7 @@ const redis: RedisClient = new RedisClient();
 
 export default class Coin {
   public symbol: string = '';
-  private _redisKeys: TCoinRedisKeys;
+  public _redisKeys: TCoinRedisKeys;
   private _actualPrice: number = 0;
   private _nearPositionBuy: number;
   private _nearPositionSell: number;
@@ -40,11 +40,24 @@ export default class Coin {
   public get id() {
     return `${this.symbol}_${this.exchange}`;
   }
+
+  private get _commonRedisProperties() {
+    return {
+      coin: {
+        id: this.id,
+        symbol: this.symbol,
+        exchange: this.exchange,
+      },
+    };
+  }
   public set priceChange24hr(newValue:number) {
     if (!isNaN(newValue) && isFinite(newValue)) {
       this._priceChange24hr = newValue;
-      const redisValue = JSON.stringify({ id: this.id, symbol: this.symbol, exchange: this.exchange, price: this._priceChange24hr });
-      redis.setPriceChange(this._redisKeys.PRICE_CHANGE_24HR, redisValue);
+      const redisValue = {
+        ...this._commonRedisProperties,
+        price: this._priceChange24hr,
+      };
+      redis.setPriceChange(this._redisKeys.PRICE_CHANGE_24HR, JSON.stringify(redisValue));
     }
   }
 
@@ -83,8 +96,11 @@ export default class Coin {
   public set actualPrice(newValue: number) {
     if (newValue > 0) {
       this._actualPrice = newValue;
-      const redisValue = JSON.stringify({ id: this.id, symbol: this.symbol, exchange: this.exchange, price: this._actualPrice });
-      redis.setLatestPrice(this._redisKeys.LATEST_PRICE, redisValue);
+      const redisValue = {
+        ...this._commonRedisProperties,
+        price: this._actualPrice,
+      };
+      redis.setLatestPrice(this._redisKeys.LATEST_PRICE, JSON.stringify(redisValue));
     }
   }
 
@@ -101,8 +117,11 @@ export default class Coin {
   public set pricesList(prices: TPricesList) {
     this._pricesList = prices.splice(prices.length - 100, prices.length - 1);
     // Set the new value for the redis key's last order
-    const redisValue = JSON.stringify({ id: this.id, symbol: this.symbol, exchange: this.exchange, prices: this._pricesList });
-    redis.setPricesList(this._redisKeys.PRICES_LIST, redisValue);
+    const redisValue = {
+      ...this._commonRedisProperties,
+      prices: this._pricesList,
+    };
+    redis.setPricesList(this._redisKeys.PRICES_LIST, JSON.stringify(redisValue));
   }
 
   /**
@@ -267,10 +286,10 @@ export default class Coin {
     for (const [orderPrice, orderQuantity] of Object.entries(newCoinOrders)) {
       const price: number = parseFloat(orderPrice);
       const coinQuantity: number = parseFloat(orderQuantity.toString());
-      const value = price * coinQuantity;
+      const value = Math.round(price * coinQuantity);
       if (value < this.alarm.order && whaleOrders[orderPrice]) {
         console.log(`Order DELETED at price ${orderPrice} for ${this.symbol}--> Previous value: ${whaleOrders[orderPrice].quantity} New Value: ${value}`);
-        delete whaleOrders[orderPrice];
+        whaleOrders[orderPrice] = undefined;
         numOrdersDeleted++;
       }
     }
@@ -300,7 +319,7 @@ export default class Coin {
     for (const [orderPrice, orderQuantity] of Object.entries(orders)) {
       const price: number = parseFloat(orderPrice);
       const coinQuantity: number = parseFloat(orderQuantity);
-      const value = price * coinQuantity;
+      const value = Math.round(price * coinQuantity);
       position++;
       sumVolume += value;
       if (value > this.alarm.order) {
@@ -323,45 +342,19 @@ export default class Coin {
   }
 
   public getOrdersProperties(type: 'buy' | 'sell' = 'buy') {
-    const orderInfo: any = {};
-    orderInfo.name = this.symbol;
-    orderInfo.exchange = this.exchange;
-    orderInfo.type = type;
     switch (type) {
       case 'buy':
         if (this.nearPositionBuy > 0) {
-          const { id, quantity, createdAt, lastPosition, type } = this.whaleOrders.buy[this.nearPositionBuy].toJSON();
-          orderInfo.id = id;
-          orderInfo.details = {
-            type,
-            createdAt,
-            quantity: Math.round(quantity),
-            price: this.nearPositionBuy,
-            position: lastPosition,
-          };
-        } else {
-          orderInfo.id = 'NOT_EXISTS';
+          return this.whaleOrders.buy[this.nearPositionBuy].toJSON();
         }
         break;
 
       default:
         if (this.nearPositionSell > 0) {
-          const { id, quantity, createdAt, lastPosition } = this.whaleOrders.sell[this.nearPositionSell].toJSON();
-          orderInfo.id = id;
-          orderInfo.details = {
-            type,
-            createdAt,
-            quantity: Math.round(quantity),
-            price: this.nearPositionSell,
-            position: lastPosition,
-          };
-        } else {
-          orderInfo.id = 'NOT_EXISTS';
+          return this.whaleOrders.sell[this.nearPositionSell].toJSON();
         }
         break;
     }
-
-    return orderInfo;
   }
   public containsOrders() {
     return this.containsBuyOrders() || this.containsSellOrders();

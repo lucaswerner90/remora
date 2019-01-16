@@ -35,7 +35,7 @@ export class FavoritesList extends Component {
     const header = (
       <Grid item xs={12}>
         <Typography variant="h4">
-          <strong>Favorites</strong>
+          Favorites
         </Typography>
         <Typography variant="body1">
           Add coins to your favorites and get access to more info faster.
