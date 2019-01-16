@@ -3,25 +3,10 @@ import PropTypes from 'prop-types';
 import SocketComponent from './SocketComponent';
 import { Grid, Typography, Card, CardContent, CardActions } from '@material-ui/core';
 
-
 import CoinProperty from '../dashboard/subcomponents/CoinProperty';
 import GenericPriceChart from '../dashboard/subcomponents/charts/GenericPriceChart';
 import CoinCardButtons from '../dashboard/subcomponents/CoinCardButtons';
 
-const getTimeAgo = (date = new Date()) => {
-  const now = Date.now();
-  const difference = Math.round((now - date.getTime()) / 1000);
-
-  const timeInMinutes = Math.round(difference / 60);
-  const timeInHours = Math.round(timeInMinutes / 60);
-  if (timeInHours >= 1) {
-    return `Created ${Math.round(timeInMinutes)} hours ago`;
-  }
-  if (timeInMinutes >= 1) {
-    return `Created ${Math.round(timeInMinutes)} minutes ago`;
-  }
-  return `Created ${difference} seconds ago`;
-}
 
 const textStyle = { color: 'white', fontSize: '0.625rem' };
 
@@ -65,7 +50,7 @@ export class CoinSocketComponent extends SocketComponent {
     sellOrder: {},
   }
   constructor(props) {
-    super(props, `${props.coin.exchange}_${props.coin.id}`);
+    super(props, `${props.coin.id}`);
   }
   onSocketData = ({ info = {}, type = '' }) => {
     switch (type) {

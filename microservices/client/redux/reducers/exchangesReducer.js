@@ -8,7 +8,7 @@ const initialState = {
     url: 'https://binance.com',
     coins: [
       {
-        id: 'ETHUSDT',
+        id: 'binance_ETHUSDT',
         coinSymbol: 'ETH',
         name: 'Ethereum',
         against: '$',
@@ -16,7 +16,7 @@ const initialState = {
         exchange: 'binance'
       },
       {
-        id: 'LTCUSDT',
+        id: 'binance_LTCUSDT',
         name: 'Litecoin',
         against: '$',
         coinSymbol: 'LTC',
@@ -24,7 +24,7 @@ const initialState = {
         exchange: 'binance'
       },
       {
-        id: 'BTCUSDT',
+        id: 'binance_BTCUSDT',
         name: 'Bitcoin',
         against: '$',
         coinSymbol: 'BTC',
@@ -32,11 +32,11 @@ const initialState = {
         exchange: 'binance'
       },
       {
-        id: 'XRPUSDT',
+        id: 'binance_XRPUSDT',
         name: 'Ripple',
         against: '$',
         coinSymbol: 'XRP',
-        url: 'https://binance.com/en/trade/pro/BTC_USDT',
+        url: 'https://binance.com/en/trade/pro/XRP_USDT',
         exchange: 'binance'
       },
     ]

@@ -20,7 +20,6 @@ export class CoinDetailView extends Component {
   render() {
     const { coin } = this.props;
     const { pricesList = [], priceChange = 0, volumeDifference = 0, buyOrder = {}, sellOrder = {} } = coin;
-    console.log(coin);
     let hasPriceIncreased = false;
     if (pricesList.length > 1 ) {
       const lastPrice = pricesList.unshift() - pricesList[pricesList.length - 2];

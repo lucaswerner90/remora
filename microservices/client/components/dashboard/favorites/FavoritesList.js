@@ -8,11 +8,11 @@ import CoinSocketComponent from '../../common/CoinSocketComponent';
 import { connect } from 'react-redux';
 import { getFavorites } from '../../../redux/actions/coinActions';
 
-const mapStateToProps = state => ({
+const mapReduxStateToComponentProps = state => ({
   favorites: state.coin.favorites,
 });
 
-const renderList = (coinsArray = [], tileSize = 3, {showExchange = false}) => {
+const renderList = (coinsArray = [], tileSize = 3, { showExchange = false }) => {
   return coinsArray.map(coin =>
     <CoinSocketComponent key={coin.id} coin={coin} tileSize={tileSize} showExchange={showExchange} isFavorite={true}/>
   );
@@ -63,4 +63,4 @@ export class FavoritesList extends Component {
   }
 }
 
-export default connect(mapStateToProps, { getFavorites })(FavoritesList);
+export default connect(mapReduxStateToComponentProps, { getFavorites })(FavoritesList);

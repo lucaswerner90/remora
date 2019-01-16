@@ -5,7 +5,7 @@ const initialState = {
   selected: {},
   favorites: [
     {
-      id: 'ETHUSDT',
+      id: 'binance_ETHUSDT',
       name: 'Ethereum',
       against: '$',
       isFavorite: true,
@@ -14,7 +14,7 @@ const initialState = {
       exchange: 'binance'
     },
     {
-      id: 'BTCUSDT',
+      id: 'binance_BTCUSDT',
       name: 'Bitcoin',
       isFavorite: true,
       against: '$',
@@ -23,6 +23,7 @@ const initialState = {
       exchange: 'binance'
     },
   ],
+  coinInfo: {}
 };
 
 
@@ -36,19 +37,13 @@ export default (state = initialState, action) => {
       };
     case UPDATE_COIN_INFO:
       console.log(payload);
-      // return {
-      //   ...state,
-      //   info: {
-      //     ...state.info,
-      //     [payload.exchange]: {
-      //       ...state.info[payload.exchange],
-      //       [payload.id]: {
-      //         ...state.info[payload.exchange][payload.id],
-      //         ...payload
-      //       }
-      //     }
-      //   }
-      // };
+      return {
+        ...state,
+        coinInfo: {
+          ...state.coinInfo,
+          [payload.id]: payload
+        }
+      }
     case GET_ALL_FAVORITES:
       return {...state};
     default:

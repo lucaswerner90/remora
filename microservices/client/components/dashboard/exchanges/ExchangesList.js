@@ -30,9 +30,6 @@ export class ExchangesList extends Component {
   componentWillMount() {
     this.props.getExchangesInfo();
   }
-  componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
-  }
   shouldComponentUpdate(nextProps) {
     return Object.keys(this.props.exchanges) !== Object.keys(nextProps.exchanges);
   }

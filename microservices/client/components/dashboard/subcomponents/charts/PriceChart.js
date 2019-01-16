@@ -29,7 +29,6 @@ class PriceChart extends React.Component {
     return rerender;
   }
   render() {
-    console.log('Hello world?')
     const { sell={}, buy={}, prices=[] } = this.props;
     const price = prices.length ? prices[prices.length - 1] : 0;
     const priceAnnotation = price ? {
