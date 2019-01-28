@@ -44,16 +44,17 @@ class GenericPriceChart extends Component {
 
   shouldComponentUpdate(nextProps = {buyOrder:{}, sellOrder:{}, prices:[]}) {
     const { buyOrder = {}, sellOrder = {}, prices = [] } = this.props;
-    const differentBuyOrder = buyOrder && buyOrder.price && (buyOrder.price !== nextProps.buyOrder.price);
-    const differentSellOrder = sellOrder && sellOrder.price && (sellOrder.price !== nextProps.sellOrder.price);
-    const differentPrice = prices.length && nextProps.prices.length && (prices[prices.length - 1] !== nextProps.prices[prices.length - 1]);
+    const differentBuyOrder = buyOrder.price !== nextProps.buyOrder.price;
+    const differentSellOrder = sellOrder.price !== nextProps.sellOrder.price;
+    const differentPrice = prices[prices.length - 1] !== nextProps.prices[prices.length - 1];
     
     const rerender = differentBuyOrder || differentSellOrder || differentPrice;
     return rerender;
   }
 
   render() {
-    const { prices = [], buy: buyOrder = {}, sell: sellOrder = {}, isFavorite } = this.props;
+    const { prices = [], buy: buyOrder = {}, sell: sellOrder = {}, isFavorite = false } = this.props;
+    const pricesList = prices.splice(prices.length - 20, prices.length - 1);
     const buyOrderAnnotation = buyOrder && buyOrder.price ? {
       y: buyOrder.price,
       borderColor: '#72CAA8',
@@ -96,16 +97,21 @@ class GenericPriceChart extends Component {
           enabled:false,
         },
         chart: {
+          animations: {
+            enabled: true,
+            easing: 'linear',
+            dynamicAnimation: {
+              speed: 2000
+            }
+          },
           toolbar: {
             show: false
           },
         },
         yaxis: {
           axisBorder: {
-            show: false,
+            show: true,
           },
-          min: Math.min(...prices) * 0.99,
-          max: Math.max(...prices) * 1.01,
         },
         xaxis: {
           labels: {
@@ -118,7 +124,7 @@ class GenericPriceChart extends Component {
           },
           axisTicks: {
             show: false
-          }
+          },
         },
         annotations: {
           yaxis: [buyOrderAnnotation, sellOrderAnnotation],
@@ -138,20 +144,20 @@ class GenericPriceChart extends Component {
           type: 'gradient',
           gradient: {
             shade: 'light',
-            gradientToColors: ['white'],
-            shadeIntensity: 0.5,
+            gradientToColors: ['transparent','white'],
+            shadeIntensity: 0,
             type: 'horizontal',
             opacityFrom: 0,
             opacityTo: 1,
-            stops: [0, 100]
+            stops: [0, 100, 0, 100]
           },
         },
       },
       series: [{
-        data: prices
+        data: pricesList
       }],
     };
-    if (prices.length > 0) {
+    if (pricesList.length > 0) {
       return (
         <Chart
           options={graphOptions.options}

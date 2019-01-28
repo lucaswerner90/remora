@@ -51,11 +51,6 @@ export default class ExchangeConnection {
     this._mainCoin = mainCoin;
     this.config();
     this.coinsList = this.getCoins(this.mainCoin);
-
-    // This is only for informative purposses, it shows the different coins and its properties/orders
-    // setInterval(() => {
-    //   this.refreshTable();
-    // }, 10 * 1000);
   }
   protected get mainCoin() {
     return this._mainCoin;

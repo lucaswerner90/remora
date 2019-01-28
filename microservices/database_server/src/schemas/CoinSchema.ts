@@ -62,30 +62,30 @@ export default class CoinSchema extends Schema{
     }
   }
 
-  private writePriceChange({ id, symbol, exchange, price }) {
-    CoinSchema.model.findByIdAndUpdate(id, { symbol, exchange, priceChange24hr: parseFloat(price) }, this._writeOptions, (err, res) => {
+  private writePriceChange({ coin, price }) {
+    CoinSchema.model.findByIdAndUpdate(coin.id, { symbol: coin.symbol, exchange: coin.exchange, priceChange24hr: parseFloat(price) }, this._writeOptions, (err, res) => {
       if (err) {
         console.trace(err);
       }
     });
   }
-  private writeLatestPrice({ id, symbol, exchange, price }) {
-    CoinSchema.model.findByIdAndUpdate(id, { symbol, exchange, price: parseFloat(price) }, this._writeOptions, (err, res) => {
+  private writeLatestPrice({ coin , price }) {
+    CoinSchema.model.findByIdAndUpdate(coin.id, { symbol: coin.symbol, exchange: coin.exchange, price: parseFloat(price) }, this._writeOptions, (err, res) => {
       if (err) {
         console.trace(err);
       }
     });
   }
 
-  private writePriceList({ id, symbol, exchange, prices }) {
-    CoinSchema.model.findByIdAndUpdate(id, { symbol, exchange, listOfPrices: prices }, this._writeOptions, (err, res) => {
+  private writePriceList({ coin, prices }) {
+    CoinSchema.model.findByIdAndUpdate(coin.id, { symbol: coin.symbol, exchange: coin.exchange, listOfPrices: prices }, this._writeOptions, (err, res) => {
       if (err) {
         console.trace(err);
       }
     });
   }
-  private writeVolumeDifference({ id, tendency, symbol, exchange, currentVolumeDifference }) {
-    CoinSchema.model.findByIdAndUpdate(id, { symbol, exchange, tendency, currentVolumeDifference }, this._writeOptions, (err, res) => {
+  private writeVolumeDifference({ coin, tendency, currentVolumeDifference }) {
+    CoinSchema.model.findByIdAndUpdate(coin.id, { tendency, currentVolumeDifference, symbol: coin.symbol, exchange: coin.exchange }, this._writeOptions, (err, res) => {
       if (err) {
         console.trace(err);
       }

@@ -1,20 +1,27 @@
 import React, { Component } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Layout from '../components/Layout';
-import FavoritesList from '../components/dashboard/favorites/FavoritesList';
-import ExchangesList from '../components/dashboard/exchanges/ExchangesList';
+import { withStyles } from '@material-ui/core/styles';
+import CoinDetailView from '../components/dashboard/CoinDetailView';
+import RightSideView from '../components/dashboard/RightSideView';
 
 
+const styles = () => ({
+  root: {
+    flexGrow: 1,
+  },
+});
 class Dashboard extends Component {
   render() {
+
     return (
       <Layout>
-        <Grid container style={{ flexGrow: 1 }} spacing={24}>
-          <Grid item xs={12}>
-            <FavoritesList />
+        <Grid container style={{ flexGrow: 1, height: '100vh' }} spacing={40}>
+          <Grid item xs={9}>
+            <CoinDetailView/>
           </Grid>
-          <Grid item xs={12}>
-            <ExchangesList />
+          <Grid item xs={3}>
+            <RightSideView/>
           </Grid>
         </Grid>
       </Layout>
@@ -22,4 +29,4 @@ class Dashboard extends Component {
   }
 }
 
-export default Dashboard;
+export default withStyles(styles)(Dashboard);

@@ -8,8 +8,8 @@ export default class Coin {
   public symbol: string = '';
   public _redisKeys: TCoinRedisKeys;
   private _actualPrice: number = 0;
-  private _nearPositionBuy: number;
-  private _nearPositionSell: number;
+  private _buyPosition: number;
+  private _sellPosition: number;
   private _pricesList: TPricesList = [];
   private _whaleOrders: TCoinWhaleOrders = { buy: {}, sell:{} };
   private _alarm: TCoinAlarm;
@@ -19,6 +19,9 @@ export default class Coin {
   private _lastSellVolume: number = 0;
   private _priceChange24hr: number = -1;
   private _against: string;
+  // private _volumeInBetween: number = 0;
+  private buyOrders: {};
+  private sellOrders: {};
   constructor(symbol: string = '', { alarm = { order : 0, volume : 0 } }, against = 'USD', exchange: string = '') {
     this.symbol = symbol;
     this._against = against;
@@ -26,8 +29,8 @@ export default class Coin {
     this._exchange = exchange;
 
     this._redisKeys = {
-      NEAR_BUY_ORDER: `${this.exchange}_${this.symbol}_buy_near_order`,
-      NEAR_SELL_ORDER: `${this.exchange}_${this.symbol}_sell_near_order`,
+      BUY_ORDER: `${this.exchange}_${this.symbol}_buy_order`,
+      SELL_ORDER: `${this.exchange}_${this.symbol}_sell_order`,
       PRICES_LIST: `${this.exchange}_${this.symbol}_prices_list`,
       LATEST_PRICE: `${this.exchange}_${this.symbol}_latest_price`,
       VOLUME_DIFFERENCE: `${this.exchange}_${this.symbol}_volume_difference`,
@@ -172,17 +175,17 @@ export default class Coin {
    * @memberof Coin
    */
   public updateOrders({ sellOrders = {}, buyOrders = {} }) {
-    let needToUpdateOrders = false;
+    this.buyOrders = buyOrders;
+    this.sellOrders = sellOrders;
+
     // Delete previous whale orders if they just dissapear
     const deletedBuyOrders = this._deleteWhaleOrders(this.whaleOrders.buy, buyOrders);
     if (deletedBuyOrders.numOrdersDeleted) {
-      needToUpdateOrders = true;
       this.whaleOrders.buy = deletedBuyOrders.whaleOrders;
     }
 
     const deletedSellOrders = this._deleteWhaleOrders(this.whaleOrders.sell, sellOrders);
     if (deletedSellOrders.numOrdersDeleted) {
-      needToUpdateOrders = true;
       this.whaleOrders.sell = deletedSellOrders.whaleOrders;
     }
 
@@ -197,7 +200,6 @@ export default class Coin {
       // Create/update the whale buy orders
       const assignNewBuyOrders = this._assignWhaleOrders('buy', newBuyOrders, this.whaleOrders.buy);
       if (assignNewBuyOrders.hasBeenModified) {
-        needToUpdateOrders = true;
         this.whaleOrders.buy = assignNewBuyOrders.whaleOrdersArray;
       }
     }
@@ -205,16 +207,23 @@ export default class Coin {
       // Create/update the whale sell orders
       const assignNewSellOrders = this._assignWhaleOrders('sell', newSellOrders, this.whaleOrders.sell);
       if (assignNewSellOrders.hasBeenModified) {
-        needToUpdateOrders = true;
         this.whaleOrders.sell = assignNewSellOrders.whaleOrdersArray;
       }
     }
-    if (needToUpdateOrders) {
-      this.updateNearOrders();
-    }
+    this.updateNearOrders();
 
   }
 
+  public calculateVolumeInBetweenWhaleOrders(buyOrders = this.buyOrders, sellOrders = this.sellOrders) {
+    const validBuyKeys = Object.keys(buyOrders)
+      .map(key => parseFloat(key))
+      .filter(key => key >= this.buyPosition && key <= this.actualPrice);
+    const validSellKeys = Object.keys(sellOrders)
+      .map(key => parseFloat(key))
+      .filter(key => key >= this.actualPrice && key <= this.sellPosition);
+
+    console.log(`Price: ${this.actualPrice}, buyOrders: ${validBuyKeys.length}, sellOrders: ${validSellKeys.length}`);
+  }
   /**
    *
    * Update the orders
@@ -229,49 +238,51 @@ export default class Coin {
         .map(key => parseFloat(key))
         .filter(key => key <= this.actualPrice);
       const newPosition = Math.max(...validKeys);
-      this.nearPositionBuy = newPosition;
+      this.buyPosition = newPosition;
     } else {
-      this.nearPositionBuy = -1;
+      this.buyPosition = -1;
     }
 
     if (this.containsSellOrders()) {
       const validKeys = Object.keys(this.whaleOrders.sell)
         .map(key => parseFloat(key))
         .filter(key => key >= this.actualPrice);
-      this.nearPositionSell = Math.min(...validKeys);
+      this.sellPosition = Math.min(...validKeys);
     } else {
-      this.nearPositionSell = -1;
+      this.sellPosition = -1;
+    }
+
+    if (this.sellPosition > -1 && this.buyPosition > -1) {
+      this.calculateVolumeInBetweenWhaleOrders(this.buyOrders, this.sellOrders);
     }
   }
 
-  public set nearPositionSell(newValue: number) {
-    this._nearPositionSell = newValue;
-    if (newValue > -1 && this.whaleOrders.sell[this.nearPositionSell]) {
-      if (this.whaleOrders.sell[this.nearPositionSell].toJSON) {
-        const redisValue = JSON.stringify(this.getOrdersProperties('sell'));
-        redis.setOrderValue(this._redisKeys.NEAR_SELL_ORDER, redisValue);
-      }
-    } else {
-      redis.setOrderValue(this._redisKeys.NEAR_SELL_ORDER, JSON.stringify({}));
+  public set sellPosition(newValue: number) {
+    this._sellPosition = newValue;
+    let redisValue: any = { ...this._commonRedisProperties, order: {}, type: 'sell' };
+    if (newValue > -1 && this.whaleOrders.sell[this.sellPosition] && this.whaleOrders.sell[this.sellPosition].toJSON) {
+      redisValue = {
+        ...this._commonRedisProperties,
+        order: this.getOrdersProperties('sell'),
+      };
     }
+    redis.setOrderValue(this._redisKeys.SELL_ORDER, JSON.stringify(redisValue));
   }
-  public get nearPositionSell(): number {
-    return this._nearPositionSell;
+  public get sellPosition(): number {
+    return this._sellPosition;
   }
 
-  public set nearPositionBuy(newValue: number) {
-    this._nearPositionBuy = newValue;
-    if (newValue > -1 && this.whaleOrders.buy[this.nearPositionBuy]) {
-      if (this.whaleOrders.buy[this.nearPositionBuy].toJSON) {
-        const redisValue = JSON.stringify(this.getOrdersProperties('buy'));
-        redis.setOrderValue(this._redisKeys.NEAR_BUY_ORDER, redisValue);
-      }
-    } else {
-      redis.setOrderValue(this._redisKeys.NEAR_BUY_ORDER, JSON.stringify({}));
+  public set buyPosition(newValue: number) {
+    this._buyPosition = newValue;
+    let redisValue: any = { ...this._commonRedisProperties, order: {}, type: 'buy' };
+    if (newValue > -1 && this.whaleOrders.buy[this.buyPosition] &&
+      this.whaleOrders.buy[this.buyPosition].toJSON) {
+      redisValue = { ...redisValue, order: this.getOrdersProperties('buy') };
     }
+    redis.setOrderValue(this._redisKeys.BUY_ORDER, JSON.stringify(redisValue));
   }
-  public get nearPositionBuy(): number {
-    return this._nearPositionBuy;
+  public get buyPosition(): number {
+    return this._buyPosition;
   }
   /**
    *
@@ -287,8 +298,7 @@ export default class Coin {
       const price: number = parseFloat(orderPrice);
       const coinQuantity: number = parseFloat(orderQuantity.toString());
       const value = Math.round(price * coinQuantity);
-      if (value < this.alarm.order && whaleOrders[orderPrice]) {
-        console.log(`Order DELETED at price ${orderPrice} for ${this.symbol}--> Previous value: ${whaleOrders[orderPrice].quantity} New Value: ${value}`);
+      if (whaleOrders[orderPrice] && value < this.alarm.order) {
         whaleOrders[orderPrice] = undefined;
         numOrdersDeleted++;
       }
@@ -330,31 +340,8 @@ export default class Coin {
     return { numOrders, sumVolume, orders: whaleOrders };
   }
 
-  public getVolumeProperties() {
-    return {
-      id: this.id,
-      exchange: this.exchange,
-      actualPrice: this.actualPrice,
-      symbol: this.symbol,
-      tendency: this.tendency,
-      currentVolumeDifference: this._currentVolumeDifference,
-    };
-  }
-
   public getOrdersProperties(type: 'buy' | 'sell' = 'buy') {
-    switch (type) {
-      case 'buy':
-        if (this.nearPositionBuy > 0) {
-          return this.whaleOrders.buy[this.nearPositionBuy].toJSON();
-        }
-        break;
-
-      default:
-        if (this.nearPositionSell > 0) {
-          return this.whaleOrders.sell[this.nearPositionSell].toJSON();
-        }
-        break;
-    }
+    return type === 'buy' ? this.whaleOrders.buy[this.buyPosition].toJSON() : this.whaleOrders.sell[this.sellPosition].toJSON();
   }
   public containsOrders() {
     return this.containsBuyOrders() || this.containsSellOrders();

@@ -114,11 +114,6 @@ export default class Order {
   public toJSON() {
     return {
       id: this._id,
-      coin: {
-        id: this._coin.id,
-        exchange: this._coin.exchange,
-        symbol: this._coin.symbol,
-      },
       initialValues: {
         position: this._initialPosition,
         quantity: this._initialQuantity,

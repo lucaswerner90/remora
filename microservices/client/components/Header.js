@@ -1,24 +1,24 @@
 import React from 'react';
 import { Grid, Typography } from '@material-ui/core';
 import Link from 'next/link';
+import HeaderMenu from './HeaderMenu';
 const Header = () => {
   return (
-    <Grid container style={{ height: '40px' }} spacing={24} style={{ borderBottom:'1px solid #05354a'}}>
-        <Grid item xs={3}>
+    <Grid container spacing={0} justify="space-between"
+      alignItems="center">
+        <Grid item>
+          <HeaderMenu />
+        </Grid>
+        <Grid item xs={9}>
           <Link href="/">
-              <Typography variant="h5" align="left">
-                <a>Rémora</a>
-              </Typography>
+            <Typography style={{fontSize:'1.25rem', fontWeight:500}} align="left">
+              <a>rémora</a>
+            </Typography>
           </Link>
         </Grid>
-        <Grid item xs={6}>
-          <Typography variant="h6" align="center">
-            <a>Dashboard</a>
-          </Typography>
-        </Grid>
-        <Grid item xs={3}>
-          <Typography variant="body2" align="right">
-            <a>CONFIG</a>
+        <Grid item xs={2}>
+          <Typography variant="body2" component="span" align="right">
+            <a>Lucas Werner</a>
           </Typography>
         </Grid>
       </Grid>

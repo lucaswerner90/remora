@@ -10,7 +10,7 @@ import CoinCardButtons from '../dashboard/subcomponents/CoinCardButtons';
 
 const textStyle = { color: 'white', fontSize: '0.625rem' };
 
-const renderOrderInfo = ({ price = 0, hasBeenExecuted = false, currentValues = { quantity: 0}, type = '' }, against = '') => {
+const renderOrderInfo = ({ price = 0, hasBeenExecuted = false, currentValues = { quantity: 0 }, type = '' }, against = '') => {
   if (price) {
     return (
       <Grid item xs={12}>
@@ -62,15 +62,15 @@ export class CoinSocketComponent extends SocketComponent {
         break;
       case 'order':
         if (info.type === 'buy') {
-          this.setState({ ...this.state, buyOrder:info });
+          this.setState({ ...this.state, buyOrder:info.order });
         } else {
-          this.setState({ ...this.state, sellOrder:info });
+          this.setState({ ...this.state, sellOrder:info.order });
         }
         break;
       case 'price_change_24hr':
         this.setState({ ...this.state, priceChange: parseFloat(info.price) });
         break;
-        case 'price_list':
+      case 'price_list':
         this.setState({ ...this.state, ...info });
         break;
         

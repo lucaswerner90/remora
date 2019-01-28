@@ -6,7 +6,9 @@ const { publicRuntimeConfig } = getConfig();
 const { backend = 'localhost:8080' } = publicRuntimeConfig;
 
 export class SocketComponent extends Component {
-  onSocketData = () => { };
+  onSocketData = () => {
+    throw Error('Implement the onSocketData in order to manage the data coming from the websocket');
+  };
   constructor(props, channel) {
     super(props);
     this.socket = io(backend, { forceNew: true });

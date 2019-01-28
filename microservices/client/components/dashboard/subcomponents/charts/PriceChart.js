@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import dynamic from 'next/dynamic';
+import lightBlue from '@material-ui/core/colors/lightBlue';
+
 const Chart = dynamic(import('react-apexcharts'), { ssr: false });
 
 
@@ -20,34 +22,15 @@ class PriceChart extends React.Component {
   }
 
   shouldComponentUpdate(nextProps = { buy: {}, sell: {}, prices: [] }) {
-    const { buy = {}, sell = {}, prices = [] } = this.props;
-    const differentbuy = buy && buy.price && (buy.price !== nextProps.buy.price);
-    const differentsell = sell && sell.price && (sell.price !== nextProps.sell.price);
+    const { prices = [] } = this.props;
     const differentPrice = prices.length && nextProps.prices.length && (prices[prices.length - 1] !== nextProps.prices[prices.length - 1]);
 
-    const rerender = differentbuy || differentsell || differentPrice;
+    const rerender = differentPrice;
     return rerender;
   }
   render() {
     const { sell={}, buy={}, prices=[] } = this.props;
     const price = prices.length ? prices[prices.length - 1] : 0;
-    const priceAnnotation = price ? {
-      y: price,
-      borderColor: 'blue',
-      label: {
-        position: 'right',
-        offsetX: -20,
-        offsetY: -10,
-        borderColor: 'blue',
-        style: {
-          color: '#fff',
-          background: 'blue',
-          fontFamily: 'Roboto',
-          fontSize: '12px'
-        },
-        text: `Price: ${price}$`,
-      }
-    } : {};
     const buyAnnotation = buy && buy.price ? {
       y: buy.price,
       borderColor: '#00E396',
@@ -60,7 +43,7 @@ class PriceChart extends React.Component {
           color: '#fff',
           background: '#00E396',
           fontFamily: 'Roboto',
-          fontSize: '12px'
+          fontSize: '10px'
         },
         text: `Buy at ${buy.price}$, margin of ${Math.round((((price / buy.price) - 1) * 100) * 10) / 10}%`,
       }
@@ -77,7 +60,7 @@ class PriceChart extends React.Component {
           color: '#fff',
           background: '#FF4560',
           fontFamily: 'Roboto',
-          fontSize: '12px'
+          fontSize: '10px'
         },
         text: `Sell at ${sell.price}$, margin of ${Math.round((((sell.price/price)-1)*100)*10)/10}%`,
       }
@@ -88,36 +71,21 @@ class PriceChart extends React.Component {
           enabled: false,
         },
         chart: {
+          animations: {
+            enabled: true,
+            easing: 'linear',
+            dynamicAnimation: {
+              speed: 2000
+            }
+          },
           toolbar: {
             show: false
           },
-          
-        },
-        tooltip: {
-          show: false,
         },
         yaxis: {
-          labels: {
-            show: true,
-            minWidth: 0,
-            maxWidth: 160,
-            style: {
-              color: 'primary',
-              fontSize: '12px',
-              fontFamily: 'Roboto',
-              cssClass: 'apexcharts-yaxis-label',
-            },
-            offsetX: 0,
-            offsetY: 0,
-            formatter: (val) => Math.round(val)
-          },
           axisBorder: {
             show: true,
-            color: 'primary',
-            width: 1,
           },
-          min: Math.min(...prices)*0.98,
-          max: Math.max(...prices) * 1.02,
         },
         xaxis: {
           labels: {
@@ -128,33 +96,41 @@ class PriceChart extends React.Component {
             width: '100%',
             height: 1
           },
-          axisTicks:{
+          axisTicks: {
             show: false
-          }
+          },
+        },
+        annotations: {
+          yaxis: [buyAnnotation, sellAnnotation],
         },
         markers: {
           size: 0,
         },
-        annotations: {
-          yaxis: [priceAnnotation,buyAnnotation, sellAnnotation],
-        },
         stroke: {
-          curve: 'straight',
+          curve: 'smooth',
+          width: 2
         },
+        colors: ['#fff'],
         grid: {
-          column: {
-            colors: ['transparent'],
-            opacity: 0.2
+          show: false,
+        },
+        fill: {
+          type: 'gradient',
+          gradient: {
+            gradientToColors: ['#fff', lightBlue[500]],
+            shade: 'light',
+            shadeIntensity: 0,
+            type: 'vertical',
+            opacityFrom: 1,
+            opacityTo: 0,
           },
-          row: {
-            colors: ['transparent', 'transparent'], // takes an array which will be repeated on columns
-            opacity: 0.2
-          },
+        },
+        dataLabels: {
+          enabled: false
         },
       },
       series: [{
-        name: 'Price',
-        data: this.props.prices
+        data: prices
       }],
     };
     if (prices.length > 0) {
@@ -162,7 +138,7 @@ class PriceChart extends React.Component {
         <Chart
           options={graphOptions.options}
           series={graphOptions.series}
-          type="line"
+          type="area"
           width="100%"
           height="300px"
         />

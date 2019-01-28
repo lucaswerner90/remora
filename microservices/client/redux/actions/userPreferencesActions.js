@@ -1,27 +1,67 @@
-import { FETCH_USER_PREFERENCES, UPDATE_USER_PREFERENCES } from './types';
+import { UPDATE_USER_PREFERENCES, UPDATE_USER_FAVORITE_COINS, UPDATE_USER_SELECTED_COIN, GET_USER_SELECTED_COIN, UPDATE_USER_NOTIFICATIONS, GET_USER_FAVORITE_COINS } from './types';
 
-import fetch from 'isomorphic-unfetch';
+// import fetch from 'isomorphic-unfetch';
 
-export const fetchPosts = () => async dispatch => {
-  const res = await fetch('https://jsonplaceholder.typicode.com/posts');
-  const posts = await res.json();
+
+export const getUserSelectedCoin = () => dispatch => {
   dispatch({
-    type: FETCH_USER_PREFERENCES,
-    payload: posts
+    type: GET_USER_SELECTED_COIN,
   });
-};
-
-export const createPost = postData => async dispatch => {
-  const res = await fetch('https://jsonplaceholder.typicode.com/posts', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json'
-    },
-    body: JSON.stringify(postData)
-  });
-  const post = await res.json();
+}
+export const updateUserSelectedCoin = payload => dispatch => {
   dispatch({
+    payload,
+    type: UPDATE_USER_SELECTED_COIN,
+  });
+}
+
+export const updateUserNotifications = payload => dispatch => {
+  dispatch({
+    payload,
+    type: UPDATE_USER_NOTIFICATIONS,
+  });
+}
+export const updateUserFavorites = payload => dispatch => {
+  dispatch({
+    payload,
+    type: UPDATE_USER_FAVORITE_COINS,
+  });
+}
+export const getUserFavoriteCoins = () => dispatch => {
+  dispatch({
+    type: GET_USER_FAVORITE_COINS,
+  });
+}
+export const updateUserPreferences = payload => dispatch => {
+  dispatch({
+    payload,
     type: UPDATE_USER_PREFERENCES,
-    payload: post
   });
-};
+}
+
+
+
+
+// export const fetchPosts = () => async dispatch => {
+//   const res = await fetch('https://jsonplaceholder.typicode.com/posts');
+//   const posts = await res.json();
+//   dispatch({
+//     type: FETCH_USER_PREFERENCES,
+//     payload: posts
+//   });
+// };
+
+// export const createPost = postData => async dispatch => {
+//   const res = await fetch('https://jsonplaceholder.typicode.com/posts', {
+//     method: 'POST',
+//     headers: {
+//       'content-type': 'application/json'
+//     },
+//     body: JSON.stringify(postData)
+//   });
+//   const post = await res.json();
+//   dispatch({
+//     type: UPDATE_USER_PREFERENCES,
+//     payload: post
+//   });
+// };
