@@ -166,16 +166,14 @@ class NotificationsList extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { dense, notifications, pendingNotifications = this.state.notifications.length } = this.state;
+    const { dense, notifications = [], pendingNotifications = this.state.notifications.length } = this.state;
 
     return (
       <Grid container spacing={16}>
         <Grid item xs={12}>
-          <Badge className={classes.padding} color="secondary" badgeContent={pendingNotifications}>
-            <Typography variant="h6">
-              Notifications
-            </Typography>
-          </Badge>
+          <Typography className={classes.padding} variant="h6">
+            NOTIFICATIONS
+          </Typography>
         </Grid>
         <Grid item xs={12} md={12}>
           <List dense={dense} className={classes.list}>

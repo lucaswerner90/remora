@@ -24,6 +24,7 @@ export default (state = initialState, { payload = {}, type = ''}) => {
       };
     
     case UPDATE_USER_FAVORITE_COINS:
+      console.log(payload)
       return {
         ...state,
         userPreferences: {

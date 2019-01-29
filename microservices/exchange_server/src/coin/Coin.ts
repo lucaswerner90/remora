@@ -103,6 +103,7 @@ export default class Coin {
         ...this._commonRedisProperties,
         price: this._actualPrice,
       };
+      this.updateNearOrders();
       redis.setLatestPrice(this._redisKeys.LATEST_PRICE, JSON.stringify(redisValue));
     }
   }
@@ -145,7 +146,7 @@ export default class Coin {
         const properties: any = _properties;
         if (!whaleOrdersArray[price]) {
           // If the order doesn't exist previously, we create a new one.
-          whaleOrdersArray[price] = new Order(this, type, parseFloat(properties.value), properties.position);
+          whaleOrdersArray[price] = new Order(this, type, price, parseFloat(properties.value), properties.position);
 
           hasBeenModified = true;
 
@@ -210,8 +211,6 @@ export default class Coin {
         this.whaleOrders.sell = assignNewSellOrders.whaleOrdersArray;
       }
     }
-    this.updateNearOrders();
-
   }
 
   public calculateVolumeInBetweenWhaleOrders(buyOrders = this.buyOrders, sellOrders = this.sellOrders) {
@@ -237,8 +236,7 @@ export default class Coin {
       const validKeys = Object.keys(this.whaleOrders.buy)
         .map(key => parseFloat(key))
         .filter(key => key <= this.actualPrice);
-      const newPosition = Math.max(...validKeys);
-      this.buyPosition = newPosition;
+      this.buyPosition = Math.max(...validKeys);
     } else {
       this.buyPosition = -1;
     }
@@ -252,9 +250,9 @@ export default class Coin {
       this.sellPosition = -1;
     }
 
-    if (this.sellPosition > -1 && this.buyPosition > -1) {
-      this.calculateVolumeInBetweenWhaleOrders(this.buyOrders, this.sellOrders);
-    }
+    // if (this.sellPosition > -1 && this.buyPosition > -1) {
+    //   this.calculateVolumeInBetweenWhaleOrders(this.buyOrders, this.sellOrders);
+    // }
   }
 
   public set sellPosition(newValue: number) {

@@ -10,18 +10,19 @@ import getConfig from 'next/config';
 const { publicRuntimeConfig } = getConfig();
 const { backend = 'localhost:8080' } = publicRuntimeConfig;
 
-
 import { connect } from 'react-redux';
 import { getUserSelectedCoin, getUserFavoriteCoins } from '../../redux/actions/userPreferencesActions';
 import { getCoinByID } from '../../redux/actions/coinsActions';
 
 
 import PriceChart from './subcomponents/charts/PriceChart';
+import { red, lightGreen } from '@material-ui/core/colors';
+import { formatPrice } from '../common/utils/Format';
 
 const mapReduxStateToComponentProps = state => ({
   selectedCoin: state.user.userPreferences.selectedCoin,
-  favorites: state.user.userPreferences.favorites,
-  coinInfo: state.coins.selected
+  coinInfo: state.coins.selected,
+  allCoins: state.coins.coins
 });
 
 const initialState = {
@@ -42,7 +43,7 @@ export class CoinDetailView extends Component {
   }
 
   static defaultProps = {
-    selectedCoin: {},
+    selectedCoin: '',
     favorites: [],
     coinInfo: {}
   }
@@ -51,8 +52,6 @@ export class CoinDetailView extends Component {
   }
 
   componentWillMount() {
-    this.props.getUserSelectedCoin();
-    this.props.getUserFavoriteCoins();
     this.props.getCoinByID(this.props.selectedCoin);
     this.socket = io(backend, { forceNew: true });
     this.socket.on(this.props.selectedCoin, this.onSocketData);
@@ -64,22 +63,20 @@ export class CoinDetailView extends Component {
         this.setState({ ...this.state, volumeDifference: info.volumeDifference });
         break;
       case 'order':
-        if (info.type === 'buy') {
-          console.log(info.order)
-          this.setState({ ...this.state, buyOrder: info.order });
-        } else {
-          this.setState({ ...this.state, sellOrder: info.order });
-        }
+        this.setState({
+          ...this.state,
+          [info.type === 'buy' ? 'buyOrder' : 'sellOrder']: info.order
+        });
         break;
       case 'price_change_24hr':
-        this.setState({ ...this.state, priceChange: parseFloat(info.price) });
+        this.setState({ ...this.state, priceChange: info.price });
         break;
       case 'price_list':
-        this.setState({ ...this.state, pricesList: [...info.pricesList] });
+        this.setState({ ...this.state, pricesList: info.pricesList || [] });
         break;
 
       case 'latest_price':
-        this.setState({ ...this.state, price: parseFloat(info.price) });
+        this.setState({ ...this.state, price: info.price });
         break;
 
       default:
@@ -90,11 +87,19 @@ export class CoinDetailView extends Component {
     this.socket.disconnect();
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.selectedCoin !== this.props.selectedCoin) {
+
+      // Get the upcoming coin
       this.props.getCoinByID(nextProps.selectedCoin);
+
+      // Reset all the component state
       this.setState({ ...this.state, initialState });
+
+      // Disconnect from the previous coin
       if (this.socket) this.socket.off(this.props.selectedCoin);
+
+      // Stablish a new connection with the next coin
       this.socket.on(nextProps.selectedCoin, this.onSocketData);
     }
     return true;
@@ -111,98 +116,88 @@ export class CoinDetailView extends Component {
   renderBasicInfo = () => {
     const { volumeDifference = 0, price = 0, priceChange = 0 } = this.state;
     return (
-      <React.Fragment>
         <Grid container spacing={40} alignItems="center" alignContent="space-around">
           <Grid item xs={4}>
-            <Typography color="primary" align="center" variant="body2">
+            <Typography align="center" variant="body2">
               VOLUME DIFFERENCE
             </Typography>
-            <Typography color="primary" align="center" variant="h3">
-              {volumeDifference | 0}%
+            <Typography align="center" style={{ color: volumeDifference < 0 ? red[500] : lightGreen[500]}} variant="h3">
+              {volumeDifference}
+              <Typography style={{ display: 'inline-block', color: volumeDifference < 0 ? red[500] : lightGreen[500]}} align="center" variant="h5">
+                %
+              </Typography>
             </Typography>
           </Grid>
           <Grid item xs={4}>
+            <Typography align="center" variant="body2">
+              PRICE
+            </Typography>
+            <Typography align="center" variant="h3">
+              {formatPrice(price)}
+              <Typography style={{ display: 'inline-block' }} align="center" variant="h5">
+                $
+              </Typography>
+            </Typography>
+          </Grid>
+          <Grid item xs={4}>
+            <Typography align="center" variant="body2">
+              PRICE 24HR
+            </Typography>
+            <Typography align="center" style={{ color: priceChange < 0 ? red[500] : lightGreen[500]}} variant="h3">
+              {priceChange}
+              <Typography style={{ display: 'inline-block', color: priceChange < 0 ? red[500] : lightGreen[500]}} align="center" variant="h5">
+                %
+              </Typography>
+            </Typography>
+          </Grid>
+        </Grid>
+    );
+  }
+  renderOrder = ({ price = '-', currentValues = { position: '-', quantity: '-' }, hasBeenExecuted = undefined }, coinPrice = 0) => {
+    let margin = '-';
+    if (!isNaN(price) && coinPrice > 0) {
+      margin = Math.round((Math.abs(price - coinPrice) / coinPrice) * 10000)/100;
+      return (
+        <React.Fragment>
+          <Grid item xs={2}>
             <Typography color="primary" align="center" variant="body2">
               PRICE
             </Typography>
-            <Typography color="primary" align="center" variant="h3">
-              {price | 0}$
+            <Typography color="primary" align="center" variant="h5">
+              {price}$
             </Typography>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={2}>
             <Typography color="primary" align="center" variant="body2">
-              PRICE 24HR
+              QUANTITY
             </Typography>
-            <Typography color="primary" align="center" variant="h3">
-              {priceChange | 0}%
+            <Typography color="primary" align="center" variant="h5">
+              {currentValues.quantity}$
             </Typography>
           </Grid>
-        </Grid>
-        
-      </React.Fragment>
-    );
-  }
-  renderOrder = ({ price = '-', currentValues = { position: '-', quantity: '-' }, hasBeenExecuted= '-'}) => {
-    return (
-      <React.Fragment>
-        <Grid item xs={2}>
-          <Typography color="primary" align="center" variant="body2">
-            PRICE
-          </Typography>
-          <Typography color="primary" align="center" variant="h5">
-            {price}$
-          </Typography>
-        </Grid>
-        <Grid item xs={2}>
-          <Typography color="primary" align="center" variant="body2">
-            QUANTITY
-          </Typography>
-          <Typography color="primary" align="center" variant="h5">
-            {currentValues.quantity}$
-          </Typography>
-        </Grid>
-        <Grid item xs={2}>
-          <Typography color="primary" align="center" variant="body2">
-            HAS BEEN EXECUTED
-          </Typography>
-          <Typography color="primary" align="center" variant="h5">
-            {hasBeenExecuted ? 'YES' : 'NO'}
-          </Typography>
-        </Grid>
-        <Grid item xs={2}>
-          <Typography color="primary" align="center" variant="body2">
-            CURRENT POSITION
-          </Typography>
-          <Typography color="primary" align="center" variant="h5">
-            {currentValues.position}
-          </Typography>
-        </Grid>
-      </React.Fragment>
-    );
+          <Grid item xs={2}>
+            <Typography color="primary" align="center" variant="body2">
+              MARGIN TO PRICE
+            </Typography>
+            <Typography color="primary" align="center" variant="h5">
+              {margin}%
+            </Typography>
+          </Grid>
+        </React.Fragment>
+      );
+    } else {
+      return null;
+    }
   }
   render() {
-    const { favorites = [], selectedCoin = '', coinInfo = {} } = this.props;
+    const { coinInfo = {} } = this.props;
     const { pricesList = [], buyOrder = {},sellOrder = {}, price = 0 } = this.state;
-    const numFavorites = favorites.length;
-    const selectedPosition = favorites.indexOf(selectedCoin);
+
     if (pricesList.length > 0 && price > 0) {
       return (
-        <Grid container direction="row" justify="space-around" alignItems="center" spacing={40}>
-          
-          <Grid item xs={3}>
-            {numFavorites > 0 && (
-              <React.Fragment>
-                <Typography align="right" variant="body2">
-                  BINANCE
-                </Typography>
-                <Typography align="right" variant="body1">
-                  {`< Bitcoin (BTC)`}
-                </Typography>
-              </React.Fragment>
-            )}
-            
-          </Grid>
-          <Grid item xs={6}>
+        <Grid container direction="row" justify="space-around" alignItems="center" spacing={40} style={{ borderRight:'1px solid #ffffff63'}}>
+
+          <Grid item xs={12}>
             <Typography align="center" style={{ textTransform:'uppercase'}} variant="body2">
               {`${coinInfo.exchange}`}
             </Typography>
@@ -210,32 +205,26 @@ export class CoinDetailView extends Component {
               <strong>{`${coinInfo.name} (${coinInfo.symbol})`}</strong>
             </Typography>
           </Grid>
-          <Grid item xs={3}>
-            <Typography align="left" variant="body2">
-              BINANCE
-            </Typography>
-            <Typography align="left" variant="body1">
-              {`Litecoin (LTC)>`}
-            </Typography>
-          </Grid>
 
+          {this.renderBasicInfo()}
 
-          <Grid item xs={12} style={{marginTop:'-20px', marginBottom:'-40px'}}>
+          <Grid item xs={12} style={{ marginTop: '-20px', marginBottom: '-80px' }}>
             <PriceChart prices={pricesList} buy={buyOrder} sell={sellOrder}/>
           </Grid>
 
           
-          {this.renderBasicInfo()}
+          
 
             <Grid item xs={12}>
-              <Grid container style={{marginTop:'20px'}} spacing={40} alignItems="center" alignContent="space-between">
+              <Grid container style={{ marginTop: '20px' }} spacing={40} alignItems="center" alignContent="space-between">
+
                 <Grid item xs={3} style={{borderRight: '1px solid white'}}>
                   <Typography color="primary" align="left" variant="h4">
                     BUY ORDER
                   </Typography>
                 </Grid>
                 
-                {this.renderOrder(buyOrder)}
+              {buyOrder.price && this.renderOrder(buyOrder, price)}
                 
               </Grid>
               <Grid item xs={12}></Grid>
@@ -246,7 +235,7 @@ export class CoinDetailView extends Component {
                   </Typography>
                 </Grid>
                 
-                {this.renderOrder(sellOrder)}
+              {sellOrder.price && this.renderOrder(sellOrder, price)}
                 
               </Grid>
             </Grid>

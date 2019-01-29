@@ -31,12 +31,12 @@ export default class Order {
   private _currentQuantity: number;
   private _id: string;
   private _events: OrderEvents;
-  constructor(coin: Coin, type: string = 'buy', quantity: number = 0, initialPosition: number = 0) {
+  constructor(coin: Coin, type: string = 'buy', price:number = 0, quantity: number = 0, initialPosition: number = 0) {
     this._coin = coin;
     // Order info
     // "buy" or "sell"
     this._type = type;
-    this._price = this._coin.actualPrice;
+    this._price = price;
     // Quantity of the order
     this._initialQuantity = Math.round(quantity);
     this._currentQuantity = Math.round(quantity);

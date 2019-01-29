@@ -27,8 +27,13 @@ import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 
 // Redux
 import { connect } from 'react-redux';
-import { updateUserSelectedCoin } from '../../../redux/actions/userPreferencesActions';
+import { updateUserSelectedCoin, updateUserFavorites } from '../../../redux/actions/userPreferencesActions';
 
+
+const mapReduxStateToComponentProps = state => ({
+  favorites: state.user.userPreferences.favorites,
+  coins: Object.values(state.coins.coins)
+});
 
 const POSITIVE_COLOR = 'rgba(76, 175, 80, 0.5)';
 const NEGATIVE_COLOR = 'rgba(244, 67, 54, 0.5)';
@@ -58,68 +63,24 @@ class CoinsList extends React.Component {
   state = {
     dense: true,
     showFilters: false,
-    filterValue: '',
-    coins: {
-      'binance_ETHUSDT': {
-        id: 'binance_ETHUSDT',
-        isFavorite: true,
-        name: 'Ethereum',
-        symbol: 'ETH',
-        exchange: 'Binance',
-        price: 100,
-        against: 'USD',
-        priceChange24hr: -0.2,
-        volumeDifference: 45
-      },
-      'binance_BTCUSDT': {
-        id: 'binance_BTCUSDT',
-        isFavorite: false,
-        name: 'Bitcoin',
-        symbol: 'BTC',
-        exchange: 'Binance',
-        price: 4000, against: 'USD',
-        priceChange24hr: 3,
-        volumeDifference: 10
-      },
-      'binance_TRXUSDT': {
-        id: 'binance_TRXUSDT',
-        name: 'Tron',
-        isFavorite: false,
-        symbol: 'TRX',
-        exchange: 'Binance',
-        price: 3,
-        against: 'USD',
-        priceChange24hr: 20,
-        volumeDifference: 200
-      },
-      'binance_XRPUSDT': {
-        id: 'binance_XRPUSDT',
-        name: 'Ripple',
-        isFavorite: true,
-        symbol: 'XRP',
-        exchange: 'Binance',
-        price: 6.7,
-        against: 'USD',
-        priceChange24hr: 5,
-        volumeDifference: 9
-      },
-    }
+    filterValue: ''
   };
+
   selectCoin = (coinID = '') => {
     this.props.updateUserSelectedCoin(coinID);
   }
+  componentWillReceiveProps({coins=[]}){
+    this.setState({ ...this.state, coins });
+  }
 
   markAsFavorite = (coinID = '') => {
-    const newCoin = this.state.coins[coinID];
-    newCoin.isFavorite = !newCoin.isFavorite;
-
-    this.setState({
-      ...this.state,
-      coins: {
-        ...this.state.coins,
-        [coinID]: newCoin
-      }
-    });
+    const {favorites} = this.props;
+    if (favorites.indexOf(coinID) === -1) {
+      this.props.updateUserFavorites([...favorites, coinID]);  
+    } else {
+      const newFav = favorites.filter(coin => coin !== coinID);
+      this.props.updateUserFavorites(newFav);  
+    }
   }
 
   getTrendingIcon = ({priceChange24hr:condition = 0}) => {
@@ -138,6 +99,7 @@ class CoinsList extends React.Component {
   }
 
   generateItems = (coins = this.state.coins) => {
+    const { favorites } = this.props;
     return coins.map(coin => {
       return (
         <ListItem key={Math.random()} onClick={() => this.selectCoin(coin.id)} dense button>
@@ -150,14 +112,9 @@ class CoinsList extends React.Component {
             primary={
               <React.Fragment>
                 <Grid container alignItems="flex-end">
-                  <Grid item xs={6}>
+                  <Grid item xs={12}>
                     <Typography component="span" variant="body1">
-                      {`${coin.name} (${coin.symbol})`}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6} >
-                    <Typography component="span" align="right" variant="body2">
-                      {`${coin.price}${coin.against === 'USD' ? '$' : 'BTC'}`}
+                      {`${coin.name} (${coin.symbol}-${coin.against})`}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -172,9 +129,9 @@ class CoinsList extends React.Component {
             }
           />
           <ListItemSecondaryAction>
-            <IconButton aria-label="Favorite" onClick={() => this.markAsFavorite(coin.id)}>
-              {coin.isFavorite && <StarIcon />}
-              {!coin.isFavorite && <StarBorderIcon />}
+            <IconButton aria-label="Favorite" disabled={favorites.length === 1 && favorites.indexOf(coin.id) > -1} onClick={() => this.markAsFavorite(coin.id)}>
+              {favorites.indexOf(coin.id) > -1 && <StarIcon />}
+              {favorites.indexOf(coin.id) === -1 && <StarBorderIcon />}
             </IconButton>
           </ListItemSecondaryAction>
         </ListItem>
@@ -237,7 +194,7 @@ class CoinsList extends React.Component {
   }
   render() {
     const { classes } = this.props;
-    const { dense = true, coins = [], filterValue = '', showFilters = false } = this.state;
+    const { dense = true, filterValue = '', showFilters = false, coins=[] } = this.state;
     let filteredCoins = filterValue.length ? Object.values(coins).filter(this.filterCoin): Object.values(coins);
 
     filteredCoins = filteredCoins.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase());
@@ -246,7 +203,7 @@ class CoinsList extends React.Component {
       <Grid container spacing={16} alignItems="center">
         <Grid item xs={10}>
           <Typography className={classes.padding} align="left" variant="h6">
-            My coins
+            COINS
           </Typography>
         </Grid>
         <Grid item xs={2} md={2} style={{textAlign: 'right'}}>
@@ -267,4 +224,4 @@ CoinsList.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default connect(null, { updateUserSelectedCoin })(withStyles(styles)(CoinsList));
+export default connect(mapReduxStateToComponentProps, { updateUserSelectedCoin, updateUserFavorites })(withStyles(styles)(CoinsList));

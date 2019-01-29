@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import dynamic from 'next/dynamic';
 import lightBlue from '@material-ui/core/colors/lightBlue';
+import { lightGreen, green, red } from '@material-ui/core/colors';
 
 const Chart = dynamic(import('react-apexcharts'), { ssr: false });
 
@@ -22,47 +23,48 @@ class PriceChart extends React.Component {
   }
 
   shouldComponentUpdate(nextProps = { buy: {}, sell: {}, prices: [] }) {
-    const { prices = [] } = this.props;
+    const { prices = [], buy = {}, sell= {} } = this.props;
     const differentPrice = prices.length && nextProps.prices.length && (prices[prices.length - 1] !== nextProps.prices[prices.length - 1]);
+    const differentBuy = buy.price !== nextProps.buy.price;
+    const differentSell = sell.price !== nextProps.sell.price;
 
-    const rerender = differentPrice;
-    return rerender;
+    return differentPrice || differentBuy || differentSell;
+    
   }
   render() {
     const { sell={}, buy={}, prices=[] } = this.props;
-    const price = prices.length ? prices[prices.length - 1] : 0;
     const buyAnnotation = buy && buy.price ? {
       y: buy.price,
-      borderColor: '#00E396',
+      borderColor: green[700],
       label: {
         position: 'left',
         offsetX: 400,
-        offsetY: 20,
-        borderColor: '#00E396',
+        offsetY: -10,
+        borderColor: green[700],
         style: {
           color: '#fff',
-          background: '#00E396',
+          background: green[700],
           fontFamily: 'Roboto',
-          fontSize: '10px'
+          fontSize: '0.875rem'
         },
-        text: `Buy at ${buy.price}$, margin of ${Math.round((((price / buy.price) - 1) * 100) * 10) / 10}%`,
+        text: `Buy at ${buy.price}$`,
       }
     }: {};
     const sellAnnotation = sell && sell.price ? {
       y: sell.price,
-      borderColor: '#FF4560',
+      borderColor: red[700],
       label: {
         position: 'left',
         offsetX: 200,
-        offsetY: -10,
-        borderColor: '#FF4560',
+        offsetY: 18,
+        borderColor: red[700],
         style: {
           color: '#fff',
-          background: '#FF4560',
+          background: red[700],
           fontFamily: 'Roboto',
-          fontSize: '10px'
+          fontSize: '0.875rem'
         },
-        text: `Sell at ${sell.price}$, margin of ${Math.round((((sell.price/price)-1)*100)*10)/10}%`,
+        text: `Sell at ${sell.price}$`,
       }
     } : {};
     const graphOptions = {
@@ -74,8 +76,13 @@ class PriceChart extends React.Component {
           animations: {
             enabled: true,
             easing: 'linear',
+            animateGradually: {
+              enabled: true,
+              delay: 200
+            },
             dynamicAnimation: {
-              speed: 2000
+              enabled: true,
+              speed: 1000
             }
           },
           toolbar: {
@@ -84,8 +91,8 @@ class PriceChart extends React.Component {
         },
         yaxis: {
           axisBorder: {
-            show: true,
-          },
+            show: false,
+          }
         },
         xaxis: {
           labels: {
@@ -97,7 +104,7 @@ class PriceChart extends React.Component {
             height: 1
           },
           axisTicks: {
-            show: false
+            show: true
           },
         },
         annotations: {
