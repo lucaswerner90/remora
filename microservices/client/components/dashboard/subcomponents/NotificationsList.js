@@ -5,20 +5,30 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemText from '@material-ui/core/ListItemText';
-import Badge from '@material-ui/core/Badge';
 import Avatar from '@material-ui/core/Avatar';
 import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import ThumbUpAltIcon from '@material-ui/icons/ThumbUpAlt';
 import ThumbDownAltIcon from '@material-ui/icons/ThumbDownAlt';
 import { getTimeAgo } from '../../common/utils/Time';
+import Loading from '../../common/utils/Loading';
+
+
+import io from 'socket.io-client';
+import getConfig from 'next/config';
+
+const { publicRuntimeConfig } = getConfig();
+const { backend = 'localhost:8080' } = publicRuntimeConfig;
+
 
 
 import { connect } from 'react-redux';
-import {getUserFavoriteCoins, updateUserSelectedCoin } from '../../../redux/actions/userPreferencesActions';
+import { updateUserSelectedCoin, updateUserNotifications} from '../../../redux/actions/userPreferencesActions';
 
 const mapReduxStateToComponentProps = state => ({
-  favorites: state.user.userPreferences.favorites
+  favorites: state.user.userPreferences.favorites,
+  notifications: state.user.userPreferences.notifications
 });
 
 const POSITIVE_COLOR = 'rgba(76, 175, 80, 0.5)';
@@ -27,7 +37,7 @@ const NEGATIVE_COLOR = 'rgba(244, 67, 54, 0.5)';
 
 const notificationTypes = {
   COIN: {
-    NEW_ORDER: 'COIN_NEW_ORDER'
+    WHALE_ORDER: 'COIN_WHALE_ORDER'
   }
 };
 
@@ -39,7 +49,7 @@ const styles = theme => ({
   list: {
     backgroundColor: 'transparent',
     overflow: 'hidden',
-    height: '40vh',
+    height: '30vh',
     overflowY:'auto'
   },
   padding: {
@@ -53,77 +63,84 @@ class NotificationsList extends React.Component {
     dense: true,
     pendingNotifications: 0,
     secondary: true,
-    notifications: [
-      {
-        coin: {
-          id: 'binance_ETHUSDT',
-          name: 'Ethereum',
-          against: 'USD',
-          symbol: 'ETH',
-          exchange: 'Binance'
-        },
-        type: notificationTypes.COIN.NEW_ORDER,
-        isGood: true,
-        info: {
-          type: 'buy',
-          price: 110,
-          quantity: 150000,
-          created: Date.now()
-        }
-      },
-      {
-        coin: {
-          id: 'binance_BTCUSDT',
-          name: 'Bitcoin',
-          against: 'USD',
-          symbol: 'BTC',
-          exchange: 'Binance'
-        },
-        type: notificationTypes.COIN.NEW_ORDER,
-        isGood: true,
-        info: {
-          type: 'buy',
-          price: 4500,
-          quantity: 300000,
-          created: Date.now()
-        }
-      },
-      {
-        coin: {
-          id: 'binance_ETHUSDT',
-          name: 'Ethereum',
-          against: 'USD',
-          symbol: 'ETH',
-          url: 'www.binance.com/en/trade/pro/ETH_USDT',
-          exchange: 'Binance'
-        },
-        type: notificationTypes.COIN.NEW_ORDER,
-        isGood: false,
-        info: {
-          type: 'sell',
-          price: 150,
-          quantity: 500000,
-          created: Date.now()
-        }
-      },
-
-    ],
+    notifications:[]
   };
+  componentWillUnmount() {
+    const currentCoins = this.props.favorites;
+    for (let i = 0; i < currentCoins.length; i++) {
+      this.socket.off(currentCoins[i]);
+    }
+  }
   componentWillMount() {
-    this.props.getUserFavoriteCoins();
+    this.socket = io(backend, { forceNew: true });
+    const currentCoins = this.props.favorites;
+    for (let i = 0; i < currentCoins.length; i++) {
+      this.socket.on(currentCoins[i], this.onSocketData);
+    }
+  }
+  componentWillReceiveProps({ favorites = []}) {
+    const currentCoins = this.props.favorites;
+    const newCoins = favorites;
+    if (currentCoins.length !== newCoins.length) {
+      for (let i = 0; i < currentCoins.length; i++) {
+        this.socket.off(currentCoins[i]);
+      }
+      for (let i = 0; i < newCoins.length; i++) {
+        this.socket.on(newCoins[i], this.onSocketData);
+      }
+    }
+    return true;
+  }
+  onSocketData = ({ info = {}, message = '' }) => {
+    const { notifications = {} } = this.props;
+    const { notifications: currentNotifications = [] } = this.state;
+    switch (message) {
+      case 'order':
+        const { coin = {}, order = {}, type = '' } = info;
+        if (type) {
+          const { id: orderID } = order;
+          const { id = '' } = coin;
+          const notificationInfo = {
+            coin,
+            info: order,
+            type: notificationTypes.COIN.WHALE_ORDER
+          }
+          if (!notifications[id]) {
+            notifications[id] = {
+              orders: {
+                buy: {},
+                sell: {}
+              }
+            };
+          }
+          if (orderID && currentNotifications.findIndex(notif => notif.info.id === orderID) === -1) {
+            this.setState({
+              ...this.state,
+              notifications: [notificationInfo, ...currentNotifications].sort((a, b) =>
+                new Date(a.createdAt).getTime() > new Date(b.createdAt).getTime())
+            });
+            notifications[id]['orders'][type] = notificationInfo;
+          }
+          this.props.updateUserNotifications(notifications);
+        }
+        break;
+      default:
+        break;
+    }
   }
   selectCoin = (coinID = '') => {
     this.props.updateUserSelectedCoin(coinID);
   }
-  generateItems = (notifications = this.state.notifications) => {
+  generateItems = (notifications = []) => {
     return notifications.map(notification => {
-      const { coin, type, info, isGood } = notification;
+      const { coin, type, info } = notification;
+      const goodNews = notificationTypes.COIN.WHALE_ORDER && info.type === 'buy';
       return (
         <ListItem key={Math.random()} onClick={() => this.selectCoin(coin.id)} dense button>
           <ListItemAvatar>
-            <Avatar style={{backgroundColor: isGood ? POSITIVE_COLOR:NEGATIVE_COLOR}}>
-              {type === notificationTypes.COIN.NEW_ORDER && info.type === 'buy' && <ThumbUpAltIcon />}
-              {type === notificationTypes.COIN.NEW_ORDER && info.type === 'sell' && <ThumbDownAltIcon/>}
+            <Avatar style={{ color:'#fff', background: goodNews ? POSITIVE_COLOR : NEGATIVE_COLOR}}>
+              {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'buy' && <ThumbUpAltIcon />}
+              {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'sell' && <ThumbDownAltIcon/>}
             </Avatar>
           </ListItemAvatar>
           <ListItemText
@@ -132,18 +149,18 @@ class NotificationsList extends React.Component {
                 <Grid container alignItems="flex-end">
                   <Grid item xs={8}>
                     <Typography component="span" variant="body1" style={{fontWeight:500}}>
-                      {type === notificationTypes.COIN.NEW_ORDER && info.type === 'buy' && 'New buy order'}
-                      {type === notificationTypes.COIN.NEW_ORDER && info.type === 'sell' && 'New sell order'}
+                      {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'buy' && 'New buy order'}
+                      {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'sell' && 'New sell order'}
                     </Typography>
                   </Grid>
                   <Grid item xs={4}>
                     <Typography component="span" align="right" style={{ fontSize: '0.625rem' }} variant="body2">
-                      {`${getTimeAgo(info.created)}`}
+                      {getTimeAgo(new Date(info.createdAt).getTime())}
                     </Typography>
                   </Grid>
                   <Grid item xs={12}>
                     <Typography component="span" variant="body2">
-                      {`${coin.name} (${coin.symbol}) - ${coin.against}`}
+                      {`${coin.symbol}`}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -152,7 +169,7 @@ class NotificationsList extends React.Component {
             secondary={
               <React.Fragment>
                 <Typography component="span" color="textPrimary">
-                  {coin.exchange}
+                  {coin.exchange.toUpperCase()}
                 </Typography>
               </React.Fragment>
             }
@@ -166,22 +183,38 @@ class NotificationsList extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { dense, notifications = [], pendingNotifications = this.state.notifications.length } = this.state;
-
-    return (
-      <Grid container spacing={16}>
+    const { notifications = [] } = this.state;
+    if (notifications.length) {
+      return (
+        <Grid container spacing={16}>
         <Grid item xs={12}>
-          <Typography className={classes.padding} variant="h6">
-            NOTIFICATIONS
-          </Typography>
+        <Typography className={classes.padding} variant="h6">
+        NOTIFICATIONS
+        </Typography>
         </Grid>
         <Grid item xs={12} md={12}>
-          <List dense={dense} className={classes.list}>
-            {this.generateItems(notifications)}
-          </List>
+          <Paper elevation={0}>
+            <List dense className={classes.list}>
+              {this.generateItems(notifications)}
+            </List>
+          </Paper>
+          </Grid>
         </Grid>
-      </Grid>
-    );
+      );
+    } else {
+      return (
+        <Grid container spacing={16}>
+          <Grid item xs={12}>
+            <Typography className={classes.padding} variant="h6">
+              NOTIFICATIONS
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <Loading height="35vh" />
+          </Grid>
+        </Grid>
+      );
+    }
   }
 }
 
@@ -189,4 +222,4 @@ NotificationsList.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default connect(mapReduxStateToComponentProps, { updateUserSelectedCoin, getUserFavoriteCoins })(withStyles(styles)(NotificationsList));
+export default connect(mapReduxStateToComponentProps, { updateUserSelectedCoin, updateUserNotifications })(withStyles(styles)(NotificationsList));

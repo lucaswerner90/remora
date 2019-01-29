@@ -7,8 +7,8 @@ class RightSideView extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <CoinsList />
         <NotificationsList />
+        <CoinsList />
       </React.Fragment>
     );
   }

@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+
+
 import { Grid, Typography } from '@material-ui/core';
-import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 import io from 'socket.io-client';
@@ -11,17 +12,15 @@ const { publicRuntimeConfig } = getConfig();
 const { backend = 'localhost:8080' } = publicRuntimeConfig;
 
 import { connect } from 'react-redux';
-import { getUserSelectedCoin, getUserFavoriteCoins } from '../../redux/actions/userPreferencesActions';
-import { getCoinByID } from '../../redux/actions/coinsActions';
 
 
 import PriceChart from './subcomponents/charts/PriceChart';
-import { red, lightGreen } from '@material-ui/core/colors';
-import { formatPrice } from '../common/utils/Format';
+import OrderInfo from './subcomponents/info/OrderInfo';
+import BasicInfo from './subcomponents/info/BasicInfo';
+import Loading from '../common/utils/Loading';
 
 const mapReduxStateToComponentProps = state => ({
   selectedCoin: state.user.userPreferences.selectedCoin,
-  coinInfo: state.coins.selected,
   allCoins: state.coins.coins
 });
 
@@ -31,30 +30,29 @@ const initialState = {
   price: 0,
   buyOrder: {},
   sellOrder: {},
-  priceChange: {}
+  priceChange: 0
 }
 export class CoinDetailView extends Component {
   state = { ...initialState };
 
   static propTypes = {
     selectedCoin: PropTypes.string.isRequired,
-    favorites: PropTypes.array.isRequired,
-    coinInfo: PropTypes.object.isRequired
+    allCoins: PropTypes.object.isRequired
   }
 
   static defaultProps = {
     selectedCoin: '',
-    favorites: [],
-    coinInfo: {}
+    allCoins: {}
   }
+
   constructor(props) {
     super(props); 
   }
 
   componentWillMount() {
-    this.props.getCoinByID(this.props.selectedCoin);
+    const { selectedCoin = '' } = this.props;
     this.socket = io(backend, { forceNew: true });
-    this.socket.on(this.props.selectedCoin, this.onSocketData);
+    this.socket.on(selectedCoin, this.onSocketData);
   }
 
   onSocketData = ({ info = {}, message = '' }) => {
@@ -69,10 +67,10 @@ export class CoinDetailView extends Component {
         });
         break;
       case 'price_change_24hr':
-        this.setState({ ...this.state, priceChange: info.price });
+        this.setState({ ...this.state, priceChange: parseFloat(info.price) });
         break;
       case 'price_list':
-        this.setState({ ...this.state, pricesList: info.pricesList || [] });
+        this.setState({ ...this.state, pricesList: info.pricesList });
         break;
 
       case 'latest_price':
@@ -90,9 +88,6 @@ export class CoinDetailView extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.selectedCoin !== this.props.selectedCoin) {
 
-      // Get the upcoming coin
-      this.props.getCoinByID(nextProps.selectedCoin);
-
       // Reset all the component state
       this.setState({ ...this.state, initialState });
 
@@ -102,100 +97,17 @@ export class CoinDetailView extends Component {
       // Stablish a new connection with the next coin
       this.socket.on(nextProps.selectedCoin, this.onSocketData);
     }
-    return true;
   }
-  renderLoading = () => {
-    return (
-      <Grid container spacing={40} justify="center" style={{ height: '90vh' }} alignItems="center">
-        <Grid item>
-          <CircularProgress variant="indeterminate" />
-        </Grid>
-      </Grid>
-    );
-  }
-  renderBasicInfo = () => {
-    const { volumeDifference = 0, price = 0, priceChange = 0 } = this.state;
-    return (
-        <Grid container spacing={40} alignItems="center" alignContent="space-around">
-          <Grid item xs={4}>
-            <Typography align="center" variant="body2">
-              VOLUME DIFFERENCE
-            </Typography>
-            <Typography align="center" style={{ color: volumeDifference < 0 ? red[500] : lightGreen[500]}} variant="h3">
-              {volumeDifference}
-              <Typography style={{ display: 'inline-block', color: volumeDifference < 0 ? red[500] : lightGreen[500]}} align="center" variant="h5">
-                %
-              </Typography>
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography align="center" variant="body2">
-              PRICE
-            </Typography>
-            <Typography align="center" variant="h3">
-              {formatPrice(price)}
-              <Typography style={{ display: 'inline-block' }} align="center" variant="h5">
-                $
-              </Typography>
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography align="center" variant="body2">
-              PRICE 24HR
-            </Typography>
-            <Typography align="center" style={{ color: priceChange < 0 ? red[500] : lightGreen[500]}} variant="h3">
-              {priceChange}
-              <Typography style={{ display: 'inline-block', color: priceChange < 0 ? red[500] : lightGreen[500]}} align="center" variant="h5">
-                %
-              </Typography>
-            </Typography>
-          </Grid>
-        </Grid>
-    );
-  }
-  renderOrder = ({ price = '-', currentValues = { position: '-', quantity: '-' }, hasBeenExecuted = undefined }, coinPrice = 0) => {
-    let margin = '-';
-    if (!isNaN(price) && coinPrice > 0) {
-      margin = Math.round((Math.abs(price - coinPrice) / coinPrice) * 10000)/100;
-      return (
-        <React.Fragment>
-          <Grid item xs={2}>
-            <Typography color="primary" align="center" variant="body2">
-              PRICE
-            </Typography>
-            <Typography color="primary" align="center" variant="h5">
-              {price}$
-            </Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography color="primary" align="center" variant="body2">
-              QUANTITY
-            </Typography>
-            <Typography color="primary" align="center" variant="h5">
-              {currentValues.quantity}$
-            </Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography color="primary" align="center" variant="body2">
-              MARGIN TO PRICE
-            </Typography>
-            <Typography color="primary" align="center" variant="h5">
-              {margin}%
-            </Typography>
-          </Grid>
-        </React.Fragment>
-      );
-    } else {
-      return null;
-    }
-  }
-  render() {
-    const { coinInfo = {} } = this.props;
-    const { pricesList = [], buyOrder = {},sellOrder = {}, price = 0 } = this.state;
 
-    if (pricesList.length > 0 && price > 0) {
+  render() {
+    const { allCoins = {}, selectedCoin = '' } = this.props;
+    const coinInfo = allCoins && allCoins[selectedCoin] ? allCoins[selectedCoin] : {};
+
+    const { pricesList = [], buyOrder = {}, sellOrder = {}, priceChange = 0, price = 0, volumeDifference = 0 } = this.state;
+    
+    if (pricesList.length > 0 && priceChange !== 0 && price > 0 && coinInfo.name) {
       return (
-        <Grid container direction="row" justify="space-around" alignItems="center" spacing={40} style={{ borderRight:'1px solid #ffffff63'}}>
+        <Grid container direction="row" justify="space-around" alignItems="center" spacing={40} style={{ borderRight:'1px solid #ffffff63', height:'80vh'}}>
 
           <Grid item xs={12}>
             <Typography align="center" style={{ textTransform:'uppercase'}} variant="body2">
@@ -205,37 +117,37 @@ export class CoinDetailView extends Component {
               <strong>{`${coinInfo.name} (${coinInfo.symbol})`}</strong>
             </Typography>
           </Grid>
+          <BasicInfo volumeDifference={volumeDifference} price={price} priceChange={priceChange}/>
 
-          {this.renderBasicInfo()}
-
-          <Grid item xs={12} style={{ marginTop: '-20px', marginBottom: '-80px' }}>
-            <PriceChart prices={pricesList} buy={buyOrder} sell={sellOrder}/>
+          <Grid item xs={12} style={{ marginTop: '0px', marginBottom: '-80px' }}>
+            <PriceChart priceChange={priceChange} prices={pricesList} buy={buyOrder} sell={sellOrder}/>
           </Grid>
 
           
           
 
             <Grid item xs={12}>
-              <Grid container style={{ marginTop: '20px' }} spacing={40} alignItems="center" alignContent="space-between">
+              <Grid container spacing={40} alignItems="center"
+              style={{height:'20vh', overflowY:'auto'}}
+              alignContent="space-between">
 
                 <Grid item xs={3} style={{borderRight: '1px solid white'}}>
                   <Typography color="primary" align="left" variant="h4">
                     BUY ORDER
                   </Typography>
                 </Grid>
-                
-              {buyOrder.price && this.renderOrder(buyOrder, price)}
-                
+                  
+                {buyOrder.price && <OrderInfo order={buyOrder} coinPrice={price}/>}
+                  
               </Grid>
-              <Grid item xs={12}></Grid>
-              <Grid container style={{marginTop:'20px'}} spacing={40} alignItems="center" alignContent="space-between">
+              <Grid container spacing={40} alignItems="center" alignContent="space-between">
                 <Grid item xs={3} style={{borderRight: '1px solid white'}}>
                   <Typography color="primary" align="left" variant="h4">
                     SELL ORDER
                   </Typography>
                 </Grid>
                 
-              {sellOrder.price && this.renderOrder(sellOrder, price)}
+              {sellOrder.price && <OrderInfo order={sellOrder} coinPrice={price} />}
                 
               </Grid>
             </Grid>
@@ -243,9 +155,9 @@ export class CoinDetailView extends Component {
         </Grid>
       );
     } else {
-      return this.renderLoading();
+      return <Loading height={'90vh'}/>
     }
   }
 }
 
-export default connect(mapReduxStateToComponentProps, { getUserSelectedCoin, getUserFavoriteCoins, getCoinByID })(CoinDetailView);
+export default connect(mapReduxStateToComponentProps)(CoinDetailView);

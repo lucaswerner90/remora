@@ -41,7 +41,7 @@ export default class Coin {
     return this._against;
   }
   public get id() {
-    return `${this.symbol}_${this.exchange}`;
+    return `${this.exchange}_${this.symbol}`;
   }
 
   private get _commonRedisProperties() {
@@ -196,7 +196,6 @@ export default class Coin {
     // Assign the coin volume for both buy and sell orders
     this._lastBuyVolume = newBuyOrders.sumVolume;
     this._lastSellVolume = newSellOrders.sumVolume;
-
     if (newBuyOrders.numOrders) {
       // Create/update the whale buy orders
       const assignNewBuyOrders = this._assignWhaleOrders('buy', newBuyOrders, this.whaleOrders.buy);
@@ -257,12 +256,9 @@ export default class Coin {
 
   public set sellPosition(newValue: number) {
     this._sellPosition = newValue;
-    let redisValue: any = { ...this._commonRedisProperties, order: {}, type: 'sell' };
+    const redisValue: any = { ...this._commonRedisProperties, order: {}, type: 'sell' };
     if (newValue > -1 && this.whaleOrders.sell[this.sellPosition] && this.whaleOrders.sell[this.sellPosition].toJSON) {
-      redisValue = {
-        ...this._commonRedisProperties,
-        order: this.getOrdersProperties('sell'),
-      };
+      redisValue.order = this.getOrdersProperties('sell');
     }
     redis.setOrderValue(this._redisKeys.SELL_ORDER, JSON.stringify(redisValue));
   }
@@ -272,10 +268,10 @@ export default class Coin {
 
   public set buyPosition(newValue: number) {
     this._buyPosition = newValue;
-    let redisValue: any = { ...this._commonRedisProperties, order: {}, type: 'buy' };
+    const redisValue: any = { ...this._commonRedisProperties, order: {}, type: 'buy' };
     if (newValue > -1 && this.whaleOrders.buy[this.buyPosition] &&
       this.whaleOrders.buy[this.buyPosition].toJSON) {
-      redisValue = { ...redisValue, order: this.getOrdersProperties('buy') };
+      redisValue.order = this.getOrdersProperties('buy');
     }
     redis.setOrderValue(this._redisKeys.BUY_ORDER, JSON.stringify(redisValue));
   }

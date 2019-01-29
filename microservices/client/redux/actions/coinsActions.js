@@ -8,6 +8,7 @@ export const getCoinByID = (coinID = '') => dispatch => {
     });
   }
 };
+
 export const getAllCoins = () => dispatch => {
   dispatch({
     type: GET_ALL_COINS,

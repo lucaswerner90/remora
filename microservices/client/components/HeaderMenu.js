@@ -13,10 +13,12 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Link from 'next/link';
+import { Divider, Typography } from '@material-ui/core';
 
 const styles = {
   fullList: {
     width: 250,
+    paddingTop: '40px',
     height:'100vh',
     background: 'rgb(7, 16, 43)'
   },
@@ -38,6 +40,9 @@ class SwipeableTemporaryDrawer extends React.Component {
 
     const fullList = (
       <div className={classes.fullList}>
+        <Typography variant="h4" style={{width:'90%', marginLeft:'20px', marginBottom:'20px'}}>
+          rémora
+        </Typography>
         <List>
           <Link href="/">
             <ListItem button key="home">
@@ -57,6 +62,7 @@ class SwipeableTemporaryDrawer extends React.Component {
               <ListItemText primary='Settings' />
             </ListItem>
           </Link>
+          <Divider style={{marginTop:'60px', marginBottom:'10px'}}/>
           <Link href="/logout">
             <ListItem button key="logout">
               <ListItemIcon><PowerSettingsNewIcon style={{ color: 'white' }} /></ListItemIcon>

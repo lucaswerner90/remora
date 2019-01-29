@@ -20,8 +20,7 @@ const styles = () => ({
 
 const background = {
   background: '#005C97',
-  background: '-webkit-linear-gradient(to right, #363795, #005C97)',
-  background: 'linear-gradient(to right, #363795, #005C97)'
+  background: 'linear-gradient(to bottom, #021B79, #0575E6)'
 }
 
 

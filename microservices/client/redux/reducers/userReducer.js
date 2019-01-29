@@ -5,9 +5,13 @@ const initialState = {
   userPreferences: {
     selectedCoin: 'binance_ETHUSDT',
     favorites: ['binance_ETHUSDT', 'binance_BTCUSDT'],
-    notifications:[]
+    notifications: {}
   },
-  userInfo: {},
+  userInfo: {
+    name: 'Lucas Werner',
+    email: 'wernerlucas12@gmail.com',
+    isPremium: true
+  },
 };
 
 export default (state = initialState, { payload = {}, type = ''}) => {
@@ -24,7 +28,6 @@ export default (state = initialState, { payload = {}, type = ''}) => {
       };
     
     case UPDATE_USER_FAVORITE_COINS:
-      console.log(payload)
       return {
         ...state,
         userPreferences: {

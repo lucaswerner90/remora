@@ -16,6 +16,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import TextField from '@material-ui/core/TextField';
+import Paper from '@material-ui/core/Paper';
 
 // Icons
 import StarIcon from '@material-ui/icons/Star';
@@ -46,8 +47,7 @@ const styles = theme => ({
   list: {
     backgroundColor: 'transparent',
     overflow: 'hidden',
-    height: '40vh',
-    marginBottom: 20,
+    height: '30vh',
     overflowY:'auto'
   },
   padding: {
@@ -143,7 +143,7 @@ class CoinsList extends React.Component {
   showFilterComponents = () => {
     const { classes } = this.props;
     return (
-      <React.Fragment>
+      <Grid item xs={12} style={{textAlign:'right'}}>
         <TextField
           id="outlined-search"
           label="Search for coins"
@@ -153,6 +153,7 @@ class CoinsList extends React.Component {
           onChange={this.handlerFilterChange}
           autoCapitalize="true"
           autoFocus={true}
+          fullWidth={true}
           autoComplete="off"
           InputProps={{
             className: classes.input,
@@ -163,7 +164,7 @@ class CoinsList extends React.Component {
             ),
           }}
         />
-      </React.Fragment>
+      </Grid>
     );
   }
   handleShowFilters = () => {
@@ -193,8 +194,8 @@ class CoinsList extends React.Component {
     this.setState({ ...this.state, filterValue });
   }
   render() {
-    const { classes } = this.props;
-    const { dense = true, filterValue = '', showFilters = false, coins=[] } = this.state;
+    const { classes, coins = [] } = this.props;
+    const { dense = true, filterValue = '', showFilters = false } = this.state;
     let filteredCoins = filterValue.length ? Object.values(coins).filter(this.filterCoin): Object.values(coins);
 
     filteredCoins = filteredCoins.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase());
@@ -210,11 +211,13 @@ class CoinsList extends React.Component {
           {this.showFilterButton()}
         </Grid>
         {showFilters && this.showFilterComponents()}
-        <Grid item xs={12} md={12}>
-            <List dense={dense} className={classes.list}>
-              {this.generateItems(filteredCoins)}
-            </List>
-        </Grid>
+        <Paper elevation={0}>
+          <Grid item xs={12} md={12}>
+              <List dense={dense} className={classes.list}>
+                {this.generateItems(filteredCoins)}
+              </List>
+          </Grid>
+        </Paper>
       </Grid>
     );
   }

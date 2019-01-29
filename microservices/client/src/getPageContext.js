@@ -5,6 +5,20 @@ import { blue, green } from '@material-ui/core/colors';
 // A theme with custom primary and secondary color.
 // It's optional.
 const theme = createMuiTheme({
+  overrides: {
+    MuiPaper: {
+      root: {
+        background: 'rgba(226, 226, 226, 0.08)',
+        flexGrow:1
+      },
+      elevation0:{
+        background: 'rgba(226, 226, 226, 0.08)'
+      },
+      elevation1:{
+        background: 'rgba(226, 226, 226, 0.08)'
+      }
+    }
+  },
   palette: {
     type:'dark',
     primary: { main: '#fff' },

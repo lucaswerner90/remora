@@ -32,7 +32,7 @@ class PriceChart extends React.Component {
     
   }
   render() {
-    const { sell={}, buy={}, prices=[] } = this.props;
+    const { sell={}, buy={}, prices=[], priceChange = 0 } = this.props;
     const buyAnnotation = buy && buy.price ? {
       y: buy.price,
       borderColor: green[700],
@@ -117,14 +117,13 @@ class PriceChart extends React.Component {
           curve: 'smooth',
           width: 2
         },
-        colors: ['#fff'],
+        colors: [priceChange >= 0 ? lightGreen[300] : red[300]],
         grid: {
           show: false,
         },
         fill: {
           type: 'gradient',
           gradient: {
-            gradientToColors: ['#fff', lightBlue[500]],
             shade: 'light',
             shadeIntensity: 0,
             type: 'vertical',
@@ -147,7 +146,7 @@ class PriceChart extends React.Component {
           series={graphOptions.series}
           type="area"
           width="100%"
-          height="300px"
+          height="250px"
         />
       );
     }

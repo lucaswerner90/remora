@@ -1,5 +1,5 @@
 
-import { GET_ALL_COINS, UPDATE_SELECTED_COIN } from '../actions/types';
+import { UPDATE_SELECTED_COIN } from '../actions/types';
 
 const initialState = {
   coins: {
@@ -39,14 +39,11 @@ const initialState = {
       against: 'USDT'
     },
   },
-  selected: 'binance_ETHUSDT'
 };
 
 export default (state = initialState, action) => {
   switch (action.type) {
     case UPDATE_SELECTED_COIN:
-      const coinID = action.payload;
-      return { ...state, selected: state.coins[coinID] };
     default:
       return state;
   }
