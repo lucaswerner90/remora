@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import dynamic from 'next/dynamic';
 import lightBlue from '@material-ui/core/colors/lightBlue';
-import { lightGreen, green, red } from '@material-ui/core/colors';
+import { green, red } from '@material-ui/core/colors';
 
 const Chart = dynamic(import('react-apexcharts'), { ssr: false });
 
@@ -117,7 +117,7 @@ class PriceChart extends React.Component {
           curve: 'smooth',
           width: 2
         },
-        colors: [priceChange >= 0 ? lightGreen[300] : red[300]],
+        colors: [priceChange >= 0 ? lightBlue[300] : red[300]],
         grid: {
           show: false,
         },

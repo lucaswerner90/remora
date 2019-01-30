@@ -38,6 +38,13 @@ const initialState = {
       exchange: 'Binance',
       against: 'USDT'
     },
+    'binance_BNBUSDT': {
+      id: 'binance_BNBUSDT',
+      name: 'Binance Coin',
+      symbol: 'BNB',
+      exchange: 'Binance',
+      against: 'USDT'
+    },
   },
 };
 

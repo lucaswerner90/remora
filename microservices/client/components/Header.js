@@ -23,7 +23,7 @@ const Header = () => {
         <Grid item xs={10}>
           <Typography variant="body2" component="span" align="right">
             <a>Lucas Werner</a>
-            <Badge badgeContent={4} style={{margin:'10px'}} color="secondary">
+            <Badge badgeContent={4} color="secondary">
               <IconButton disabled={true}>
                 <MessageIcon />
               </IconButton>

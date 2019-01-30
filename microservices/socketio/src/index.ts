@@ -67,7 +67,7 @@ class SocketIOServer {
     const messageParsed = JSON.parse(message);
 
     if (messageParsed.coin && messageParsed.coin.exchange) {
-      const finalChannel = `${messageParsed.coin.exchange}_${messageParsed.coin.symbol || messageParsed.coin.name}`;
+      const finalChannel = messageParsed.coin.id;
       let finalData: any = {};
       switch (channel) {
         case 'latest_price':

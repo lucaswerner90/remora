@@ -171,6 +171,7 @@ class CoinsList extends React.Component {
     const currentValue = this.state.showFilters;
     this.setState({ ...this.state, showFilters: !currentValue });
   }
+
   showFilterButton = () => {
     return (
       <IconButton aria-label="Show/Hide filters" onClick={this.handleShowFilters}>
@@ -198,7 +199,7 @@ class CoinsList extends React.Component {
     const { dense = true, filterValue = '', showFilters = false } = this.state;
     let filteredCoins = filterValue.length ? Object.values(coins).filter(this.filterCoin): Object.values(coins);
 
-    filteredCoins = filteredCoins.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase());
+    filteredCoins = filteredCoins.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase());
 
     return (
       <Grid container spacing={16} alignItems="center">
@@ -211,13 +212,13 @@ class CoinsList extends React.Component {
           {this.showFilterButton()}
         </Grid>
         {showFilters && this.showFilterComponents()}
-        <Paper elevation={0}>
-          <Grid item xs={12} md={12}>
+        <Grid item xs={12} md={12}>
+          <Paper elevation={0}>
               <List dense={dense} className={classes.list}>
                 {this.generateItems(filteredCoins)}
               </List>
+          </Paper>
           </Grid>
-        </Paper>
       </Grid>
     );
   }

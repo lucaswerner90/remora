@@ -186,24 +186,24 @@ class NotificationsList extends React.Component {
     const { notifications = [] } = this.state;
     if (notifications.length) {
       return (
-        <Grid container spacing={16}>
-        <Grid item xs={12}>
-        <Typography className={classes.padding} variant="h6">
-        NOTIFICATIONS
-        </Typography>
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <Paper elevation={0}>
-            <List dense className={classes.list}>
-              {this.generateItems(notifications)}
-            </List>
-          </Paper>
+        <Grid container spacing={32}>
+          <Grid item xs={12}>
+          <Typography className={classes.padding} variant="h6">
+          NOTIFICATIONS
+          </Typography>
           </Grid>
+          <Grid item xs={12} md={12}>
+            <Paper elevation={0}>
+              <List dense className={classes.list}>
+                {this.generateItems(notifications)}
+              </List>
+            </Paper>
+            </Grid>
         </Grid>
       );
     } else {
       return (
-        <Grid container spacing={16}>
+        <Grid container spacing={32}>
           <Grid item xs={12}>
             <Typography className={classes.padding} variant="h6">
               NOTIFICATIONS

@@ -15,9 +15,9 @@ import { connect } from 'react-redux';
 
 
 import PriceChart from './subcomponents/charts/PriceChart';
-import OrderInfo from './subcomponents/info/OrderInfo';
-import BasicInfo from './subcomponents/info/BasicInfo';
+import BasicInfo from './subcomponents/info/CoinBasicInfo';
 import Loading from '../common/utils/Loading';
+import TabsInfo from './subcomponents/info/TabsInfo';
 
 const mapReduxStateToComponentProps = state => ({
   selectedCoin: state.user.userPreferences.selectedCoin,
@@ -117,41 +117,16 @@ export class CoinDetailView extends Component {
               <strong>{`${coinInfo.name} (${coinInfo.symbol})`}</strong>
             </Typography>
           </Grid>
+          
           <BasicInfo volumeDifference={volumeDifference} price={price} priceChange={priceChange}/>
 
-          <Grid item xs={12} style={{ marginTop: '0px', marginBottom: '-80px' }}>
+          <Grid item xs={12} style={{ marginBottom: '-80px' }}>
             <PriceChart priceChange={priceChange} prices={pricesList} buy={buyOrder} sell={sellOrder}/>
           </Grid>
 
-          
-          
-
-            <Grid item xs={12}>
-              <Grid container spacing={40} alignItems="center"
-              style={{height:'20vh', overflowY:'auto'}}
-              alignContent="space-between">
-
-                <Grid item xs={3} style={{borderRight: '1px solid white'}}>
-                  <Typography color="primary" align="left" variant="h4">
-                    BUY ORDER
-                  </Typography>
-                </Grid>
-                  
-                {buyOrder.price && <OrderInfo order={buyOrder} coinPrice={price}/>}
-                  
-              </Grid>
-              <Grid container spacing={40} alignItems="center" alignContent="space-between">
-                <Grid item xs={3} style={{borderRight: '1px solid white'}}>
-                  <Typography color="primary" align="left" variant="h4">
-                    SELL ORDER
-                  </Typography>
-                </Grid>
-                
-              {sellOrder.price && <OrderInfo order={sellOrder} coinPrice={price} />}
-                
-              </Grid>
-            </Grid>
-
+          <Grid item xs={12}>
+            <TabsInfo sellOrder={sellOrder} buyOrder={buyOrder} coinPrice={price}/>
+          </Grid>
         </Grid>
       );
     } else {

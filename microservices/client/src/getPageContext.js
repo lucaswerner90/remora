@@ -1,11 +1,24 @@
 import { SheetsRegistry } from 'jss';
 import { createMuiTheme, createGenerateClassName } from '@material-ui/core/styles';
-import { blue, green } from '@material-ui/core/colors';
+import { lightBlue, blueGrey, blue, green, cyan, indigo } from '@material-ui/core/colors';
 
 // A theme with custom primary and secondary color.
 // It's optional.
 const theme = createMuiTheme({
   overrides: {
+    MuiBadge: {
+      "badge": {
+        "margin": 10,
+      }
+    },
+    MuiTabs: {
+      "root": {
+        color:'#fff'
+      },
+      "indicator": {
+        "color" : '#fff'
+      }
+    },
     MuiPaper: {
       root: {
         background: 'rgba(226, 226, 226, 0.08)',
@@ -21,8 +34,10 @@ const theme = createMuiTheme({
   },
   palette: {
     type:'dark',
-    primary: { main: '#fff' },
-    secondary: { main: green[300]},
+    primary: {
+      main: '#fff',
+    },
+    secondary: blue,
   },
   typography: {
     color: '#fff',
@@ -47,10 +62,8 @@ const theme = createMuiTheme({
       fontWeight: 400
     },
     display1: {
-       
-    },
-    button:{
-      color:'white'
+      fontSize: '0.5rem',
+      fontWeight: 100
     }
   },
 });

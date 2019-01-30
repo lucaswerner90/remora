@@ -6,6 +6,15 @@
             "volume": 50
         }
     },
+    
+    "EOSUSDT": {
+        "name": "EOS",
+        "alarm":{
+            "order": 100000,
+            "volume": 50
+        }
+    },
+    
     "TRXUSDT": {
         "name": "TRX",
         "alarm":{
