@@ -35,19 +35,19 @@ class PriceChart extends React.Component {
     const { sell={}, buy={}, prices=[], priceChange = 0 } = this.props;
     const buyAnnotation = buy && buy.price ? {
       y: buy.price,
-      borderColor: green[700],
+      borderColor: green[900],
       label: {
         position: 'left',
         offsetX: 400,
-        offsetY: -10,
-        borderColor: green[700],
+        offsetY: -5,
+        borderColor: green[900],
         style: {
           color: '#fff',
-          background: green[700],
+          background: green[900],
           fontFamily: 'Roboto',
           fontSize: '0.875rem'
         },
-        text: `Buy at ${buy.price}$`,
+        text: `${buy.price}$`,
       }
     }: {};
     const sellAnnotation = sell && sell.price ? {
@@ -55,7 +55,7 @@ class PriceChart extends React.Component {
       borderColor: red[700],
       label: {
         position: 'left',
-        offsetX: 200,
+        offsetX: 350,
         offsetY: 18,
         borderColor: red[700],
         style: {
@@ -64,7 +64,7 @@ class PriceChart extends React.Component {
           fontFamily: 'Roboto',
           fontSize: '0.875rem'
         },
-        text: `Sell at ${sell.price}$`,
+        text: `${sell.price}$`,
       }
     } : {};
     const graphOptions = {
@@ -92,7 +92,9 @@ class PriceChart extends React.Component {
         yaxis: {
           axisBorder: {
             show: false,
-          }
+          },
+          max: sell.price ? sell.price * 1.01 : Math.min(...prices),
+          min: buy.price ? buy.price * 0.99 : Math.min(...prices)
         },
         xaxis: {
           labels: {
@@ -150,7 +152,7 @@ class PriceChart extends React.Component {
         />
       );
     }
-    return null;
+    return <Loading height="250px"/>;
   }
 }
 

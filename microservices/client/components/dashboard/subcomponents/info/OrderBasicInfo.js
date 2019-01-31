@@ -39,7 +39,7 @@ export class OrderBasicInfo extends Component {
             {!isNaN(price) ? formatPrice(parseFloat(price)) : price}$
           </Typography>
         </Grid>
-        <Grid item>
+        <Grid item xs={3}>
           <Typography align="center" variant="body2">
             QUANTITY
           </Typography>

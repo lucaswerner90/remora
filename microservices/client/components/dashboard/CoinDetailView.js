@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 
 import { Grid, Typography } from '@material-ui/core';
-
-
+import IconButton from '@material-ui/core/IconButton';
+import OpenInNew from '@material-ui/icons/OpenInNew';
 import io from 'socket.io-client';
 import getConfig from 'next/config';
 
@@ -107,7 +107,7 @@ export class CoinDetailView extends Component {
     
     if (pricesList.length > 0 && priceChange !== 0 && price > 0 && coinInfo.name) {
       return (
-        <Grid container direction="row" justify="space-around" alignItems="center" spacing={40} style={{ borderRight:'1px solid #ffffff63', height:'80vh'}}>
+        <Grid container direction="row" justify="space-around" alignItems="center" spacing={16} style={{ borderRight:'1px solid #ffffff63'}}>
 
           <Grid item xs={12}>
             <Typography align="center" style={{ textTransform:'uppercase'}} variant="body2">
@@ -115,12 +115,15 @@ export class CoinDetailView extends Component {
             </Typography>
             <Typography align="center" variant="h5">
               <strong>{`${coinInfo.name} (${coinInfo.symbol})`}</strong>
+              <IconButton aria-label="Open coin url" onClick={() => window.open(coinInfo.url, 'blank')}>
+                <OpenInNew />
+              </IconButton>
             </Typography>
           </Grid>
           
           <BasicInfo volumeDifference={volumeDifference} price={price} priceChange={priceChange}/>
 
-          <Grid item xs={12} style={{ marginBottom: '-80px' }}>
+          <Grid item xs={12} style={{ marginTop: '-40px', marginBottom: '-40px' }}>
             <PriceChart priceChange={priceChange} prices={pricesList} buy={buyOrder} sell={sellOrder}/>
           </Grid>
 

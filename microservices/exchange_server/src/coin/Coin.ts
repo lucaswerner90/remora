@@ -1,12 +1,15 @@
 import Order from './Order';
 import RedisClient from '../redis/RedisClient';
-import { TCoinRedisKeys, TPricesList, TCoinWhaleOrder, TCoinWhaleOrders, IRawCoinWhaleOrder, TCoinAlarm } from '../commonTypes';
+import { TCoinRedisKeys, TPricesList, TCoinWhaleOrder, TCoinWhaleOrders, TCoinAlarm } from '../commonTypes';
 
 const redis: RedisClient = new RedisClient();
 
 export default class Coin {
   public symbol: string = '';
   public _redisKeys: TCoinRedisKeys;
+  private _url: string = '';
+  private _acronym: string = '';
+  private _name: string = '';
   private _actualPrice: number = 0;
   private _buyPosition: number;
   private _sellPosition: number;
@@ -19,22 +22,33 @@ export default class Coin {
   private _lastSellVolume: number = 0;
   private _priceChange24hr: number = -1;
   private _against: string;
-  // private _volumeInBetween: number = 0;
-  private buyOrders: {};
-  private sellOrders: {};
-  constructor(symbol: string = '', { alarm = { order : 0, volume : 0 } }, against = 'USD', exchange: string = '') {
+  constructor(symbol: string = '', { acronym = '', url = '', name = '', alarm = { order : 0, volume : 0 } }, against = 'USD', exchange: string = '') {
     this.symbol = symbol;
     this._against = against;
     this._alarm = alarm;
+    this._acronym = acronym;
+    this._url = url;
+    this._name = name;
     this._exchange = exchange;
 
     this._redisKeys = {
-      BUY_ORDER: `${this.exchange}_${this.symbol}_buy_order`,
-      SELL_ORDER: `${this.exchange}_${this.symbol}_sell_order`,
-      PRICES_LIST: `${this.exchange}_${this.symbol}_prices_list`,
-      LATEST_PRICE: `${this.exchange}_${this.symbol}_latest_price`,
-      VOLUME_DIFFERENCE: `${this.exchange}_${this.symbol}_volume_difference`,
-      PRICE_CHANGE_24HR: `${this.exchange}_${this.symbol}_price_change_24hr`,
+      BUY_ORDER: `${this.id}_buy_order`,
+      SELL_ORDER: `${this.id}_sell_order`,
+      PRICES_LIST: `${this.id}_prices_list`,
+      LATEST_PRICE: `${this.id}_latest_price`,
+      VOLUME_DIFFERENCE: `${this.id}_volume_difference`,
+      PRICE_CHANGE_24HR: `${this.id}_price_change_24hr`,
+    };
+    redis.appendCoin(this.basicProperties);
+  }
+  public get basicProperties() {
+    return {
+      id: this.id,
+      url: this._url,
+      exchange: this.exchange,
+      against: this.against,
+      name: this._name,
+      symbol: this._acronym,
     };
   }
   public get against() {
@@ -139,32 +153,24 @@ export default class Coin {
    */
 
   private _assignWhaleOrders(type: string, newOrdersArray: any, whaleOrdersArray: TCoinWhaleOrder) {
-    let hasBeenModified = false;
-    if (newOrdersArray.numOrders > 0) {
-      for (const [_price, _properties] of Object.entries(newOrdersArray.orders)) {
-        const price: any = _price;
-        const properties: any = _properties;
-        if (!whaleOrdersArray[price]) {
+    for (const [_price, _properties] of Object.entries(newOrdersArray)) {
+      const price: any = _price;
+      const properties: any = _properties;
+
+      if (!whaleOrdersArray[price]) {
           // If the order doesn't exist previously, we create a new one.
-          whaleOrdersArray[price] = new Order(this, type, price, parseFloat(properties.value), properties.position);
-
-          hasBeenModified = true;
-
-        } else {
+        whaleOrdersArray[price] = new Order(this, type, price, parseFloat(properties.value), properties.position);
+      } else {
           // Update the new properties if they are different
-          // Right now, we're not interested in the current order position but we could use it in a future
-          if (properties.position !== whaleOrdersArray[price].lastPosition) {
-            whaleOrdersArray[price].lastPosition = properties.position;
-            hasBeenModified = true;
-          }
-          if (Math.round(properties.value) !== Math.round(whaleOrdersArray[price].quantity)) {
-            whaleOrdersArray[price].quantity = Math.round(properties.value);
-            hasBeenModified = true;
-          }
+        if (properties.position !== whaleOrdersArray[price].lastPosition) {
+          whaleOrdersArray[price].lastPosition = properties.position;
+        }
+        if (Math.round(properties.value) !== Math.round(whaleOrdersArray[price].quantity)) {
+          whaleOrdersArray[price].quantity = Math.round(properties.value);
         }
       }
     }
-    return { whaleOrdersArray, hasBeenModified };
+    return whaleOrdersArray;
   }
 
   /**
@@ -175,53 +181,27 @@ export default class Coin {
    *
    * @memberof Coin
    */
-  public updateOrders({ sellOrders = {}, buyOrders = {} }) {
-    this.buyOrders = buyOrders;
-    this.sellOrders = sellOrders;
+  public updateOrders(sellOrders = {}, buyOrders = {}) {
 
     // Delete previous whale orders if they just dissapear
-    const deletedBuyOrders = this._deleteWhaleOrders(this.whaleOrders.buy, buyOrders);
-    if (deletedBuyOrders.numOrdersDeleted) {
-      this.whaleOrders.buy = deletedBuyOrders.whaleOrders;
-    }
+    this.whaleOrders.buy = this._deleteWhaleOrders(this.whaleOrders.buy, buyOrders);
 
-    const deletedSellOrders = this._deleteWhaleOrders(this.whaleOrders.sell, sellOrders);
-    if (deletedSellOrders.numOrdersDeleted) {
-      this.whaleOrders.sell = deletedSellOrders.whaleOrders;
-    }
+    this.whaleOrders.sell = this._deleteWhaleOrders(this.whaleOrders.sell, sellOrders);
 
-    // Detect possible whale orders
-    const newBuyOrders = this._detectWhaleOrders(buyOrders);
-    const newSellOrders = this._detectWhaleOrders(sellOrders);
+    // Detect new whale orders
+    const { sumVolume: buyOrdersVolume, orders: newBuyWhaleOrders } = this._detectWhaleOrders(buyOrders);
+    const { sumVolume: sellOrdersVolume, orders: newSellWhaleOrders } = this._detectWhaleOrders(sellOrders);
+
     // Assign the coin volume for both buy and sell orders
-    this._lastBuyVolume = newBuyOrders.sumVolume;
-    this._lastSellVolume = newSellOrders.sumVolume;
-    if (newBuyOrders.numOrders) {
-      // Create/update the whale buy orders
-      const assignNewBuyOrders = this._assignWhaleOrders('buy', newBuyOrders, this.whaleOrders.buy);
-      if (assignNewBuyOrders.hasBeenModified) {
-        this.whaleOrders.buy = assignNewBuyOrders.whaleOrdersArray;
-      }
-    }
-    if (newSellOrders.numOrders) {
-      // Create/update the whale sell orders
-      const assignNewSellOrders = this._assignWhaleOrders('sell', newSellOrders, this.whaleOrders.sell);
-      if (assignNewSellOrders.hasBeenModified) {
-        this.whaleOrders.sell = assignNewSellOrders.whaleOrdersArray;
-      }
-    }
+    this._lastBuyVolume = buyOrdersVolume;
+    this._lastSellVolume = sellOrdersVolume;
+
+    // Create/update the whale buy orders
+    this.whaleOrders.buy = this._assignWhaleOrders('buy', newBuyWhaleOrders, this.whaleOrders.buy);
+    // Create/update the whale sell orders
+    this.whaleOrders.sell = this._assignWhaleOrders('sell', newSellWhaleOrders, this.whaleOrders.sell);
   }
 
-  public calculateVolumeInBetweenWhaleOrders(buyOrders = this.buyOrders, sellOrders = this.sellOrders) {
-    const validBuyKeys = Object.keys(buyOrders)
-      .map(key => parseFloat(key))
-      .filter(key => key >= this.buyPosition && key <= this.actualPrice);
-    const validSellKeys = Object.keys(sellOrders)
-      .map(key => parseFloat(key))
-      .filter(key => key >= this.actualPrice && key <= this.sellPosition);
-
-    console.log(`Price: ${this.actualPrice}, buyOrders: ${validBuyKeys.length}, sellOrders: ${validSellKeys.length}`);
-  }
   /**
    *
    * Update the orders
@@ -249,9 +229,6 @@ export default class Coin {
       this.sellPosition = -1;
     }
 
-    // if (this.sellPosition > -1 && this.buyPosition > -1) {
-    //   this.calculateVolumeInBetweenWhaleOrders(this.buyOrders, this.sellOrders);
-    // }
   }
 
   public set sellPosition(newValue: number) {
@@ -287,17 +264,13 @@ export default class Coin {
    * @memberof Coin
    */
   private _deleteWhaleOrders(whaleOrders: TCoinWhaleOrder, newCoinOrders: { [s: string]: {}; } | ArrayLike<{}>) {
-    let numOrdersDeleted = 0;
-    for (const [orderPrice, orderQuantity] of Object.entries(newCoinOrders)) {
-      const price: number = parseFloat(orderPrice);
-      const coinQuantity: number = parseFloat(orderQuantity.toString());
-      const value = Math.round(price * coinQuantity);
-      if (whaleOrders[orderPrice] && value < this.alarm.order) {
-        whaleOrders[orderPrice] = undefined;
-        numOrdersDeleted++;
+    for (const price in whaleOrders) {
+      if (!newCoinOrders[price] || (newCoinOrders[price] * parseFloat(price)) < this.alarm.order) {
+        console.log(`Order for ${this.id} has been deleted at ${price}`);
+        delete whaleOrders[price];
       }
     }
-    return { whaleOrders, numOrdersDeleted };
+    return whaleOrders;
   }
 
   public calculateVolumeDifference() {
@@ -315,23 +288,22 @@ export default class Coin {
     return currentVolumeDifference;
   }
 
-  public _detectWhaleOrders(orders: IRawCoinWhaleOrder = {}): { orders: { [index: number]: { value: number, position: number } }, numOrders: number, sumVolume: number } {
-    const whaleOrders = {};
-    let numOrders: number = 0;
+  public _detectWhaleOrders(newOrders = {}) {
+    const orders = {};
     let sumVolume: number = 0;
     let position: number = 0;
-    for (const [orderPrice, orderQuantity] of Object.entries(orders)) {
-      const price: number = parseFloat(orderPrice);
-      const coinQuantity: number = parseFloat(orderQuantity);
-      const value = Math.round(price * coinQuantity);
-      position++;
-      sumVolume += value;
-      if (value > this.alarm.order) {
-        whaleOrders[price] = { value, position };
-        numOrders++;
+    for (const price in newOrders) {
+      if (newOrders.hasOwnProperty(price)) {
+        const quantity = newOrders[price];
+        const value = Math.round(parseFloat(price) * parseFloat(quantity));
+        position++;
+        sumVolume += value;
+        if (value >= this.alarm.order) {
+          orders[price] = { value, position };
+        }
       }
     }
-    return { numOrders, sumVolume, orders: whaleOrders };
+    return { sumVolume, orders };
   }
 
   public getOrdersProperties(type: 'buy' | 'sell' = 'buy') {

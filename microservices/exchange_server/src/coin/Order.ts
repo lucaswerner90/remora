@@ -25,14 +25,18 @@ export default class Order {
   private _initialPosition: number;
   private _createdAt: Date;
   private _lastUpdateDate: Date;
-  private _coin: Coin;
+  private _coin;
   private _lastPosition: number;
   private _initialQuantity: number;
   private _currentQuantity: number;
   private _id: string;
   private _events: OrderEvents;
   constructor(coin: Coin, type: string = 'buy', price:number = 0, quantity: number = 0, initialPosition: number = 0) {
-    this._coin = coin;
+    this._coin = {
+      id: coin.id,
+      redisKeys: coin._redisKeys,
+      actualPrice: coin.actualPrice,
+    };
     // Order info
     // "buy" or "sell"
     this._type = type;
@@ -53,7 +57,7 @@ export default class Order {
     // Last known position of the order
     this._lastPosition = initialPosition;
 
-    this._id = `${this._coin.symbol}_${this._coin.exchange}_${this._createdAt.getTime()}`;
+    this._id = `${this._coin.id}_${this._createdAt.getTime()}`;
 
     this._events = {
       price: {

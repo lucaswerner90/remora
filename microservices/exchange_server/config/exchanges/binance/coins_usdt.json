@@ -1,54 +1,65 @@
 {
     "BTCUSDT": {
-        "name": "BTC",
-        "alarm":{
+        "acronym": "BTC",
+        "name": "Bitcoin",
+        "url": "https://www.binance.com/en/trade/pro/BTC_USDT",
+        "alarm": {
             "order": 100000,
             "volume": 50
         }
     },
-    
     "EOSUSDT": {
+        "acronym": "EOS",
+        "url": "https://www.binance.com/en/trade/pro/EOS_USDT",
         "name": "EOS",
-        "alarm":{
-            "order": 100000,
+        "alarm": {
+            "order": 50000,
             "volume": 50
         }
     },
-    
     "TRXUSDT": {
-        "name": "TRX",
-        "alarm":{
-            "order": 100000,
+        "acronym": "TRX",
+        "url": "https://www.binance.com/en/trade/pro/TRX_USDT",
+        "name": "Tron",
+        "alarm": {
+            "order": 50000,
             "volume": 50
         }
     },
     "ETHUSDT": {
-        "name": "ETH",
-        "alarm":{
-            "order": 100000,
+        "acronym": "ETH",
+        "url": "https://www.binance.com/en/trade/pro/ETH_USDT",
+        "name": "Ethereum",
+        "alarm": {
+            "order": 50000,
             "volume": 50
         }
     },
     "LTCUSDT": {
-        "name": "LTC",
-        "alarm":{
-            "order": 100000,
+        "acronym": "LTC",
+        "url": "https://www.binance.com/en/trade/pro/LTC_USDT",
+        "name": "Litecoin",
+        "alarm": {
+            "order": 50000,
             "volume": 50
         }
     },
     "XRPUSDT": {
-        "name": "XRP",
-        "alarm":{
-            "order": 100000,
+        "acronym": "XRP",
+        "url": "https://www.binance.com/en/trade/pro/XRP_USDT",
+        "name": "Ripple",
+        "alarm": {
+            "order": 50000,
             "volume": 50
         }
     },
     "BNBUSDT": {
-        "name": "BNB",
-        "alarm":{
+        "acronym": "BNB",
+        "url": "https://www.binance.com/en/trade/pro/BNB_USDT",
+        "name": "Binance coin",
+        "alarm": {
             "order": 100000,
             "volume": 50
         }
     }
-
 }

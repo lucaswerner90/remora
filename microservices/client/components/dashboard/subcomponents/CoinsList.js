@@ -102,12 +102,7 @@ class CoinsList extends React.Component {
     const { favorites } = this.props;
     return coins.map(coin => {
       return (
-        <ListItem key={Math.random()} onClick={() => this.selectCoin(coin.id)} dense button>
-          <ListItemAvatar>
-            
-            {this.getTrendingIcon(coin)}
-            
-          </ListItemAvatar>
+        <ListItem key={coin.id} onClick={() => this.selectCoin(coin.id)} dense button>
           <ListItemText
             primary={
               <React.Fragment>
@@ -122,7 +117,7 @@ class CoinsList extends React.Component {
             }
             secondary={
               <React.Fragment>
-                <Typography component="span" color="textPrimary">
+                <Typography component="span" style={{textTransform:'uppercase'}} color="textPrimary">
                   {coin.exchange}
                 </Typography>
               </React.Fragment>

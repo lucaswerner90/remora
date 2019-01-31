@@ -39,6 +39,7 @@ export type TCoinsArray = {
 }
 
 export type TCoinProperties = {
+  symbol: string;
   name: string;
   alarm: {
     order: number;

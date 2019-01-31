@@ -6,6 +6,11 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
+
+const isLoggedIn = async (req, res, next) => {
+  next();
+}
+
 app.prepare().then(() => {
   const server = express();
 
@@ -15,6 +20,9 @@ app.prepare().then(() => {
     res.sendFile(`${__dirname}/static/index.html`);
   });
 
+  server.get('/dashboard', isLoggedIn, (req, res) => {
+    return app.render(req, res, '/dashboard');
+  })
   server.get('*', (req, res) => {
     return handle(req, res);
   });

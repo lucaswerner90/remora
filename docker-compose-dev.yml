@@ -2,6 +2,19 @@ version: "3"
 
 services:
 
+  api:
+    build: ./microservices/api
+    restart: always
+    command: yarn run start-dev
+    environment:
+      - NODE_ENV=dev
+    volumes:
+      - ./microservices/api/src:/src
+    ports: 
+      - "9000"
+    depends_on:
+      - redis
+
   nextjs:
     build: ./microservices/client
     restart: always
@@ -26,6 +39,7 @@ services:
     command: yarn run start-dev
     volumes:
       - ./microservices/exchange_server/src:/src
+      - ./microservices/exchange_server/config:/config
     ports:
       - "7000"
     depends_on:
@@ -64,5 +78,6 @@ services:
     ports:
       - "8080:80"
     depends_on: 
+      - api
       - socketio
       - nextjs

@@ -1,6 +1,6 @@
 import * as redis from 'redis';
 const config: redis.ClientOpts = {
-  host: process.env.REDIS_HOST || '127.0.0.1',
+  host: process.env.REDIS_HOST || 'redis',
   port: parseInt(process.env.REDIS_PORT) || 6379,
 };
 
@@ -31,6 +31,26 @@ export default class RedisClient {
       console.log(`REDIS CLIENT ERROR: ${err}`);
       this.client = redis.createClient(config.port, config.host);
     });
+  }
 
+  public async getKeyValue(key: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.client.get(key, (err, reply) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(JSON.parse(reply));
+      });
+    });
+  }
+  public async getAllCoins(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.client.hgetall('coins', (err, reply) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(reply);
+      });
+    });
   }
 }

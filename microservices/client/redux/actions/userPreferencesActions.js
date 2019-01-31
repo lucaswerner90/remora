@@ -1,20 +1,11 @@
-import { UPDATE_USER_PREFERENCES, UPDATE_USER_FAVORITE_COINS, UPDATE_USER_SELECTED_COIN, GET_USER_SELECTED_COIN, UPDATE_USER_NOTIFICATIONS, GET_USER_FAVORITE_COINS } from './types';
+import { UPDATE_USER_PREFERENCES, UPDATE_USER_FAVORITE_COINS, UPDATE_USER_SELECTED_COIN, UPDATE_USER_INFO, UPDATE_USER_NOTIFICATIONS } from './types';
 
-// import fetch from 'isomorphic-unfetch';
-
-
-export const getUserSelectedCoin = () => dispatch => {
-  dispatch({
-    type: GET_USER_SELECTED_COIN,
-  });
-}
 export const updateUserSelectedCoin = payload => dispatch => {
   dispatch({
     payload,
     type: UPDATE_USER_SELECTED_COIN,
   });
 }
-
 export const updateUserNotifications = payload => dispatch => {
   dispatch({
     payload,
@@ -27,15 +18,16 @@ export const updateUserFavorites = payload => dispatch => {
     type: UPDATE_USER_FAVORITE_COINS,
   });
 }
-export const getUserFavoriteCoins = () => dispatch => {
-  dispatch({
-    type: GET_USER_FAVORITE_COINS,
-  });
-}
 export const updateUserPreferences = payload => dispatch => {
   dispatch({
     payload,
     type: UPDATE_USER_PREFERENCES,
+  });
+}
+export const updateUserInfo = payload => dispatch => {
+  dispatch({
+    payload,
+    type: UPDATE_USER_INFO,
   });
 }
 

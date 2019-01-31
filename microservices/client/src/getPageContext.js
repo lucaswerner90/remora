@@ -1,6 +1,6 @@
 import { SheetsRegistry } from 'jss';
 import { createMuiTheme, createGenerateClassName } from '@material-ui/core/styles';
-import { lightBlue, blueGrey, blue, green, cyan, indigo } from '@material-ui/core/colors';
+import { blue, lightGreen } from '@material-ui/core/colors';
 
 // A theme with custom primary and secondary color.
 // It's optional.
@@ -16,8 +16,8 @@ const theme = createMuiTheme({
         color:'#fff'
       },
       "indicator": {
-        "color" : '#fff'
-      }
+        "color": '#fff'
+      },
     },
     MuiPaper: {
       root: {
@@ -37,7 +37,7 @@ const theme = createMuiTheme({
     primary: {
       main: '#fff',
     },
-    secondary: blue,
+    secondary: lightGreen,
   },
   typography: {
     color: '#fff',

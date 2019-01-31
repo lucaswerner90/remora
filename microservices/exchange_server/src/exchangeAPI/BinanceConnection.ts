@@ -74,7 +74,13 @@ export default class BinanceConnection extends ExchangeConnection{
     Binance.websockets.depthCache([coin.symbol], (coinName: string, depth: { bids: any, asks: any }) => {
       const buyOrders = Binance.sortBids(depth.bids, BinanceConnection.NUM_NEAR_ORDERS);
       const sellOrders = Binance.sortAsks(depth.asks, BinanceConnection.NUM_NEAR_ORDERS);
-      this.coinsArray[coinName].updateOrders({ sellOrders, buyOrders });
+
+      const parsedBuyOrders = {};
+      const parsedSellOrders = {};
+
+      Object.keys(buyOrders).map(key => parsedBuyOrders[parseFloat(key)] = buyOrders[key]);
+      Object.keys(sellOrders).map(key => parsedSellOrders[parseFloat(key)] = sellOrders[key]);
+      this.coinsArray[coinName].updateOrders(parsedSellOrders, parsedBuyOrders);
     });
 
     Binance.websockets.prevDay([coin.symbol], (error: any, { percentChange }) => {

@@ -1,5 +1,5 @@
 
-import { FETCH_USER_PREFERENCES, UPDATE_USER_PREFERENCES, UPDATE_USER_FAVORITE_COINS, UPDATE_USER_SELECTED_COIN, UPDATE_USER_NOTIFICATIONS, GET_USER_SELECTED_COIN } from '../actions/types';
+import { UPDATE_USER_PREFERENCES, UPDATE_USER_FAVORITE_COINS, UPDATE_USER_SELECTED_COIN, UPDATE_USER_NOTIFICATIONS, GET_USER_SELECTED_COIN } from '../actions/types';
 
 const initialState = {
   userPreferences: {
@@ -45,13 +45,15 @@ export default (state = initialState, { payload = {}, type = ''}) => {
         }
       };
     
-    case FETCH_USER_PREFERENCES:
-      return state.userPreferences;
-
     case UPDATE_USER_PREFERENCES:
       return {
         ...state,
         userPreferences: payload
+      };
+    case UPDATE_USER_PREFERENCES:
+      return {
+        ...state,
+        userInfo: payload
       };
     default:
       return state;

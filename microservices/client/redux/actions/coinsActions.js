@@ -1,4 +1,4 @@
-import { UPDATE_SELECTED_COIN, GET_ALL_COINS } from './types';
+import { UPDATE_SELECTED_COIN, UPDATE_ALL_COINS } from './types';
 
 export const getCoinByID = (coinID = '') => dispatch => {
   if (coinID.length) {
@@ -9,8 +9,9 @@ export const getCoinByID = (coinID = '') => dispatch => {
   }
 };
 
-export const getAllCoins = () => dispatch => {
+export const updateAllCoins = (payload) => dispatch => {
   dispatch({
-    type: GET_ALL_COINS,
+    payload,
+    type: UPDATE_ALL_COINS,
   });
 };

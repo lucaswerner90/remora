@@ -4,9 +4,11 @@ import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import Typography from '@material-ui/core/Typography';
 
 import OrderBasicInfo from './OrderBasicInfo';
 import OrderAdvancedInfo from './OrderAdvancedInfo';
+import { Paper } from '@material-ui/core';
 
 const styles = theme => ({
   root: {
@@ -72,9 +74,11 @@ class TabsInfo extends React.Component {
           >
             <Tab label="Basic" />
             <Tab label="Advanced" />
+            <Tab label="Chat" />
           </Tabs>
         {value === 0 && this.renderBasicInfo()}
         {value === 1 && this.renderAdvancedInfo()}
+        {value === 2 && <Typography>Chat</Typography>}
         </Grid>
       </Grid>
     );
