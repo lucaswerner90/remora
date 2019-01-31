@@ -6,6 +6,7 @@
   "dependencies": {
     "express": "^4.16.4",
     "fast-json-stringify": "^1.9.1",
+    "mongoose": "^5.4.8",
     "newsapi": "^2.4.0",
     "redis": "^2.8.0"
   },

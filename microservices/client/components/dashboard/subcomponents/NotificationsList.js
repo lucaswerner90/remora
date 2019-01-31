@@ -12,7 +12,6 @@ import Typography from '@material-ui/core/Typography';
 import ThumbUpAltIcon from '@material-ui/icons/ThumbUpAlt';
 import ThumbDownAltIcon from '@material-ui/icons/ThumbDownAlt';
 import { getTimeAgo } from '../../common/utils/Time';
-import Loading from '../../common/utils/Loading';
 
 
 import io from 'socket.io-client';
@@ -210,7 +209,9 @@ class NotificationsList extends React.Component {
             </Typography>
           </Grid>
           <Grid item xs={12} md={12}>
-            <Loading height="35vh" />
+            <Paper elevation={0} style={{height: '30vh'}}>
+              <Typography align="center" variant="body2">Nothing to show yet...</Typography>
+            </Paper>
           </Grid>
         </Grid>
       );

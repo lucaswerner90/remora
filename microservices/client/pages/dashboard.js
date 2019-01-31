@@ -18,6 +18,7 @@ import { updateUserPreferences, updateUserInfo } from '../redux/actions/userPref
 import { updateAllCoins } from '../redux/actions/coinsActions';
 
 import Router from 'next/router';
+import CoinChat from '../components/dashboard/subcomponents/chat/CoinChat';
 
 
 const { publicRuntimeConfig } = getConfig();
@@ -82,6 +83,7 @@ class Dashboard extends Document {
             <RightSideView/>
           </Grid>
         </Grid>
+        <CoinChat/>
       </Layout>
     )
   }

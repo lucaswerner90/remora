@@ -35,8 +35,16 @@ class SocketIOServer {
    * @memberof SocketIOServer
    */
   private redisSubscriber: redis.RedisClient = redis.createClient(REDIS_CONFIGURATION);
+  private redisPublisher: redis.RedisClient = redis.createClient(REDIS_CONFIGURATION);
 
   private channelList: string[] = configJson.channelList;
+  private chatCoins: string[] = configJson.chatCoins || [
+    'binance_BTCUSDT',
+    'binance_ETHUSDT',
+    'binance_TRXUSDT',
+    'binance_XRPUSDT',
+    'binance_EOSUSDT',
+  ];
 
   constructor() {
     this.initConnection();
@@ -47,16 +55,24 @@ class SocketIOServer {
 
     this.redisSubscriber.on('ready', this.redisOnConnect.bind(this));
     this.redisSubscriber.on('message', this.redisOnMessage.bind(this));
-
     for (let i = 0; i < this.channelList.length; i++) {
       this.redisSubscriber.subscribe(this.channelList[i]);
     }
   }
   private initConnection() {
-    console.log(`Listening on port: ${PORT}`);
-    this.ioServer.on('connection', () => {
-      console.log('New connection detected!');
+    this.ioServer.on('connection', (socket) => {
+      this.initChat(socket);
     });
+  }
+
+  private initChat(socket:socketIo.Socket) {
+    for (let i = 0; i < this.chatCoins.length; i++) {
+      const coin = this.chatCoins[i];
+      socket.on(`${coin}_chat`, (msg) => {
+        this.redisPublisher.rpush(`${coin}_chat_messages`, JSON.stringify(msg));
+        this.ioServer.emit(`${coin}_chat`, msg);
+      });
+    }
   }
 
   private redisOnConnect() {
@@ -65,7 +81,6 @@ class SocketIOServer {
 
   private redisOnMessage(channel:string, message:string) {
     const messageParsed = JSON.parse(message);
-
     if (messageParsed.coin && messageParsed.coin.exchange) {
       const finalChannel = messageParsed.coin.id;
       let finalData: any = {};
@@ -80,6 +95,9 @@ class SocketIOServer {
           finalData = { pricesList: messageParsed.prices };
           break;
         case 'order':
+          finalData = messageParsed;
+          break;
+        case 'mean_order_value':
           finalData = messageParsed;
           break;
         case 'volume_difference':

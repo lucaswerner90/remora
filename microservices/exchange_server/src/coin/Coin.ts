@@ -22,6 +22,10 @@ export default class Coin {
   private _lastSellVolume: number = 0;
   private _priceChange24hr: number = -1;
   private _against: string;
+  private _meanOrderValue = { buy: 0, sell: 0 };
+  private _minWhaleOrderValue = { buy: 0, sell: 0 };
+  private _minTimesHigher: number = 20;
+
   constructor(symbol: string = '', { acronym = '', url = '', name = '', alarm = { order : 0, volume : 0 } }, against = 'USD', exchange: string = '') {
     this.symbol = symbol;
     this._against = against;
@@ -35,6 +39,7 @@ export default class Coin {
       BUY_ORDER: `${this.id}_buy_order`,
       SELL_ORDER: `${this.id}_sell_order`,
       PRICES_LIST: `${this.id}_prices_list`,
+      MEAN_ORDER_VALUE: `${this.id}_mean_order_value`,
       LATEST_PRICE: `${this.id}_latest_price`,
       VOLUME_DIFFERENCE: `${this.id}_volume_difference`,
       PRICE_CHANGE_24HR: `${this.id}_price_change_24hr`,
@@ -66,6 +71,21 @@ export default class Coin {
         exchange: this.exchange,
       },
     };
+  }
+  public set meanOrderValue(newValue: { buy: number; sell: number; }) {
+    this._meanOrderValue = {
+      buy: Math.round((this._meanOrderValue.buy + newValue.buy) / 2),
+      sell: Math.round((this._meanOrderValue.sell + newValue.sell) / 2),
+    };
+    this._minWhaleOrderValue = {
+      buy: this._meanOrderValue.buy * this._minTimesHigher,
+      sell: this._meanOrderValue.sell * this._minTimesHigher,
+    };
+    const redisValue = {
+      ...this._commonRedisProperties,
+      value: this._meanOrderValue,
+    };
+    redis.setMeanOrderValue(this._redisKeys.MEAN_ORDER_VALUE, JSON.stringify(redisValue));
   }
   public set priceChange24hr(newValue:number) {
     if (!isNaN(newValue) && isFinite(newValue)) {
@@ -184,13 +204,18 @@ export default class Coin {
   public updateOrders(sellOrders = {}, buyOrders = {}) {
 
     // Delete previous whale orders if they just dissapear
-    this.whaleOrders.buy = this._deleteWhaleOrders(this.whaleOrders.buy, buyOrders);
+    this.whaleOrders.buy = this._deleteWhaleOrders(this.whaleOrders.buy, buyOrders, this._minWhaleOrderValue.buy);
 
-    this.whaleOrders.sell = this._deleteWhaleOrders(this.whaleOrders.sell, sellOrders);
+    this.whaleOrders.sell = this._deleteWhaleOrders(this.whaleOrders.sell, sellOrders, this._minWhaleOrderValue.sell);
 
     // Detect new whale orders
-    const { sumVolume: buyOrdersVolume, orders: newBuyWhaleOrders } = this._detectWhaleOrders(buyOrders);
-    const { sumVolume: sellOrdersVolume, orders: newSellWhaleOrders } = this._detectWhaleOrders(sellOrders);
+    const { sumVolume: buyOrdersVolume, orders: newBuyWhaleOrders } = this._detectWhaleOrders(buyOrders, this._minWhaleOrderValue.buy);
+    const { sumVolume: sellOrdersVolume, orders: newSellWhaleOrders } = this._detectWhaleOrders(sellOrders, this._minWhaleOrderValue.sell);
+
+    this.meanOrderValue = {
+      buy: buyOrdersVolume / Object.keys(buyOrders).length,
+      sell: sellOrdersVolume / Object.keys(sellOrders).length,
+    };
 
     // Assign the coin volume for both buy and sell orders
     this._lastBuyVolume = buyOrdersVolume;
@@ -263,11 +288,11 @@ export default class Coin {
    * @param {*} newCoinOrders
    * @memberof Coin
    */
-  private _deleteWhaleOrders(whaleOrders: TCoinWhaleOrder, newCoinOrders: { [s: string]: {}; } | ArrayLike<{}>) {
+  private _deleteWhaleOrders(whaleOrders: TCoinWhaleOrder, newCoinOrders: { [s: string]: {}; } | ArrayLike<{}>, minValue = 0) {
     for (const price in whaleOrders) {
-      if (!newCoinOrders[price] || (newCoinOrders[price] * parseFloat(price)) < this.alarm.order) {
-        console.log(`Order for ${this.id} has been deleted at ${price}`);
-        delete whaleOrders[price];
+      const value = newCoinOrders[price] * parseFloat(price);
+      if (!newCoinOrders[price] || value < minValue * 0.8) {
+        whaleOrders[price] = undefined;
       }
     }
     return whaleOrders;
@@ -276,8 +301,10 @@ export default class Coin {
   public calculateVolumeDifference() {
     const buyVolume = this._lastBuyVolume;
     const sellVolume = this._lastSellVolume;
-    const currentVolumeDifference = Math.abs(Math.round(((buyVolume >= sellVolume ? buyVolume / sellVolume : sellVolume / buyVolume)) * 100) - 100);
-
+    let currentVolumeDifference = Math.abs(Math.round(((buyVolume >= sellVolume ? buyVolume / sellVolume : sellVolume / buyVolume)) * 100) - 100);
+    if (buyVolume < sellVolume) {
+      currentVolumeDifference = currentVolumeDifference * -1;
+    }
     if (currentVolumeDifference !== this._currentVolumeDifference) {
       this._currentVolumeDifference = currentVolumeDifference;
 
@@ -288,7 +315,8 @@ export default class Coin {
     return currentVolumeDifference;
   }
 
-  public _detectWhaleOrders(newOrders = {}) {
+  public _detectWhaleOrders(newOrders = {}, minOrderValue = 0) {
+    const meanAlarm = minOrderValue;
     const orders = {};
     let sumVolume: number = 0;
     let position: number = 0;
@@ -298,7 +326,7 @@ export default class Coin {
         const value = Math.round(parseFloat(price) * parseFloat(quantity));
         position++;
         sumVolume += value;
-        if (value >= this.alarm.order) {
+        if (meanAlarm && value >= meanAlarm) {
           orders[price] = { value, position };
         }
       }

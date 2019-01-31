@@ -44,6 +44,10 @@ export default class RedisClient {
     this.clientPublisher.publish('order', value);
     this.client.set(key, value);
   }
+  public setMeanOrderValue(key: string, value: string) {
+    this.clientPublisher.publish('mean_order_value', value);
+    this.client.set(key, value);
+  }
   public setPriceChange(key: string, value: string) {
     this.clientPublisher.publish('price_change_24hr', value);
     this.client.set(key, value);

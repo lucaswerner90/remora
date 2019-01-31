@@ -2,19 +2,17 @@ import React, { Component } from 'react';
 import { Grid, Typography } from '@material-ui/core';
 import Link from 'next/link';
 import HeaderMenu from './HeaderMenu';
-import MessageIcon from '@material-ui/icons/MessageOutlined';
-import IconButton from '@material-ui/core/IconButton';
-import Badge from '@material-ui/core/Badge';
 
 import { connect } from 'react-redux';
 
 const mapReduxStateToComponentProps = state => ({
-  userName: state.user.userInfo.name
+  name: state.user.userInfo.name,
+  username: state.user.userInfo.username,
 });
 export class Header extends Component {
 
   render() {
-    const { userName = '' } = this.props;
+    const { username = '', name = '' } = this.props;
     return (
       <Grid container spacing={0} justify="space-between"
         alignItems="center">
@@ -30,13 +28,7 @@ export class Header extends Component {
         </Grid>
         <Grid item xs={10}>
           <Typography variant="body2" align="right">
-            {userName}
-            <Badge badgeContent={4} color="secondary">
-              <IconButton disabled={true}>
-                <MessageIcon />
-              </IconButton>
-            </Badge>
-
+            {name}  ( {username} )
           </Typography>
         </Grid>
       </Grid>

@@ -99,7 +99,7 @@ export default class ExchangeConnection {
    * @memberof ExchangeConnection
    */
   private createCoinIntervals(coin: Coin): NodeJS.Timeout {
-    const updateTime: number = 20 * 1000;
+    const updateTime: number = 5 * 1000;
     return setInterval(() => {
       if (coin.actualPrice) {
         coin.calculateVolumeDifference();

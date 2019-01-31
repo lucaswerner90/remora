@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 import lightBlue from '@material-ui/core/colors/lightBlue';
 import { green, red } from '@material-ui/core/colors';
+import Loading from '../../../common/utils/Loading';
 
 const Chart = dynamic(import('react-apexcharts'), { ssr: false });
 
@@ -150,7 +151,7 @@ class PriceChart extends React.Component {
         />
       );
     }
-    return <Loading height="250px"/>;
+    return <Loading height="250px" />;
   }
 }
 

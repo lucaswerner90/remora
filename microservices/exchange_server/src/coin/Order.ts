@@ -79,7 +79,7 @@ export default class Order {
   }
   private afterCreatedIntervals() {
     setTimeout(async() => {
-      const redisKey = this._coin._redisKeys.LATEST_PRICE;
+      const redisKey = this._coin.redisKeys.LATEST_PRICE;
 
       try {
         const { price = 0 } = await redis.getKeyValue(redisKey);
@@ -89,7 +89,7 @@ export default class Order {
       }
     }, 5 * 60 * 1000);
     setTimeout(async() => {
-      const redisKey = this._coin._redisKeys.LATEST_PRICE;
+      const redisKey = this._coin.redisKeys.LATEST_PRICE;
 
       try {
         const { price = 0 } = await redis.getKeyValue(redisKey);
@@ -99,7 +99,7 @@ export default class Order {
       }
     }, 10 * 60 * 1000);
     setTimeout(async() => {
-      const redisKey = this._coin._redisKeys.LATEST_PRICE;
+      const redisKey = this._coin.redisKeys.LATEST_PRICE;
 
       try {
         const { price = 0 } = await redis.getKeyValue(redisKey);
@@ -149,7 +149,7 @@ export default class Order {
 
   private afterExecutedIntervals() {
     setTimeout(async () => {
-      const redisKey = this._coin._redisKeys.LATEST_PRICE;
+      const redisKey = this._coin.redisKeys.LATEST_PRICE;
 
       try {
         const { price = 0 } = await redis.getKeyValue(redisKey);
@@ -159,7 +159,7 @@ export default class Order {
       }
     }, 5 * 60 * 1000);
     setTimeout(async () => {
-      const redisKey = this._coin._redisKeys.LATEST_PRICE;
+      const redisKey = this._coin.redisKeys.LATEST_PRICE;
 
       try {
         const { price = 0 } = await redis.getKeyValue(redisKey);
@@ -169,7 +169,7 @@ export default class Order {
       }
     }, 10 * 60 * 1000);
     setTimeout(async () => {
-      const redisKey = this._coin._redisKeys.LATEST_PRICE;
+      const redisKey = this._coin.redisKeys.LATEST_PRICE;
 
       try {
         const { price = 0 } = await redis.getKeyValue(redisKey);

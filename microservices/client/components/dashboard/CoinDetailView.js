@@ -21,7 +21,7 @@ import TabsInfo from './subcomponents/info/TabsInfo';
 
 const mapReduxStateToComponentProps = state => ({
   selectedCoin: state.user.userPreferences.selectedCoin,
-  allCoins: state.coins.coins
+  coinInfo: state.coins.coins[state.user.userPreferences.selectedCoin]
 });
 
 const initialState = {
@@ -100,12 +100,11 @@ export class CoinDetailView extends Component {
   }
 
   render() {
-    const { allCoins = {}, selectedCoin = '' } = this.props;
-    const coinInfo = allCoins && allCoins[selectedCoin] ? allCoins[selectedCoin] : {};
+    const { coinInfo = {}, selectedCoin = '' } = this.props;
 
     const { pricesList = [], buyOrder = {}, sellOrder = {}, priceChange = 0, price = 0, volumeDifference = 0 } = this.state;
     
-    if (pricesList.length > 0 && priceChange !== 0 && price > 0 && coinInfo.name) {
+    if (coinInfo.name) {
       return (
         <Grid container direction="row" justify="space-around" alignItems="center" spacing={16} style={{ borderRight:'1px solid #ffffff63'}}>
 
@@ -133,7 +132,7 @@ export class CoinDetailView extends Component {
         </Grid>
       );
     } else {
-      return <Loading height={'90vh'}/>
+      return <Loading height={'90vh'} message="Waiting for the whales to appear..."/>
     }
   }
 }

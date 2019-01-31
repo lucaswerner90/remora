@@ -9,6 +9,7 @@ const initialState = {
   },
   userInfo: {
     name: 'Lucas Werner',
+    username: 'lucaswerner',
     email: 'wernerlucas12@gmail.com',
     isPremium: true
   },

@@ -51,6 +51,7 @@ services:
     command: yarn run start-dev
     volumes:
       - ./microservices/socketio/src:/src
+      - ./microservices/socketio/config:/config
     ports:
       - "5000"
     depends_on:
