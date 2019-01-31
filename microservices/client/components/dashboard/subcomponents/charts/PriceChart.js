@@ -93,8 +93,6 @@ class PriceChart extends React.Component {
           axisBorder: {
             show: false,
           },
-          max: sell.price ? sell.price * 1.01 : Math.min(...prices),
-          min: buy.price ? buy.price * 0.99 : Math.min(...prices)
         },
         xaxis: {
           labels: {
