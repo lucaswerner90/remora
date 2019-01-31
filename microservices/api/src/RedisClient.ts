@@ -55,15 +55,12 @@ export default class RedisClient {
   }
   public async getChatMessages(chat = ''): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.client.lrange(`${chat}_messages`, -20, 20, (err, reply) => {
+      this.client.lrange(`${chat}_messages`, -20, -1, (err, reply) => {
         if (err) {
           reject(err);
         }
-
         resolve(reply);
       });
     });
   }
-
-  
 }

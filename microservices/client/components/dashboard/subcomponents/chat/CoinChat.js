@@ -155,7 +155,7 @@ export class Chat extends Component {
     if (open) {
       return (
         <div style={{ zIndex: 100, maxWidth: '300px', width: '100%', position: 'fixed', bottom: '5%', right: '5%' }}>
-          <Grid container spacing={16} style={{ background: 'rgba(34, 35, 35, 0.52)', padding:20, borderRadius: 10}}>
+          <Grid container spacing={16} style={{ background: 'rgba(34, 35, 35, 0.87)', padding:20, borderRadius: 10}}>
             <Grid item xs={12}>
               <Typography variant="h6">
                 {coinInfo.name} ({coinInfo.symbol}{coinInfo.against}) 
