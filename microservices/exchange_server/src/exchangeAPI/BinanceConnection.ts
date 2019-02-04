@@ -53,19 +53,20 @@ export default class BinanceConnection extends ExchangeConnection{
     // Gets the last chart price of the coin
     Binance.websockets.chart(coin.symbol, BinanceConnection.TIMES.MIN['1MIN'], (symbol: string, interval: any, chart: { [x: string]: any; }) => {
       const tick = Binance.last(chart);
-      const last = chart[tick].close;
-      coin.actualPrice = parseFloat(last);
+      if (tick && chart[tick] && chart[tick].close) {
+        const last = chart[tick].close;
+        coin.actualPrice = parseFloat(last);
+        // Update coin prices.
+        const newPrices = [];
+        Object.keys(chart).forEach((tick) => {
+          const chartTick = chart[tick];
+          const price = parseFloat(chartTick.close);
+          newPrices.push(price);
+        });
 
-      // Update coin prices.
-      const newPrices = [];
-      Object.keys(chart).forEach((tick) => {
-        const chartTick = chart[tick];
-        const price = parseFloat(chartTick.close);
-        newPrices.push(price);
-      });
-
-      if (newPrices.length) {
-        coin.pricesList = newPrices;
+        if (newPrices.length) {
+          coin.pricesList = newPrices;
+        }
       }
 
     });

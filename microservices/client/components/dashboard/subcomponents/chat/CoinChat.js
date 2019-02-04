@@ -8,11 +8,11 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Typography from '@material-ui/core/Typography';
 import ListItemText from '@material-ui/core/ListItemText';
-import PersonIcon from '@material-ui/icons/Person';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import SendIcon from '@material-ui/icons/Send';
-import MessageIcon from '@material-ui/icons/MessageOutlined';
+import ChatIcon from '@material-ui/icons/Chat';
 import Badge from '@material-ui/core/Badge';
 
 import { connect } from 'react-redux';
@@ -21,23 +21,26 @@ import fetch from 'isomorphic-unfetch';
 
 import io from 'socket.io-client';
 import getConfig from 'next/config';
-import { Paper } from '@material-ui/core';
+import { Divider } from '@material-ui/core';
+import { cyan } from '@material-ui/core/colors';
 
 const mapReduxStateToComponentProps = state => ({
   selectedCoin: state.user.userPreferences.selectedCoin,
   coinInfo: state.coins.coins[state.user.userPreferences.selectedCoin],
-  username: state.user.userInfo.username
+  name: state.user.userInfo.name
 });
+
+const chatStyle = { zIndex: 100, maxWidth: '50px', width: '100%', position: 'fixed', bottom: '2%', right: '2%' };
 
 const welcomeMessage = {
   created: Date.now(),
-  username:'Rémora',
+  name:'Rémora',
   message: 'Hi! Why don\'t you share your ideas with the world about this coin?'
 }
 const { publicRuntimeConfig } = getConfig();
-const { backend = 'localhost:8080' } = publicRuntimeConfig;
+const { api } = publicRuntimeConfig;
 
-const socket = io(backend, { forceNew: true });
+const socket = io(api, { forceNew: true });
 
 export class Chat extends Component {
   state = {
@@ -63,7 +66,7 @@ export class Chat extends Component {
   onSendMessage = () => {
     const info = {
       message: this.state.message,
-      username: this.props.username,
+      name: this.props.name,
       created: Date.now()
     };
     socket.emit(`${this.props.selectedCoin}_chat`, info);
@@ -91,8 +94,8 @@ export class Chat extends Component {
         'Content-Type': 'application/json'
       }
     };
-    const messagesFetch = await fetch(`http://${backend}/api/chat/messages`, request);
-    const { messages = [] } = await messagesFetch.json();
+    const messagesFetch = await fetch(`http://${api}/api/chat/messages`, request);
+    const { messages } = await messagesFetch.json();
     if (this.state.open) {
       this.setState({
         ...this.state,
@@ -107,7 +110,7 @@ export class Chat extends Component {
       
     }
   }
-  componentWillMount() {
+  componentDidMount() {
     socket.on(`${this.props.selectedCoin}_chat`, this.onReceiveChatMessage);
     this.getInitialMessages(`${this.props.selectedCoin}_chat`);
 
@@ -118,33 +121,41 @@ export class Chat extends Component {
   }
 
   renderMessages = (chatMessages) => {
-    return chatMessages.map(({ message, username, created }) => {
+    return chatMessages.map(({ message, name, created }) => {
       const time = new Date(created);
       const parsedMinutes = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes();
       const parsedHours = time.getHours() < 10 ? `0${time.getHours()}` : time.getHours();
       const parsedTime = `${parsedHours}:${parsedMinutes}`;
       return (
         <ListItem key={created} alignItems="flex-start">
-        <ListItemAvatar>
-          <PersonIcon color="primary"/>
-        </ListItemAvatar>
+          <ListItemAvatar>
+            <AccountCircleIcon variant="rounded" color="primary"/>
+          </ListItemAvatar>
         <ListItemText
           primary={
-            <React.Fragment>
-                <Typography component="span" variant="body1" color="textPrimary">
-                {`${username}`}
-              </Typography>
-            </React.Fragment>    
+              <Grid container alignItems="center">
+                <Grid item xs={10}>
+                  <Typography component="span" variant="body1" color="textPrimary" align="left" style={{display: 'inline-block'}}>
+                    {name}
+                  </Typography>
+                </Grid>
+                <Grid item xs={2}>
+                  <Typography component="span" variant="body2" color="textPrimary" align="right" style={{display: 'inline-block'}}>
+                    {parsedTime}
+                  </Typography>
+                </Grid>
+            </Grid>    
           }
           secondary={
             <React.Fragment>
-              <Typography component="span" color="textPrimary">
+              <Typography component="span" style={{color:cyan[500]}}>
                 {message}
               </Typography>
-            </React.Fragment>
-          }
-        />
-      </ListItem>
+              </React.Fragment>
+            }
+            />
+          <Divider/>
+        </ListItem>
       );
     });
   }
@@ -154,8 +165,8 @@ export class Chat extends Component {
     const { open = false , pendingNotifications = 0} = this.state;
     if (open) {
       return (
-        <div style={{ zIndex: 100, maxWidth: '300px', width: '100%', position: 'fixed', bottom: '5%', right: '5%' }}>
-          <Grid container spacing={16} style={{ background: 'rgba(34, 35, 35, 0.87)', padding:20, borderRadius: 10}}>
+        <div style={{ ...chatStyle, maxWidth:'350px' }}>
+          <Grid container spacing={16} style={{ background: 'rgba(4, 21, 51, 0.85)', padding:20, borderRadius: 10}}>
             <Grid item xs={12}>
               <Typography variant="h6">
                 {coinInfo.name} ({coinInfo.symbol}{coinInfo.against}) 
@@ -163,6 +174,7 @@ export class Chat extends Component {
               <Typography variant="body2" style={{textTransform:'uppercase'}}>
                 {coinInfo.exchange}
               </Typography>
+              <Divider style={{marginTop:'10px'}}/>
             </Grid>
             <Grid item xs={12}>
               <List dense={true} style={{ overflowY: 'auto', height:'40vh'}}>
@@ -198,17 +210,17 @@ export class Chat extends Component {
             this.setState({ ...this.state, open: !this.state.open, pendingNotifications: 0 });
           }
           }>
-            <MessageIcon />
+            <ChatIcon />
           </IconButton>
             
         </div>
       )
     } else {
       return (
-        <div style={{ zIndex: 100, maxWidth: '50px', width: '100%', position: 'fixed', bottom: '5%', right: '5%' }}>
-          <Badge badgeContent={pendingNotifications} color="secondary">
+        <div style={chatStyle}>
+          <Badge badgeContent={pendingNotifications > 10 ? '+10' : pendingNotifications} color="secondary">
             <IconButton style={{ background: '#47a9fd85'}} onClick={() => this.setState({...this.state, open: !this.state.open})}>
-              <MessageIcon />
+              <ChatIcon />
             </IconButton>
           </Badge>
         </div>

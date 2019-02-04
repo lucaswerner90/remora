@@ -1,11 +1,16 @@
 FROM node:alpine
 
-WORKDIR /
-RUN apk update && apk upgrade && \
-  apk add --no-cache bash git openssh
+# Create app directory
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
 
-COPY . .
-
+# Install app dependencies
+COPY package.json /usr/src/app/
 RUN yarn
+
+# Bundle app source
+COPY . /usr/src/app
 RUN yarn run build
-CMD NODE_ENV=production && yarn run prod
+
+
+EXPOSE 3000

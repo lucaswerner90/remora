@@ -24,7 +24,7 @@ class MyDocument extends Document {
           />
           <link
             rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500"
+            href="https://fonts.googleapis.com/css?family=Roboto:100,200,300,400,500"
           />
           <meta name="description" content=""/>
           <meta name="author" content=""/>
@@ -32,7 +32,7 @@ class MyDocument extends Document {
           <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
           <link rel="icon" href="favicon.ico" type="im</link>age/x-icon"/>
         </Head>
-        <body>
+        <body style={{ background: 'linear-gradient(63deg, rgb(0,153,204), rgb(22,38,99))'}}>
             <Main />
             <NextScript />
         </body>

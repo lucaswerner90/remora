@@ -7,22 +7,17 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 
 // Icons
 import StarIcon from '@material-ui/icons/Star';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import SearchIcon from '@material-ui/icons/Search';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 
@@ -63,7 +58,6 @@ class CoinsList extends React.Component {
   state = {
     dense: true,
     showFilters: false,
-    filterValue: ''
   };
 
   selectCoin = (coinID = '') => {
@@ -100,7 +94,8 @@ class CoinsList extends React.Component {
 
   generateItems = (coins = this.state.coins) => {
     const { favorites } = this.props;
-    return coins.map(coin => {
+    const orderCoins = [...coins.filter(coin => favorites.indexOf(coin.id) > -1), ...coins.filter(coin => favorites.indexOf(coin.id) === -1)];
+    return orderCoins.map(coin => {
       return (
         <ListItem key={coin.id} onClick={() => this.selectCoin(coin.id)} dense button>
           <ListItemText
@@ -135,47 +130,45 @@ class CoinsList extends React.Component {
     });
 
   }
-  showFilterComponents = () => {
-    const { classes } = this.props;
-    return (
-      <Grid item xs={12} style={{textAlign:'right'}}>
-        <TextField
-          id="outlined-search"
-          label="Search for coins"
-          type="text"
-          margin="dense"
-          variant="outlined"
-          onChange={this.handlerFilterChange}
-          autoCapitalize="true"
-          autoFocus={true}
-          fullWidth={true}
-          autoComplete="off"
-          InputProps={{
-            className: classes.input,
-            endAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Grid>
-    );
-  }
-  handleShowFilters = () => {
-    const currentValue = this.state.showFilters;
-    this.setState({ ...this.state, showFilters: !currentValue });
-  }
+  showFavorites = (coins = this.state.coins) => {
+    const { favorites } = this.props;
+    const favoriteCoins = coins.filter(coin => favorites.indexOf(coin.id) > -1);
+    return favoriteCoins.map(coin => {
+      return (
+        <ListItem key={coin.id} onClick={() => this.selectCoin(coin.id)} dense button>
+          <ListItemText
+            primary={
+              <React.Fragment>
+                <Grid container alignItems="flex-end">
+                  <Grid item xs={12}>
+                    <Typography component="span" variant="body1">
+                      {`${coin.name} (${coin.symbol}-${coin.against})`}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </React.Fragment>
+            }
+            secondary={
+              <React.Fragment>
+                <Typography component="span" style={{ textTransform: 'uppercase' }} color="textPrimary">
+                  {coin.exchange}
+                </Typography>
+              </React.Fragment>
+            }
+          />
+          <ListItemSecondaryAction>
+            <IconButton aria-label="Favorite" disabled={favorites.length === 1 && favorites.indexOf(coin.id) > -1} onClick={() => this.markAsFavorite(coin.id)}>
+              {favorites.indexOf(coin.id) > -1 && <StarIcon />}
+              {favorites.indexOf(coin.id) === -1 && <StarBorderIcon />}
+            </IconButton>
+          </ListItemSecondaryAction>
+        </ListItem>
 
-  showFilterButton = () => {
-    return (
-      <IconButton aria-label="Show/Hide filters" onClick={this.handleShowFilters}>
-        <FilterListIcon/>
-      </IconButton>
-    );
+      );
+    });
   }
   filterCoin = ({name='',exchange='',symbol=''}) => {
-    const filter = this.state.filterValue.toLowerCase();
+    const filter = this.props.filter.toLowerCase();
     if (filter.length) {
       return (name.toLowerCase().includes(filter) || exchange.toLowerCase().includes(filter) || symbol.toLowerCase().includes(filter));
     }
@@ -190,11 +183,9 @@ class CoinsList extends React.Component {
     this.setState({ ...this.state, filterValue });
   }
   render() {
-    const { classes, coins = [] } = this.props;
-    const { dense = true, filterValue = '', showFilters = false } = this.state;
-    let filteredCoins = filterValue.length ? Object.values(coins).filter(this.filterCoin): Object.values(coins);
-
-    filteredCoins = filteredCoins.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase());
+    const { classes, coins = [], filter = '' } = this.props;
+    const { dense = true } = this.state;
+    let filteredCoins = filter.length ? Object.values(coins).filter(this.filterCoin): Object.values(coins);
 
     return (
       <Grid container spacing={16} alignItems="center">
@@ -203,14 +194,11 @@ class CoinsList extends React.Component {
             COINS
           </Typography>
         </Grid>
-        <Grid item xs={2} md={2} style={{textAlign: 'right'}}>
-          {this.showFilterButton()}
-        </Grid>
-        {showFilters && this.showFilterComponents()}
         <Grid item xs={12} md={12}>
           <Paper elevation={0}>
               <List dense={dense} className={classes.list}>
-                {this.generateItems(filteredCoins)}
+                {!filter.length && this.showFavorites(filteredCoins)}
+                {filter.length > 0 && this.generateItems(filteredCoins)}
               </List>
           </Paper>
           </Grid>
@@ -221,6 +209,7 @@ class CoinsList extends React.Component {
 
 CoinsList.propTypes = {
   classes: PropTypes.object.isRequired,
+  filter: PropTypes.string.isRequired
 };
 
 export default connect(mapReduxStateToComponentProps, { updateUserSelectedCoin, updateUserFavorites })(withStyles(styles)(CoinsList));

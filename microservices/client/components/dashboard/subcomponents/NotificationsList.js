@@ -18,7 +18,7 @@ import io from 'socket.io-client';
 import getConfig from 'next/config';
 
 const { publicRuntimeConfig } = getConfig();
-const { backend = 'localhost:8080' } = publicRuntimeConfig;
+const { api } = publicRuntimeConfig;
 
 
 
@@ -70,8 +70,8 @@ class NotificationsList extends React.Component {
       this.socket.off(currentCoins[i]);
     }
   }
-  componentWillMount() {
-    this.socket = io(backend, { forceNew: true });
+  componentDidMount() {
+    this.socket = io(api, { forceNew: true });
     const currentCoins = this.props.favorites;
     for (let i = 0; i < currentCoins.length; i++) {
       this.socket.on(currentCoins[i], this.onSocketData);
@@ -133,6 +133,10 @@ class NotificationsList extends React.Component {
   generateItems = (notifications = []) => {
     return notifications.map(notification => {
       const { coin, type, info } = notification;
+      const time = new Date(info.createdAt);
+      const parsedMinutes = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes();
+      const parsedHours = time.getHours() < 10 ? `0${time.getHours()}` : time.getHours();
+      const parsedTime = `${parsedHours}:${parsedMinutes}`;
       const goodNews = notificationTypes.COIN.WHALE_ORDER && info.type === 'buy';
       return (
         <ListItem key={Math.random()} onClick={() => this.selectCoin(coin.id)} dense button>
@@ -154,7 +158,7 @@ class NotificationsList extends React.Component {
                   </Grid>
                   <Grid item xs={4}>
                     <Typography component="span" align="right" style={{ fontSize: '0.625rem' }} variant="body2">
-                      {getTimeAgo(new Date(info.createdAt).getTime())}
+                      {parsedTime}
                     </Typography>
                   </Grid>
                   <Grid item xs={12}>
@@ -181,14 +185,18 @@ class NotificationsList extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, filter = '' } = this.props;
     const { notifications = [] } = this.state;
-    if (notifications.length) {
+    const filteredNotifications = filter.length ? notifications.filter(notif => 
+      notif.info.type.includes(filter) ||
+      notif.coin.symbol.includes(filter)
+    ) : notifications;
+    if (filteredNotifications.length) {
       return (
         <Grid container spacing={32}>
           <Grid item xs={12}>
           <Typography className={classes.padding} variant="h6">
-          NOTIFICATIONS
+            NOTIFICATIONS
           </Typography>
           </Grid>
           <Grid item xs={12} md={12}>
@@ -210,7 +218,7 @@ class NotificationsList extends React.Component {
           </Grid>
           <Grid item xs={12} md={12}>
             <Paper elevation={0} style={{height: '30vh'}}>
-              <Typography align="center" variant="body2">Nothing to show yet...</Typography>
+              <Typography align="center" variant="body2">Nothing in sight for now captain...</Typography>
             </Paper>
           </Grid>
         </Grid>

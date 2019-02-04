@@ -36,11 +36,14 @@ const theme = createMuiTheme({
     type:'dark',
     primary: {
       main: '#fff',
+      light: 'rgb(102,255,255)',
+      dark: 'rgb(0,153,204)'
     },
-    secondary: lightGreen,
+    secondary: {
+      main: 'rgb(255,0,102)'
+    },
   },
   typography: {
-    color: '#fff',
     useNextVariants: true,
     body1: {
       fontSize: '0.875rem',
@@ -48,22 +51,30 @@ const theme = createMuiTheme({
     },
     body2: {
       fontWeight: 300,
-      fontSize: '0.75rem'
+      fontSize: '0.875rem'
+    },
+    h3: {
+      fontWeight: 300,
+      fontSize:'3.5rem'
     },
     h4: {
       fontWeight: 500,
       fontSize:'1.25rem'
     },
     h5: {
-      fontSize:'1.125rem'
+      fontSize:'1.375rem'
     },
     h6: {
       fontSize: '0.9375rem',
-      fontWeight: 400
+      fontWeight: 300
     },
     display1: {
       fontSize: '0.5rem',
       fontWeight: 100
+    },
+    title: {
+      fontSize: '1.5rem',
+      fontWeight: 300
     }
   },
 });

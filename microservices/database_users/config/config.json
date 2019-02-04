@@ -1,0 +1,20 @@
+{
+  "defaults":{
+    "exchange":"binance",
+    "port":5100
+  },
+  "mongoDBConnection":{
+    "host":"ds163410.mlab.com",
+    "port":"63410",
+    "name":"remora_exchanges",
+    "user":"remora_exchange",
+    "password":"remora.1990"
+  },
+  "channelList":[
+    "order",
+    "price_change_24hr",
+    "volume_difference",
+    "price_list",
+    "latest_price"
+  ]
+}

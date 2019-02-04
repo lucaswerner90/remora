@@ -2,13 +2,10 @@ import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 
-
-import Document from 'next/document';
-
 import Layout from '../components/Layout';
 import CoinDetailView from '../components/dashboard/CoinDetailView';
 import RightSideView from '../components/dashboard/RightSideView';
-
+import CoinChat from '../components/dashboard/subcomponents/chat/CoinChat';
 
 import fetch from 'isomorphic-unfetch';
 import getConfig from 'next/config';
@@ -17,12 +14,8 @@ import {connect} from 'react-redux';
 import { updateUserPreferences, updateUserInfo } from '../redux/actions/userPreferencesActions';
 import { updateAllCoins } from '../redux/actions/coinsActions';
 
-import Router from 'next/router';
-import CoinChat from '../components/dashboard/subcomponents/chat/CoinChat';
-
-
 const { publicRuntimeConfig } = getConfig();
-const { backend = 'localhost:8080' } = publicRuntimeConfig;
+const { api } = publicRuntimeConfig;
 
 const styles = () => ({
   root: {
@@ -30,46 +23,28 @@ const styles = () => ({
   },
 });
 
-const redirectToLogin = res => {
-  if (res) {
-    res.writeHead(302, { Location: '/login' });
-    res.end();
-    res.finished = true;
-  } else {
-    Router.push('/login');
-  }
-}
-
-class Dashboard extends Document {
-  static async getInitialProps({req,res}) {
-    if (false) {
-      redirectToLogin(res);
-    } else {
-      const userRequestData = {
-        method: 'POST', // or 'PUT'
-        body: JSON.stringify({email: 'wernerlucas12@gmail.com'}), 
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
-      const userInfoFetch = await fetch(`http://${backend}/api/user/info`, userRequestData);
-      const userInfo = await userInfoFetch.json();
+class Dashboard extends React.Component {
   
-      const userPreferencesFetch = await fetch(`http://${backend}/api/user/preferences`, userRequestData);
-      const userPreferences = await userPreferencesFetch.json();
-  
-      const allCoinsFetch = await fetch(`http://${backend}/api/coin/all`);
-      const coins = await allCoinsFetch.json();
-      
-      Object.keys(coins).map(coinID => coins[coinID] = JSON.parse(coins[coinID]));
-      return { userInfo, userPreferences, coins };
-    }
-  }
+  async componentDidMount() {
+    const userRequestData = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+    const userInfoFetch = await fetch(`http://${api}/api/user/info`, userRequestData);
+    const userInfo = await userInfoFetch.json();
+    const userPreferencesFetch = await fetch(`http://${api}/api/user/preferences`, userRequestData);
+    const userPreferences = await userPreferencesFetch.json();
 
-  componentWillMount() {
-    this.props.updateUserPreferences(this.props.userPreferences);
-    this.props.updateUserInfo(this.props.userInfo);
-    this.props.updateAllCoins(this.props.coins);
+    const allCoinsFetch = await fetch(`http://${api}/api/coin/all`);
+    const coins = await allCoinsFetch.json();
+
+    Object.keys(coins).map(coinID => coins[coinID] = JSON.parse(coins[coinID]));
+
+    this.props.updateUserPreferences(userPreferences);
+    this.props.updateUserInfo(userInfo);
+    this.props.updateAllCoins(coins);
   }
 
   render() {

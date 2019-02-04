@@ -24,7 +24,7 @@ export default class Coin {
   private _against: string;
   private _meanOrderValue = { buy: 0, sell: 0 };
   private _minWhaleOrderValue = { buy: 0, sell: 0 };
-  private _minTimesHigher: number = 20;
+  private _minTimesHigher: number = 15;
 
   constructor(symbol: string = '', { acronym = '', url = '', name = '', alarm = { order : 0, volume : 0 } }, against = 'USD', exchange: string = '') {
     this.symbol = symbol;
@@ -291,7 +291,7 @@ export default class Coin {
   private _deleteWhaleOrders(whaleOrders: TCoinWhaleOrder, newCoinOrders: { [s: string]: {}; } | ArrayLike<{}>, minValue = 0) {
     for (const price in whaleOrders) {
       const value = newCoinOrders[price] * parseFloat(price);
-      if (!newCoinOrders[price] || value < minValue * 0.8) {
+      if (!newCoinOrders[price] || value < minValue * 0.5) {
         whaleOrders[price] = undefined;
       }
     }

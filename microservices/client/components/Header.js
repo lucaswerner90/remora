@@ -21,14 +21,14 @@ export class Header extends Component {
         </Grid>
         <Grid item xs={1}>
           <Link href="/">
-            <Typography style={{ fontSize: '1.25rem', fontWeight: 500 }} align="left">
-              <a>rémora</a>
+            <Typography variant="h4" align="left">
+              rémora
             </Typography>
           </Link>
         </Grid>
         <Grid item xs={10}>
           <Typography variant="body2" align="right">
-            {name}  ( {username} )
+            {name}
           </Typography>
         </Grid>
       </Grid>

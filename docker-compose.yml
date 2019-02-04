@@ -5,6 +5,10 @@ services:
   api:
     build: ./microservices/api
     restart: always
+    command: yarn run start
+    environment:
+      - NODE_ENV=prod
+      - REQUEST_ORIGIN=http://localhost:80
     ports: 
       - "9000"
     depends_on:
@@ -12,6 +16,7 @@ services:
 
   nextjs:
     build: ./microservices/client
+    command: yarn run prod
     restart: always
     ports: 
       - "3000"
@@ -28,7 +33,8 @@ services:
     environment:
       - DEDICATED_TO=binance
       - MAIN_COIN=USD
-      - NODE_ENV=dev
+      - NODE_ENV=prod
+    command: yarn run start
     ports:
       - "7000"
     depends_on:
@@ -37,6 +43,7 @@ services:
   socketio:
     build: ./microservices/socketio
     restart: always
+    command: yarn run start
     ports:
       - "5000"
     depends_on:
@@ -46,18 +53,33 @@ services:
   database_binance:
     build: ./microservices/database_server
     restart: always
+    command: yarn run start
     environment:
       - EXCHANGE=binance
-      - NODE_ENV=dev
+      - NODE_ENV=prod
     depends_on:
       - redis
+  
+  load_balancer:
+    build: ./microservices/load_balancer
+    restart: always
+    ports:
+      - "8080:80"
+    links: 
+      - api
+      - socketio
+      - nextjs
+    depends_on: 
+      - api
+      - socketio
+
 
   nginx:
     build: ./microservices/nginx
     restart: always
     ports:
       - "80:80"
+    links: 
+      - load_balancer
     depends_on: 
-      - socketio
-      - nextjs
-      - api
+      - load_balancer

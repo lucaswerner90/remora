@@ -7,7 +7,6 @@ import Tab from '@material-ui/core/Tab';
 
 import OrderBasicInfo from './OrderBasicInfo';
 import OrderAdvancedInfo from './OrderAdvancedInfo';
-import CoinChat from '../chat/CoinChat';
 
 const styles = () => ({
   root: {
@@ -53,16 +52,6 @@ class TabsInfo extends React.Component {
         </Grid>
         <Grid item xs={12}>
           <OrderAdvancedInfo message="BUY ORDER" order={buyOrder} coinPrice={coinPrice} />
-        </Grid>
-      </Grid>
-    );
-  }
-  renderChat = () => {
-    const { classes } = this.props;
-    return (
-      <Grid container spacing={40} className={classes.root}>
-        <Grid item xs={12}>
-          <CoinChat/>
         </Grid>
       </Grid>
     );

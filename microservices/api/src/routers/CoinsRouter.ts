@@ -3,17 +3,21 @@ import RedisClient from '../RedisClient';
 const redis = new RedisClient();
 const router = Router();
 
-// define the home page route
+// Returns the coins object containing all the info about the ones which are being used by the exchanges servers
 router.get('/all', async(req, res) => {
   const key = await redis.getAllCoins();
-  res.send(key);
+  if (!key) {
+    res.send({});
+  } else {
+    res.send(key);
+  }
 });
 
 // define the home page route
 router.post('/property', async ({ body }, res) => {
   const { coinID = '', property = '' } = body;
   const key = await redis.getKeyValue(`${coinID}_${property}`);
-  res.json({ key });
+  res.send({ value: key });
 });
 
 export default router;

@@ -8,8 +8,11 @@ services:
     command: yarn run start-dev
     environment:
       - NODE_ENV=dev
+      - REQUEST_ORIGIN=http://localhost:8000
     volumes:
       - ./microservices/api/src:/src
+      - ./microservices/api/node_modules:/node_modules
+      - ./microservices/api/package.json:/package.json
     ports: 
       - "9000"
     depends_on:
@@ -17,11 +20,12 @@ services:
 
   nextjs:
     build: ./microservices/client
+    command: yarn run dev
     restart: always
     volumes:
-      - ./microservices/client:/opt/app
+      - ./microservices/client:/usr/src/app
     ports: 
-      - "3000"
+      - "3000:3000"
 
   redis:
     build: ./microservices/redis
@@ -69,16 +73,33 @@ services:
       - NODE_ENV=dev
     depends_on:
       - redis
+  
+  load_balancer:
+    build: ./microservices/load_balancer
+    volumes: 
+      - ./microservices/load_balancer/load_balancer.conf:/etc/nginx/nginx.conf
+    restart: always
+    ports:
+      - "8080:80"
+    links: 
+      - api
+      - socketio
+      - nextjs
+    depends_on: 
+      - api
+      - socketio
+
 
   nginx:
     build: ./microservices/nginx
     volumes: 
       - ./microservices/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./microservices/nginx/static:/var/www
     restart: always
+    environment: 
+      - NODE_ENV=docker
     ports:
-      - "8080:80"
+      - "8000:80"
+    links: 
+      - load_balancer
     depends_on: 
-      - api
-      - socketio
-      - nextjs
+      - load_balancer

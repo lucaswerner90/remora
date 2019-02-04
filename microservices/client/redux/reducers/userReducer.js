@@ -1,24 +1,19 @@
 
-import { UPDATE_USER_PREFERENCES, UPDATE_USER_FAVORITE_COINS, UPDATE_USER_SELECTED_COIN, UPDATE_USER_NOTIFICATIONS, GET_USER_SELECTED_COIN } from '../actions/types';
+import { UPDATE_USER_PREFERENCES, UPDATE_USER_FAVORITE_COINS, UPDATE_USER_SELECTED_COIN, UPDATE_USER_NOTIFICATIONS, UPDATE_USER_INFO } from '../actions/types';
 
 const initialState = {
   userPreferences: {
-    selectedCoin: 'binance_ETHUSDT',
-    favorites: ['binance_ETHUSDT', 'binance_BTCUSDT'],
+    selectedCoin: '',
+    favorites: [],
     notifications: {}
   },
   userInfo: {
-    name: 'Lucas Werner',
-    username: 'lucaswerner',
-    email: 'wernerlucas12@gmail.com',
-    isPremium: true
+    
   },
 };
 
 export default (state = initialState, { payload = {}, type = ''}) => {
   switch (type) {
-    case GET_USER_SELECTED_COIN:
-      return state;
     case UPDATE_USER_SELECTED_COIN:
       return {
         ...state,
@@ -51,7 +46,7 @@ export default (state = initialState, { payload = {}, type = ''}) => {
         ...state,
         userPreferences: payload
       };
-    case UPDATE_USER_PREFERENCES:
+    case UPDATE_USER_INFO:
       return {
         ...state,
         userInfo: payload

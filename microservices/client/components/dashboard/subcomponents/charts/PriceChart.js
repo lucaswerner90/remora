@@ -2,12 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import dynamic from 'next/dynamic';
-import lightBlue from '@material-ui/core/colors/lightBlue';
-import { green, red } from '@material-ui/core/colors';
+import { green, lightBlue } from '@material-ui/core/colors';
 import Loading from '../../../common/utils/Loading';
 
 const Chart = dynamic(import('react-apexcharts'), { ssr: false });
-
 
 class PriceChart extends React.Component {
 
@@ -23,49 +21,43 @@ class PriceChart extends React.Component {
     sell: {},
   }
 
-  shouldComponentUpdate(nextProps = { buy: {}, sell: {}, prices: [] }) {
-    const { prices = [], buy = {}, sell= {} } = this.props;
-    const differentPrice = prices.length && nextProps.prices.length && (prices[prices.length - 1] !== nextProps.prices[prices.length - 1]);
-    const differentBuy = buy.price !== nextProps.buy.price;
-    const differentSell = sell.price !== nextProps.sell.price;
 
-    return differentPrice || differentBuy || differentSell;
-    
-  }
   render() {
-    const { sell={}, buy={}, prices=[], priceChange = 0 } = this.props;
+    const { sell = {}, buy = {}, prices = [] } = this.props;
+    
     const buyAnnotation = buy && buy.price ? {
       y: buy.price,
-      borderColor: green[900],
+      strokeDashArray: 0,
+      borderColor: green[500],
       label: {
         position: 'left',
         offsetX: 400,
-        offsetY: -5,
-        borderColor: green[900],
+        borderColor: 'none',
         style: {
-          color: '#fff',
-          background: green[900],
+          color: green[500],
+          background: green[500],
           fontFamily: 'Roboto',
-          fontSize: '0.875rem'
+          fontSize: '0.75rem'
         },
-        text: `${buy.price}$`,
+        text: `Buy at ${buy.price}$`,
       }
-    }: {};
+    } : {};
+    
     const sellAnnotation = sell && sell.price ? {
       y: sell.price,
-      borderColor: red[700],
+      strokeDashArray: 0,
+      borderColor: 'rgb(255,0,102)',
       label: {
         position: 'left',
-        offsetX: 350,
-        offsetY: 18,
-        borderColor: red[700],
+        offsetX: 300,
+        borderColor: 'none',
         style: {
-          color: '#fff',
-          background: red[700],
+          color: 'white',
+          background: 'rgb(255,0,102)',
           fontFamily: 'Roboto',
-          fontSize: '0.875rem'
+          fontSize: '0.75rem'
         },
-        text: `${sell.price}$`,
+        text: `Sell at ${sell.price}$`,
       }
     } : {};
     const graphOptions = {
@@ -79,11 +71,11 @@ class PriceChart extends React.Component {
             easing: 'linear',
             animateGradually: {
               enabled: true,
-              delay: 200
+              speed:2000
             },
             dynamicAnimation: {
               enabled: true,
-              speed: 1000
+              speed: 2000
             }
           },
           toolbar: {
@@ -97,16 +89,14 @@ class PriceChart extends React.Component {
         },
         xaxis: {
           labels: {
-            show: false
+            show:false,
           },
           axisBorder: {
-            color: 'primary',
-            width: '100%',
-            height: 1
+            show: false,
           },
-          axisTicks: {
-            show: true
-          },
+        },
+        grid: {
+          show: false
         },
         annotations: {
           yaxis: [buyAnnotation, sellAnnotation],
@@ -116,20 +106,17 @@ class PriceChart extends React.Component {
         },
         stroke: {
           curve: 'smooth',
-          width: 2
+          width: 4
         },
-        colors: [priceChange >= 0 ? lightBlue[300] : red[300]],
-        grid: {
-          show: false,
-        },
+        colors: ['white'],
         fill: {
           type: 'gradient',
           gradient: {
-            shade: 'light',
-            shadeIntensity: 0,
-            type: 'vertical',
-            opacityFrom: 1,
+            shadeIntensity: 1,
+            inverseColors: false,
+            opacityFrom: 0.9,
             opacityTo: 0,
+            stops: [0, 90, 100]
           },
         },
         dataLabels: {

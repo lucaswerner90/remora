@@ -9,6 +9,7 @@ const exampleUserInfo = {
     notifications: {},
   },
   userInfo: {
+    password: 'test',
     name: 'Lucas Werner',
     username: 'lucaswerner',
     email: 'wernerlucas12@gmail.com',
@@ -16,15 +17,11 @@ const exampleUserInfo = {
   },
 };
 
-router.get('/', (req, res) => {
-  res.json({ info: 'User router is working' });
-});
-
-router.post('/info', ({ body = {} }, res) => {
+router.post('/info', (_req, res) => {
   res.json(exampleUserInfo.userInfo);
 });
 
-router.post('/preferences', ({ body = {} }, res) => {
+router.post('/preferences', (_req, res) => {
   res.json(exampleUserInfo.userPreferences);
 });
 
