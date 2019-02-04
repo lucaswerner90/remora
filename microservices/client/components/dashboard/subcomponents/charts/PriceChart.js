@@ -34,7 +34,7 @@ class PriceChart extends React.Component {
         offsetX: 400,
         borderColor: 'none',
         style: {
-          color: green[500],
+          color: 'white',
           background: green[500],
           fontFamily: 'Roboto',
           fontSize: '0.75rem'
