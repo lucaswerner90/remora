@@ -3,9 +3,8 @@ const compression = require('compression');
 const next = require('next');
 const cookieParser = require('cookie-parser');
 
-const dev = process.env.NODE_ENV !== 'prod';
+const dev = true;
 const app = next({ dev });
-const handle = app.getRequestHandler();
 
 
 const cookieName = process.env.AUTH_COOKIE_NAME || 'remora_jwt_token';
@@ -30,12 +29,14 @@ app.prepare().then(() => {
   server.get('/', (_req, res) => {
     res.sendFile(`${__dirname}/static/index.html`);
   });
-
   server.get('/dashboard', isLoggedIn, (req, res) => {
     return app.render(req, res, '/dashboard');
-  })
-  server.get('*', (req, res) => {
-    return handle(req, res);
+  });
+  server.get('/login', (req, res) => {
+    return app.render(req, res, '/login');
+  });
+  server.get('/signup', (req, res) => {
+    return app.render(req, res, '/signup');
   });
 
   server.listen(3000, (err) => {
