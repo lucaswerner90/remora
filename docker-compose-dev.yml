@@ -84,7 +84,6 @@ services:
     links: 
       - api
       - socketio
-      - nextjs
     depends_on: 
       - api
       - socketio
@@ -95,8 +94,6 @@ services:
     volumes: 
       - ./microservices/nginx/nginx.conf:/etc/nginx/nginx.conf
     restart: always
-    environment: 
-      - NODE_ENV=docker
     ports:
       - "7500:80"
     links: 

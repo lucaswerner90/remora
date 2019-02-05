@@ -69,7 +69,6 @@ services:
     links: 
       - api
       - socketio
-      - nextjs
     depends_on: 
       - api
       - socketio
