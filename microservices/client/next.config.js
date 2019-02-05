@@ -1,5 +1,4 @@
-
-
+console.log(`NextJS NODE_ENV = ${process.env.NODE_ENV}`);
 module.exports = {
   exportPathMap: function () {
     return {
