@@ -29,7 +29,7 @@
     "build": "next build",
     "export": "next export",
     "prod": "NODE_ENV=prod node server.js",
-    "start": "npm run prod"
+    "start": "npm run build && npm run prod"
   },
   "devDependencies": {
     "eslint": "^5.12.0",
