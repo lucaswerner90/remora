@@ -1,3 +1,5 @@
+
+
 module.exports = {
   exportPathMap: function () {
     return {
@@ -7,6 +9,6 @@ module.exports = {
     }
   },
   publicRuntimeConfig: { // Will be available on both server and client
-    api: '178.62.121.203:8080'
+    api: process.env.NODE_ENV === 'prod' ? '178.62.121.203:8080' : 'localhost:8080'
   }
 }
