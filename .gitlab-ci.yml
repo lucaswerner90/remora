@@ -17,15 +17,16 @@ test:
     - develop
     - master
   script:
-    - docker-compose build
+    - docker-compose build --no-cache
     
 step-deploy-production:
   stage: deploy
   only:
     - master
   script:
-    - docker-compose -p remora up --build -d  
+    - docker-compose down --remove-orphans
     - docker system prune -a -f
+    - docker-compose -p remora up --build -d  
   tags:
     - production
   when: manual
