@@ -7,6 +7,6 @@ module.exports = {
     }
   },
   publicRuntimeConfig: { // Will be available on both server and client
-    api: 'localhost:8080'
+    api: process.env.NODE_ENV === 'dev' ? 'localhost:8080' : '178.62.121.203:8080'
   }
 }

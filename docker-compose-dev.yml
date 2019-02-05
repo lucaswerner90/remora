@@ -20,7 +20,7 @@ services:
 
   nextjs:
     build: ./microservices/client
-    command: yarn run dev
+    command: yarn run prod
     restart: always
     volumes:
       - ./microservices/client:/usr/src/app
