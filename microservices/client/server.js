@@ -3,7 +3,7 @@ const compression = require('compression');
 const next = require('next');
 const cookieParser = require('cookie-parser');
 
-const dev = true;
+const dev = process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 
 
