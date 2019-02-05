@@ -15,7 +15,6 @@ test:
     - development
   only:
     - develop
-    - master
   script:
     - docker-compose build --no-cache
     
@@ -24,9 +23,10 @@ step-deploy-production:
   only:
     - master
   script:
-    - docker-compose down --remove-orphans
+    - docker-compose build --no-cache
     - docker system prune -a -f
-    - docker-compose -p remora up --build -d  
+    - docker-compose down --remove-orphans
+    - docker-compose -p remora up -d  
   tags:
     - production
   when: manual
