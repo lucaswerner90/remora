@@ -24,7 +24,7 @@ const styles = {
   },
 };
 
-class SwipeableTemporaryDrawer extends React.Component {
+class HeaderMenu extends React.Component {
   state = {
     left: false,
   };
@@ -101,8 +101,8 @@ class SwipeableTemporaryDrawer extends React.Component {
   }
 }
 
-SwipeableTemporaryDrawer.propTypes = {
+HeaderMenu.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(SwipeableTemporaryDrawer);
+export default withStyles(styles)(HeaderMenu);

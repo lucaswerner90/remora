@@ -15,7 +15,9 @@ services:
 
   nextjs:
     build: ./microservices/client
-    command: yarn run start
+    command: yarn start
+    environment: 
+      - NODE_ENV=prod
     restart: always
     ports: 
       - "3000"
@@ -79,5 +81,7 @@ services:
       - "80:80"
     links: 
       - load_balancer
+      - nextjs
     depends_on: 
       - load_balancer
+      - nextjs

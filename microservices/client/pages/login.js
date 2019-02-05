@@ -17,7 +17,7 @@ import Link from 'next/link';
 
 const { publicRuntimeConfig } = getConfig();
 const { api } = publicRuntimeConfig;
-
+console.log(api);
 
 export class Login extends Component {
   
@@ -99,7 +99,7 @@ export class Login extends Component {
           {this.state.loading && <CircularProgress variant="indeterminate"/>}
         </Grid>
         <Grid item>
-          <Link href='/signup'>
+          <Link href='/signin'>
             <Typography variant="h6" component="a" align="center">
               Crete an account
             </Typography>

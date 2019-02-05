@@ -15,10 +15,9 @@ class RightSideView extends React.Component {
   }
   renderSearchInput = () => {
     return (
-      <Grid item xs={12} style={{ textAlign: 'right' }}>
+      <Grid item xs={12}>
         <TextField
-          id="outlined-search"
-          label="Search for coins or notifications"
+          label="Search coins or notifications"
           type="text"
           margin="dense"
           variant="standard"
