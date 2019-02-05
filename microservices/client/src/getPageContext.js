@@ -70,7 +70,7 @@ const theme = createMuiTheme({
     },
     display1: {
       fontSize: '0.5rem',
-      fontWeight: 100
+      fontWeight: 300
     },
     title: {
       fontSize: '1.5rem',

@@ -9,9 +9,12 @@ import InputLabel from '@material-ui/core/InputLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
+import AlternateEmailIcon from '@material-ui/icons/AlternateEmailOutlined';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import SecurityIcon from '@material-ui/icons/Security';
-import { Typography, CircularProgress } from '@material-ui/core';
+import { Typography, CircularProgress, Divider } from '@material-ui/core';
+
+import Link from 'next/link';
 
 const { publicRuntimeConfig } = getConfig();
 const { api } = publicRuntimeConfig;
@@ -50,7 +53,7 @@ export class Login extends Component {
   }
   render() {
     return (
-      <Grid container justify="center" direction="column" alignItems="center" style={{ flexGrow: 1, height: '100vh'}} spacing={40}>
+      <Grid container justify="center" direction="column" alignItems="center" style={{ flexGrow: 1, height: '100vh'}} spacing={24}>
         <Grid item>
           <Typography align="center" variant="h3">
             rémora
@@ -60,12 +63,15 @@ export class Login extends Component {
           <FormControl required error={!this.state.email.length && this.state.haveTried}>
             <InputLabel htmlFor="input-with-icon-adornment">Email</InputLabel>
             <Input
+              autoFocus={true}
               type="email"
+              autoSave="false"
+              autoComplete="false"
               value={this.state.email}
               onChange={ (event) => this.setState({...this.state, email: event.target.value})}
               startAdornment={
                 <InputAdornment position="start">
-                  <AccountCircle />
+                  <AlternateEmailIcon />
                 </InputAdornment>
               }
             />
@@ -75,7 +81,10 @@ export class Login extends Component {
           <FormControl error={!this.state.password.length && this.state.haveTried} required>
             <InputLabel htmlFor="input-with-icon-adornment">Password</InputLabel>
             <Input
+              autoSave="false"
+              autoComplete="false"
               type="password"
+              value={this.state.password}
               onChange={(event) => this.setState({ ...this.state, password: event.target.value })}
               startAdornment={
                 <InputAdornment position="start">
@@ -88,6 +97,18 @@ export class Login extends Component {
         <Grid item>
           {!this.state.loading && <Button variant="contained" color="primary" disabled={!this.state.email.length || !this.state.password.length} fullWidth={true} onClick={this.postLogin}>Login</Button>}
           {this.state.loading && <CircularProgress variant="indeterminate"/>}
+        </Grid>
+        <Grid item>
+          <Link href='/signup'>
+            <Typography variant="h6" component="a" align="center">
+              Crete an account
+            </Typography>
+          </Link>
+          <Link href='/forgotpassword'>
+            <Typography variant="h6" component="a" align="center">
+              Forgot your password?
+            </Typography>
+          </Link>
         </Grid>
       </Grid>
     )
