@@ -8,7 +8,7 @@ services:
     command: yarn run start-dev
     environment:
       - NODE_ENV=dev
-      - REQUEST_ORIGIN=http://localhost:8000
+      - REQUEST_ORIGIN=http://localhost:7500
     volumes:
       - ./microservices/api/src:/src
       - ./microservices/api/node_modules:/node_modules
@@ -98,7 +98,7 @@ services:
     environment: 
       - NODE_ENV=docker
     ports:
-      - "8000:80"
+      - "7500:80"
     links: 
       - load_balancer
     depends_on: 

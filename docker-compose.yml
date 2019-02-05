@@ -8,7 +8,6 @@ services:
     command: yarn run start
     environment:
       - NODE_ENV=prod
-      - REQUEST_ORIGIN=http://178.62.121.203
     ports: 
       - "9000"
     depends_on:

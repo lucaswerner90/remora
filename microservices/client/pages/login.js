@@ -10,9 +10,8 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
 import AlternateEmailIcon from '@material-ui/icons/AlternateEmailOutlined';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import SecurityIcon from '@material-ui/icons/Security';
-import { Typography, CircularProgress, Divider } from '@material-ui/core';
+import { Typography, CircularProgress } from '@material-ui/core';
 
 import Link from 'next/link';
 
@@ -35,6 +34,7 @@ export class Login extends Component {
       const postLoginRequestData = {
         method: 'POST',
         body: JSON.stringify({ email: this.state.email, password: this.state.password }),
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         }
