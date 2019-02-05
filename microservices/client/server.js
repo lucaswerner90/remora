@@ -24,7 +24,6 @@ app.prepare().then(() => {
   const server = express();
   
   server.use(express.static(__dirname + '/static'));
-  server.use(compression());
   server.use(cookieParser());
   server.get('/', (_req, res) => {
     res.sendFile(`${__dirname}/static/index.html`);
@@ -39,9 +38,9 @@ app.prepare().then(() => {
     return app.render(req, res, '/signup');
   });
 
-  server.listen(3000, (err) => {
+  server.listen(80, (err) => {
     if (err) throw err;
-    console.log('NextJS is ready on port 3000!');
+    console.log('NextJS is ready on port 80!');
   })
 
 }).catch((error) => {

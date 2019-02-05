@@ -13,6 +13,13 @@ services:
     depends_on:
       - redis
 
+  nextjs:
+    build: ./microservices/client
+    command: yarn run start
+    restart: always
+    ports: 
+      - "3000"
+
   redis:
     build: ./microservices/redis
     restart: always
@@ -63,3 +70,14 @@ services:
     depends_on: 
       - api
       - socketio
+
+
+  nginx:
+    build: ./microservices/nginx
+    restart: always
+    ports:
+      - "80:80"
+    links: 
+      - load_balancer
+    depends_on: 
+      - load_balancer
