@@ -28,7 +28,7 @@
     "dev": "node server.js",
     "build": "next build",
     "export": "next export",
-    "prod": "NODE_ENV=production node server.js",
+    "prod": "NODE_ENV=prod node server.js",
     "start": "npm run prod"
   },
   "devDependencies": {
