@@ -20,7 +20,7 @@ services:
       - NODE_ENV=prod
     restart: always
     ports: 
-      - "3000:3000"
+      - "80:3000"
 
   redis:
     build: ./microservices/redis
@@ -74,16 +74,3 @@ services:
     depends_on: 
       - api
       - socketio
-
-
-  nginx:
-    build: ./microservices/nginx
-    restart: always
-    ports:
-      - "80:80"
-    links: 
-      - load_balancer
-      - nextjs
-    depends_on: 
-      - load_balancer
-      - nextjs
