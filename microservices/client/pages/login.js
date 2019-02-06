@@ -17,7 +17,6 @@ import Link from 'next/link';
 
 const { publicRuntimeConfig } = getConfig();
 const { api } = publicRuntimeConfig;
-console.log(api);
 
 export class Login extends Component {
   
