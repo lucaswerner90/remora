@@ -17,7 +17,7 @@ services:
     build: ./microservices/client
     command: yarn start
     environment: 
-      - NODE_ENV=prod
+      - NODE_ENV=pruduction
     restart: always
     ports: 
       - "3000"

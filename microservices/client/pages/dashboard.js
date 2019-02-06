@@ -24,10 +24,6 @@ const styles = () => ({
 });
 
 class Dashboard extends React.Component {
-  static getInitialProps({req}) {
-    console.log(req.cookies['remora_jwt_token']);
-    return {};
-  }
   async componentDidMount() {
     const userRequestData = {
       method: 'POST',
