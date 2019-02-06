@@ -27,7 +27,7 @@
   },
   "scripts": {
     "start": "node ./dist/index.js",
-    "start-dev": "nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
+    "start-dev": "./node_modules/.bin/nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
     "lint": "./node_modules/.bin/tslint -p tsconfig.json",
     "compile": "./node_modules/.bin/tsc",
     "compile-live": "./node_modules/.bin/tsc --watch"

@@ -20,7 +20,7 @@ services:
       - NODE_ENV=prod
     restart: always
     ports: 
-      - "3000"
+      - "3000:3000"
 
   redis:
     build: ./microservices/redis
