@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import Grid from '@material-ui/core/Grid';
 import { Typography, CircularProgress } from '@material-ui/core';
-import auth from '../components/authentication/Auth';
+import Auth from '../components/authentication/Auth';
 
 export class CallbackPage extends Component {
 
   componentDidMount() {
+    const auth = new Auth();
     auth.login();
   }
 

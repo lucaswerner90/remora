@@ -14,7 +14,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Link from 'next/link';
 import { Divider, Typography } from '@material-ui/core';
-import auth from '../components/authentication/Auth';
+import Auth from '../components/authentication/Auth';
 const styles = {
   fullList: {
     width: 250,
@@ -63,7 +63,7 @@ class HeaderMenu extends React.Component {
             </ListItem>
           </Link>
           <Divider style={{marginTop:'60px', marginBottom:'10px'}}/>
-          <ListItem button key="logout" onClick={() => auth.logout()} >
+          <ListItem button key="logout" onClick={() => new Auth().logout()} >
             <ListItemIcon><PowerSettingsNewIcon style={{ color: 'white' }} /></ListItemIcon>
             <ListItemText primary='Logout' />
           </ListItem>

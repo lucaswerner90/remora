@@ -6,7 +6,7 @@ import Layout from '../components/Layout';
 import CoinDetailView from '../components/dashboard/CoinDetailView';
 import RightSideView from '../components/dashboard/RightSideView';
 import CoinChat from '../components/dashboard/subcomponents/chat/CoinChat';
-import auth from '../components/authentication/Auth';
+import Auth from '../components/authentication/Auth';
 
 import fetch from 'isomorphic-unfetch';
 import getConfig from 'next/config';
@@ -26,10 +26,10 @@ const styles = () => ({
 
 class Dashboard extends React.Component {
   async componentDidMount() {
+    const auth = new Auth();
     if (!auth.isAuthenticated()) {
       auth.login();
     } else {
-      
       // Parse the profile coming from Auth0
       const userInfo = auth.getProfile();
       console.log(userInfo);

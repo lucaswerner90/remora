@@ -31,7 +31,6 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(cookieParser());
 
-app.use('/api/auth', AuthRouter);
 app.use('/api/user', UsersRouter);
 app.use('/api/coin', CoinsRouter);
 app.use('/api/chat', ChatRouter);

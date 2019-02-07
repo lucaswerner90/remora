@@ -2,18 +2,15 @@ import auth0 from 'auth0-js';
 import jwtDecode from 'jwt-decode';
 import Router from 'next/router';
 
-class Auth {
+export default class Auth {
   auth0 = new auth0.WebAuth({
     domain: 'remora.auth0.com',
     clientID: 'Sq1hVj5mLWwmUtMmXzKl8ONBpEX17YK3',
-    redirectUri: 'http://localhost:3000/callback',
+    redirectUri: `${document.location.origin}/callback`,
     audience: "https://remora.auth0.com/userinfo",
     responseType: "token id_token",
     scope: "openid profile email"
   });
-
-  constructor(){
-  }
 
   login(){
     this.auth0.authorize();
@@ -55,7 +52,3 @@ class Auth {
     return new Date().getTime() < expiresAt;
   }
 }
-
-const auth = new Auth();
-
-export default auth;
