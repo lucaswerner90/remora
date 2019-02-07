@@ -2,7 +2,9 @@ const express = require('express');
 const next = require('next');
 const cookieParser = require('cookie-parser');
 
-console.log(`NextJS server file NODE_ENV = ${process.env.NODE_ENV}`)
+console.log(`NextJS server file NODE_ENV = ${process.env.NODE_ENV}`);
+const PORT = process.env.PORT || 3000;
+console.log(`NextJS PORT = ${PORT}`);
 const dev = process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
@@ -33,7 +35,7 @@ app.prepare().then(() => {
   });
 
 
-  server.listen(3000, (err) => {
+  server.listen(process.env.PORT || 3000, (err) => {
     if (err) throw err;
     console.log('NextJS is ready on port 3000!');
   })

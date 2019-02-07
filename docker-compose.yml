@@ -13,15 +13,6 @@ services:
     depends_on:
       - redis
 
-  nextjs:
-    build: ./microservices/client
-    command: yarn start
-    environment: 
-      - NODE_ENV=prod
-    restart: always
-    ports: 
-      - "80:3000"
-
   redis:
     build: ./microservices/redis
     restart: always
