@@ -11,7 +11,13 @@ import AuthRouter from './routers/AuthRouter';
 
 console.log(`API NODE_ENV = ${process.env.NODE_ENV}`);
 
-const accessControlHeader = process.env.NODE_ENV === 'dev' ? 'http://localhost:7500' : process.env.PRODUCTION_ENV;
+let accessControlHeader = '';
+if (process.env.NODE_ENV === 'dev') {
+  accessControlHeader = 'http://localhost:7500';
+} else {
+  accessControlHeader = process.env.PRODUCTION_ENV;
+}
+
 console.log(`API --> Access-Control-Allow-Origin header set to : ${accessControlHeader}`);
 
 app.use((req, res, next) => {

@@ -10,7 +10,7 @@ import Footer from './Footer';
 const styles = () => ({
   root: {
     width: "100%",
-    maxWidth:'1080px',
+    maxWidth:'1200px',
     margin: "0 auto",
   },
 });

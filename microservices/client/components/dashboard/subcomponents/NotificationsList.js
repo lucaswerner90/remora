@@ -24,6 +24,7 @@ const { api } = publicRuntimeConfig;
 
 import { connect } from 'react-redux';
 import { updateUserSelectedCoin, updateUserNotifications} from '../../../redux/actions/userPreferencesActions';
+import { CircularProgress } from '@material-ui/core';
 
 const mapReduxStateToComponentProps = state => ({
   favorites: state.user.userPreferences.favorites,
@@ -152,8 +153,8 @@ class NotificationsList extends React.Component {
                 <Grid container alignItems="flex-end">
                   <Grid item xs={8}>
                     <Typography component="span" variant="body1" style={{fontWeight:500}}>
-                      {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'buy' && 'New buy order'}
-                      {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'sell' && 'New sell order'}
+                      {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'buy' && 'Buy order'}
+                      {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'sell' && 'Sell order'}
                     </Typography>
                   </Grid>
                   <Grid item xs={4}>
@@ -183,7 +184,6 @@ class NotificationsList extends React.Component {
     });
 
   }
-
   render() {
     const { classes, filter = '' } = this.props;
     const { notifications = [] } = this.state;
@@ -191,39 +191,22 @@ class NotificationsList extends React.Component {
       notif.info.type.includes(filter) ||
       notif.coin.symbol.includes(filter)
     ) : notifications;
-    if (filteredNotifications.length) {
-      return (
-        <Grid container spacing={32}>
-          <Grid item xs={12}>
+    return (
+      <Grid container spacing={16} style={{ height: '40vh' }}>
+        <Grid item xs={12}>
           <Typography className={classes.padding} variant="h6">
             NOTIFICATIONS
           </Typography>
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <Paper elevation={0}>
-              <List dense className={classes.list}>
-                {this.generateItems(notifications)}
-              </List>
-            </Paper>
-            </Grid>
         </Grid>
-      );
-    } else {
-      return (
-        <Grid container spacing={32}>
-          <Grid item xs={12}>
-            <Typography className={classes.padding} variant="h6">
-              NOTIFICATIONS
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <Paper elevation={0} style={{height: '30vh'}}>
-              <Typography align="center" variant="body2">Nothing in sight for now captain...</Typography>
-            </Paper>
-          </Grid>
+        <Grid item xs={12} md={12}>
+          <Paper elevation={0}>
+            <List dense className={classes.list}>
+              {this.generateItems(filteredNotifications)}
+            </List>
+          </Paper>
         </Grid>
-      );
-    }
+      </Grid>
+    );
   }
 }
 

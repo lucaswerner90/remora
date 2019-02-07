@@ -49,6 +49,15 @@ export class Chat extends Component {
     message:'',
     pendingNotifications: 0
   };
+  constructor(props) {
+    super(props);
+    this.ref = React.createRef();
+  }
+  componentDidUpdate() {
+    if (this.ref.current) {
+      this.ref.current.scrollIntoView({ block: 'end', behavior: 'smooth' });
+    }
+  }
 
   onReceiveChatMessage = (info) => {
     this.setState({
@@ -179,6 +188,7 @@ export class Chat extends Component {
             <Grid item xs={12}>
               <List dense={true} style={{ overflowY: 'auto', height:'40vh'}}>
                 {this.renderMessages(chatMessages)}
+                <div ref={this.ref} id="lastListItem"></div>
               </List>
             </Grid>
             <Grid item xs={12}>
@@ -218,7 +228,7 @@ export class Chat extends Component {
     } else {
       return (
         <div style={chatStyle}>
-          <Badge badgeContent={pendingNotifications > 10 ? '+10' : pendingNotifications} color="secondary">
+          <Badge badgeContent={pendingNotifications > 1 ? '+1' : pendingNotifications} color="secondary">
             <IconButton style={{ background: '#47a9fd85'}} onClick={() => this.setState({...this.state, open: !this.state.open})}>
               <ChatIcon />
             </IconButton>

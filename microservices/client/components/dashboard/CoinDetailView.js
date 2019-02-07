@@ -142,7 +142,7 @@ export class CoinDetailView extends Component {
     const { pricesList = [], buyOrder = {}, sellOrder = {}, priceChange = 0, price = 0, volumeDifference = 0 } = this.state;
     if (coinInfo.name) {
       return (
-        <Grid container direction="row" justify="space-around" alignItems="center" spacing={16} style={{ borderRight:'1px solid #ffffff63'}}>
+        <Grid container direction="row" justify="space-around" alignItems="center" spacing={16}>
 
           <Grid item xs={12}>
             <Typography align="center" style={{ textTransform:'uppercase'}} variant="body2">

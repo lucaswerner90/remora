@@ -3,6 +3,15 @@ import { Grid, Typography } from '@material-ui/core';
 import { red, lightGreen } from '@material-ui/core/colors';
 import { formatPrice } from '../../../common/utils/Format';
 
+const animatedComponent = (previousNumber = 0, nextNumber = 0) => {
+  const props = useSpring({
+    from: { number: previousNumber },
+    number: nextNumber,
+  });
+  return <animated.span>{props.number}</animated.span>
+}
+
+
 export class BasicInfo extends Component {
   render() {
     const { volumeDifference = 0, price = 0, priceChange = 0 } = this.props;
@@ -13,7 +22,8 @@ export class BasicInfo extends Component {
             VOLUME DIFFERENCE
             </Typography>
           <Typography align="center" style={{ color: volumeDifference < 0 ? red[500] : lightGreen[500] }} variant="h3">
-            {volumeDifference}%
+            {volumeDifference}
+            <span style={{ fontSize: '20px' }}>%</span>
             </Typography>
         </Grid>
         <Grid item xs={4}>
@@ -21,7 +31,8 @@ export class BasicInfo extends Component {
             PRICE
             </Typography>
           <Typography align="center" variant="h3">
-            {formatPrice(price)}$
+            {formatPrice(price)}
+            <span style={{fontSize:'20px'}}>$</span>
             </Typography>
         </Grid>
         <Grid item xs={4}>
@@ -29,7 +40,8 @@ export class BasicInfo extends Component {
             PRICE 24HR
             </Typography>
           <Typography align="center" variant="h3" style={{ color: priceChange < 0 ? red[500] : lightGreen[500] }}>
-            {priceChange}%
+            {priceChange}
+            <span style={{fontSize:'20px'}}>%</span>
             </Typography>
         </Grid>
       </Grid>

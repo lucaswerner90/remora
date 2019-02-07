@@ -76,7 +76,6 @@ class CoinsList extends React.Component {
       this.props.updateUserFavorites(newFav);  
     }
   }
-
   getTrendingIcon = ({priceChange24hr:condition = 0}) => {
     if (condition >= 0) {
       return (
@@ -132,8 +131,9 @@ class CoinsList extends React.Component {
   }
   showFavorites = (coins = this.state.coins) => {
     const { favorites } = this.props;
-    const favoriteCoins = coins.filter(coin => favorites.indexOf(coin.id) > -1);
-    return favoriteCoins.map(coin => {
+    return coins.map(coin => {
+      const isFavorite = favorites.indexOf(coin.id) > -1;
+      const color = isFavorite ? 'primary' : 'grey';
       return (
         <ListItem key={coin.id} onClick={() => this.selectCoin(coin.id)} dense button>
           <ListItemText
@@ -141,7 +141,7 @@ class CoinsList extends React.Component {
               <React.Fragment>
                 <Grid container alignItems="flex-end">
                   <Grid item xs={12}>
-                    <Typography component="span" variant="body1">
+                    <Typography component="span" variant="body1" style={{color}}>
                       {`${coin.name} (${coin.symbol}-${coin.against})`}
                     </Typography>
                   </Grid>
@@ -150,16 +150,16 @@ class CoinsList extends React.Component {
             }
             secondary={
               <React.Fragment>
-                <Typography component="span" style={{ textTransform: 'uppercase' }} color="textPrimary">
-                  {coin.exchange}
+                <Typography component="span" style={{ textTransform: 'uppercase' }} style={{ color }}>
+                  {coin.exchange.toString().toUpperCase()}
                 </Typography>
               </React.Fragment>
             }
           />
           <ListItemSecondaryAction>
-            <IconButton aria-label="Favorite" disabled={favorites.length === 1 && favorites.indexOf(coin.id) > -1} onClick={() => this.markAsFavorite(coin.id)}>
-              {favorites.indexOf(coin.id) > -1 && <StarIcon />}
-              {favorites.indexOf(coin.id) === -1 && <StarBorderIcon />}
+            <IconButton aria-label="Favorite" disabled={favorites.length === 1 && isFavorite} onClick={() => this.markAsFavorite(coin.id)}>
+              {isFavorite && <StarIcon />}
+              {!isFavorite && <StarBorderIcon />}
             </IconButton>
           </ListItemSecondaryAction>
         </ListItem>
@@ -167,6 +167,7 @@ class CoinsList extends React.Component {
       );
     });
   }
+
   filterCoin = ({name='',exchange='',symbol=''}) => {
     const filter = this.props.filter.toLowerCase();
     if (filter.length) {
@@ -183,10 +184,13 @@ class CoinsList extends React.Component {
     this.setState({ ...this.state, filterValue });
   }
   render() {
-    const { classes, coins = [], filter = '' } = this.props;
+    const { classes, coins = [], filter = '', favorites = [] } = this.props;
     const { dense = true } = this.state;
     let filteredCoins = filter.length ? Object.values(coins).filter(this.filterCoin): Object.values(coins);
-
+    filteredCoins = [
+      ...filteredCoins.filter(coin => favorites.indexOf(coin.id) > -1).sort(this.sortCoin),
+      ...filteredCoins.filter(coin => favorites.indexOf(coin.id) === -1).sort(this.sortCoin),
+    ]
     return (
       <Grid container spacing={16} alignItems="center">
         <Grid item xs={10}>
