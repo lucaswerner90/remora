@@ -6,21 +6,21 @@ import auth from '../components/authentication/Auth';
 export class CallbackPage extends Component {
 
   componentDidMount() {
-    auth.login();
+    auth.handleAuthentication();
   }
 
   render() {
     return (
-      <Grid container justify="center" direction="row" alignContent="center" style={{ flexGrow: 1, height: '100vh' }} spacing={40}>
-        <Grid item xs={12}>
+      <Grid container justify="center" direction="column" alignItems="center" style={{ flexGrow: 1, height: '100vh' }} spacing={24}>
+        <Grid item>
           <Typography align="center" variant="h3">
             rémora
           </Typography>
         </Grid>
-        <CircularProgress variant="indeterminate"/>
+        <CircularProgress variant="indeterminate" />
         <Grid item xs={12}>
           <Typography align="center" variant="body2">
-            Redirecting you to the login page...
+            Processing your data...
           </Typography>
         </Grid>
       </Grid>

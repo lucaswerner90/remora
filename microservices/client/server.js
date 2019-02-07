@@ -9,16 +9,6 @@ const dev = process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'product
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-const cookieName = process.env.AUTH_COOKIE_NAME || 'remora_jwt_token';
-const isLoggedIn = (req, res, next) => {
-  if (!req.cookies || !req.cookies[cookieName]) {
-    res.writeHead(302, { Location: '/login' });
-    res.end();
-    res.finished = true;
-  } else {
-    next();
-  }
-};
 
 app.prepare().then(() => {
   const server = express();
@@ -27,9 +17,6 @@ app.prepare().then(() => {
   server.get('/', (_req, res) => {
     res.sendFile(`${__dirname}/static/index.html`).end();
   });
-  server.get('/dashboard', isLoggedIn, (req, res) => {
-    return app.render(req, res, '/dashboard');
-  })
   server.get('*', (req, res) => {
     return handle(req, res);
   });

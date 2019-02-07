@@ -6,6 +6,7 @@ import Layout from '../components/Layout';
 import CoinDetailView from '../components/dashboard/CoinDetailView';
 import RightSideView from '../components/dashboard/RightSideView';
 import CoinChat from '../components/dashboard/subcomponents/chat/CoinChat';
+import auth from '../components/authentication/Auth';
 
 import fetch from 'isomorphic-unfetch';
 import getConfig from 'next/config';
@@ -25,25 +26,35 @@ const styles = () => ({
 
 class Dashboard extends React.Component {
   async componentDidMount() {
-    const userRequestData = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    };
-    const userInfoFetch = await fetch(`http://${api}/api/user/info`, userRequestData);
-    const userInfo = await userInfoFetch.json();
-    const userPreferencesFetch = await fetch(`http://${api}/api/user/preferences`, userRequestData);
-    const userPreferences = await userPreferencesFetch.json();
+    if (!auth.isAuthenticated()) {
+      auth.login();
+    } else {
+      
+      // Parse the profile coming from Auth0
+      const userInfo = auth.getProfile();
+      console.log(userInfo);
+      const { email = '' } = userInfo;
 
-    const allCoinsFetch = await fetch(`http://${api}/api/coin/all`);
-    const coins = await allCoinsFetch.json();
+      const userRequestData = {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      };
 
-    Object.keys(coins).map(coinID => coins[coinID] = JSON.parse(coins[coinID]));
-
-    this.props.updateUserPreferences(userPreferences);
-    this.props.updateUserInfo(userInfo);
-    this.props.updateAllCoins(coins);
+      const userPreferencesFetch = await fetch(`http://${api}/api/user/preferences`, userRequestData);
+      const userPreferences = await userPreferencesFetch.json();
+  
+      const allCoinsFetch = await fetch(`http://${api}/api/coin/all`);
+      const coins = await allCoinsFetch.json();
+  
+      Object.keys(coins).map(coinID => coins[coinID] = JSON.parse(coins[coinID]));
+  
+      this.props.updateUserPreferences(userPreferences);
+      this.props.updateUserInfo(userInfo);
+      this.props.updateAllCoins(coins);
+    }
   }
 
   render() {

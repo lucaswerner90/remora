@@ -21,13 +21,14 @@ import fetch from 'isomorphic-unfetch';
 
 import io from 'socket.io-client';
 import getConfig from 'next/config';
-import { Divider } from '@material-ui/core';
+import { Divider, Avatar } from '@material-ui/core';
 import { cyan } from '@material-ui/core/colors';
 
 const mapReduxStateToComponentProps = state => ({
   selectedCoin: state.user.userPreferences.selectedCoin,
   coinInfo: state.coins.coins[state.user.userPreferences.selectedCoin],
-  name: state.user.userInfo.name
+  name: state.user.userInfo.name,
+  avatar: state.user.userInfo.picture,
 });
 
 const chatStyle = { zIndex: 100, maxWidth: '50px', width: '100%', position: 'fixed', bottom: '2%', right: '2%' };
@@ -76,7 +77,8 @@ export class Chat extends Component {
     const info = {
       message: this.state.message,
       name: this.props.name,
-      created: Date.now()
+      created: Date.now(),
+      avatar: this.props.avatar || '',
     };
     socket.emit(`${this.props.selectedCoin}_chat`, info);
     this.setState({ ...this.state, message: '' });
@@ -130,7 +132,7 @@ export class Chat extends Component {
   }
 
   renderMessages = (chatMessages) => {
-    return chatMessages.map(({ message, name, created }) => {
+    return chatMessages.map(({ message = '', name = '', created = Date.now(), avatar = '' }) => {
       const time = new Date(created);
       const parsedMinutes = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes();
       const parsedHours = time.getHours() < 10 ? `0${time.getHours()}` : time.getHours();
@@ -138,7 +140,7 @@ export class Chat extends Component {
       return (
         <ListItem key={created} alignItems="flex-start">
           <ListItemAvatar>
-            <AccountCircleIcon variant="rounded" color="primary"/>
+            <Avatar alt={name} src={avatar} />
           </ListItemAvatar>
         <ListItemText
           primary={
