@@ -7,7 +7,6 @@ const PORT = process.env.PORT || 9000;
 import UsersRouter from './routers/UsersRouter';
 import CoinsRouter from './routers/CoinsRouter';
 import ChatRouter from './routers/ChatRouter';
-import AuthRouter from './routers/AuthRouter';
 
 console.log(`API NODE_ENV = ${process.env.NODE_ENV}`);
 
