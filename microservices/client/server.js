@@ -35,9 +35,9 @@ app.prepare().then(() => {
   });
 
 
-  server.listen(process.env.PORT || 3000, (err) => {
+  server.listen(PORT, (err) => {
     if (err) throw err;
-    console.log('NextJS is ready on port 3000!');
+    console.log(`NextJS is ready on port ${PORT}!`);
   })
 
 }).catch((error) => {

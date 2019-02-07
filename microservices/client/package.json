@@ -27,6 +27,7 @@
     "dev": "node server.js",
     "build": "next build",
     "export": "next export",
-    "start": "yarn run build && node server.js"
+    "compile-prod":"NODE_ENV=production npm run build",
+    "prod": "NODE_ENV=production node server.js"
   }
 }

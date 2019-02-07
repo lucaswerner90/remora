@@ -7,3 +7,5 @@ WORKDIR /usr/src/app
 # Install app dependencies
 COPY . /usr/src/app/
 RUN yarn install
+RUN yarn compile-prod
+CMD yarn run prod
