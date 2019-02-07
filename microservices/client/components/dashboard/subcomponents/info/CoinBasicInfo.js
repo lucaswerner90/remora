@@ -3,14 +3,6 @@ import { Grid, Typography } from '@material-ui/core';
 import { red, lightGreen } from '@material-ui/core/colors';
 import { formatPrice } from '../../../common/utils/Format';
 
-const animatedComponent = (previousNumber = 0, nextNumber = 0) => {
-  const props = useSpring({
-    from: { number: previousNumber },
-    number: nextNumber,
-  });
-  return <animated.span>{props.number}</animated.span>
-}
-
 
 export class BasicInfo extends Component {
   render() {
@@ -38,11 +30,11 @@ export class BasicInfo extends Component {
         <Grid item xs={4}>
           <Typography align="center" variant="body2">
             PRICE 24HR
-            </Typography>
+          </Typography>
           <Typography align="center" variant="h3" style={{ color: priceChange < 0 ? red[500] : lightGreen[500] }}>
             {priceChange}
             <span style={{fontSize:'20px'}}>%</span>
-            </Typography>
+          </Typography>
         </Grid>
       </Grid>
     );

@@ -8,7 +8,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Typography from '@material-ui/core/Typography';
 import ListItemText from '@material-ui/core/ListItemText';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import SendIcon from '@material-ui/icons/Send';
@@ -35,8 +34,9 @@ const chatStyle = { zIndex: 100, maxWidth: '50px', width: '100%', position: 'fix
 
 const welcomeMessage = {
   created: Date.now(),
-  name:'Rémora',
-  message: 'Hi! Why don\'t you share your ideas with the world about this coin?'
+  name: 'Rémora',
+  avatar: '/static/images/icons/whale_tail_avatar.png',
+  message: 'Hi ! Why don\'t you share your knowledge with the world?'
 }
 const { publicRuntimeConfig } = getConfig();
 const { api } = publicRuntimeConfig;

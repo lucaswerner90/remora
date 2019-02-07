@@ -32,7 +32,6 @@ class Dashboard extends React.Component {
     } else {
       // Parse the profile coming from Auth0
       const userInfo = auth.getProfile();
-      console.log(userInfo);
       const { email = '' } = userInfo;
 
       const userRequestData = {

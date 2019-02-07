@@ -89,36 +89,43 @@ export class CoinDetailView extends Component {
   componentWillUnmount() {
     this.socket.disconnect();
   }
-  getCoinPricesList = async (coinID) => {
+  getCoinProperty = async (coinID, property) => {
     if (coinID) {
       const userRequestData = {
         method: 'POST',
-        body: JSON.stringify({ property: 'prices_list', coinID}),
+        body: JSON.stringify({ property, coinID }),
         headers: {
           'Content-Type': 'application/json'
         }
       };
       const response = await fetch(`http://${api}/api/coin/property`, userRequestData);
-      const { value = { prices: [] } } = await response.json();
-      this.setState({ ...this.state, pricesList: value && value.prices ? value.prices.splice(Math.round(value.prices.length/2)) : [] });
+      const { value = {} } = await response.json();
+      return value;
+    } else {
+      return {};
     }
-
+  }
+  getCoinPricesList = async (coinID) => {
+    const value = await this.getCoinProperty(coinID, 'prices_list');
+    const prices = value && value.prices && value.prices.length ? value.prices : [];
+    this.setState({ ...this.state, pricesList: prices ? prices.splice(Math.round(prices.length / 2)) : [] });
   }
   getCoinPrice = async (coinID) => {
-    if (coinID) {
-      const userRequestData = {
-        method: 'POST',
-        body: JSON.stringify({ property: 'latest_price', coinID}),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
-      const response = await fetch(`http://${api}/api/coin/property`, userRequestData);
-      const { value = { price: 0 } } = await response.json();
-      this.setState({ ...this.state, price: value.price });
-    }
-
+    const value = await this.getCoinProperty(coinID, 'price');
+    const price = value && value.price ? value.price : 0;
+    this.setState({ ...this.state, price });
   }
+  getVolumeDifference = async (coinID) => {
+    const value = await this.getCoinProperty(coinID, 'volume_difference');
+    const volumeDifference = value && value.volumeDifference ? value.volumeDifference : 0;
+    this.setState({ ...this.state, volumeDifference });
+  }
+  getPriceChange = async (coinID) => {
+    const value = await this.getCoinProperty(coinID, 'price_change_24hr');
+    const priceChange = value && value.price ? value.priceChange : 0;
+    this.setState({ ...this.state, priceChange });
+  }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.selectedCoin && nextProps.selectedCoin !== this.props.selectedCoin) {
 
@@ -133,6 +140,8 @@ export class CoinDetailView extends Component {
 
       this.getCoinPricesList(nextProps.selectedCoin);
       this.getCoinPrice(nextProps.selectedCoin);
+      this.getVolumeDifference(nextProps.selectedCoin);
+      this.getPriceChange(nextProps.selectedCoin);
     }
   }
 
