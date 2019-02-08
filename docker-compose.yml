@@ -66,7 +66,7 @@ services:
     build: ./microservices/load_balancer
     restart: always
     ports:
-      - "8080:80"
+      - "8080:443"
     links: 
       - api
       - socketio

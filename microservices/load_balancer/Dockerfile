@@ -1,3 +1,4 @@
 FROM nginx:alpine
 COPY ./load_balancer.conf /etc/nginx/nginx.conf
-EXPOSE 80
+COPY ./ssl ./etc/nginx/ssl
+EXPOSE 443
