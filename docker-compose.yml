@@ -81,7 +81,7 @@ services:
       - ./microservices/nginx/nginx.conf:/etc/nginx/nginx.conf
     restart: always
     ports:
-      - "80:80"
+      - "443:443"
     links: 
       - nextjs
     depends_on: 
