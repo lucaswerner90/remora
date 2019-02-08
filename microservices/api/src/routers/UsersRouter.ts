@@ -1,14 +1,7 @@
-import { Router, response } from 'express';
+import { Router } from 'express';
 import UserSchema from '../db/schemas/UserSchema';
-import { Mongoose } from 'mongoose';
 
 const router = Router();
-
-const initialInfo = {
-  selectedCoin: 'binance_ETHUSDT',
-  favorites: ['binance_ETHUSDT', 'binance_BTCUSDT'],
-  isPremium: false,
-};
 
 router.post('/selected', async (req, res) => {
   try {
