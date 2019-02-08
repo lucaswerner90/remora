@@ -1,4 +1,11 @@
-const { mongoDBConnection } = require('../../config/config.json');
+const mongoDBConnection = {
+  host:'ds157223.mlab.com',
+  port:'57223',
+  name:'remora_users',
+  user:'remora',
+  password:'remora.1990',
+};
+
 const mongoose = require('mongoose');
 
 export default class MongoConnection {
@@ -8,18 +15,18 @@ export default class MongoConnection {
   private _user: string = mongoDBConnection.user;
   private _password: string = mongoDBConnection.password;
   private _extraParams: any = { useNewUrlParser: true };
+  onOpen: () => void;
 
-  constructor() {
+  constructor(openCallback = () => { }) {
+    this.onOpen = openCallback;
+  }
+  public connect() {
     mongoose.connect(`mongodb://${this._user}:${this._password}@${this._host}:${this._port}/${this._databaseName}`, this._extraParams);
     const db = mongoose.connection;
     db.on('error', this.onError.bind(this));
     db.once('open', this.onOpen.bind(this));
   }
-
-  private onError(error) {
+  public onError(error) {
     console.error(error);
-  }
-  private onOpen() {
-    console.log(`Connected to Mongo DB at ${this._host}:${this._port} to ${this._databaseName} database...`);
   }
 }

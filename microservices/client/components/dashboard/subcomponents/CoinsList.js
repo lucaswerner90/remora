@@ -59,6 +59,9 @@ class CoinsList extends React.Component {
     dense: true,
     showFilters: false,
   };
+  shouldComponentUpdate(nextProps) {
+    return nextProps.coins.length !== this.props.coins.length || nextProps.favorites !== this.props.favorites || nextProps.filter !== this.props.filter;
+  }
 
   selectCoin = (coinID = '') => {
     this.props.updateUserSelectedCoin(coinID);

@@ -16,7 +16,7 @@ export class OrderAdvancedInfo extends Component {
     const { order = {}, message = '' } = this.props;
 
     const { hasBeenExecuted = false, events = { price: {} } } = order;
-
+    
     return (
       <Grid container spacing={40} alignItems="center">
         <Grid item xs={3} style={{ borderRight: '1px solid white' }}>
@@ -26,7 +26,7 @@ export class OrderAdvancedInfo extends Component {
         </Grid>
         <Grid item xs={3}>
           <Typography align="center" variant="body2">
-            WHEN CREATED
+            When created
           </Typography>
           <Typography align="center" variant="h5">
             {formatPrice(events.price.whenCreated)}$
@@ -34,7 +34,7 @@ export class OrderAdvancedInfo extends Component {
         </Grid>
         <Grid item xs={1}>
           <Typography align="center" variant="body2">
-            EXECUTED
+            Executed
           </Typography>
           <Typography align="center" variant="h5">
             {hasBeenExecuted ? 'Yes' : 'No'}

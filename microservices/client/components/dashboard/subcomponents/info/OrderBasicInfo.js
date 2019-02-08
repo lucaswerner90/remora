@@ -33,7 +33,7 @@ export class OrderBasicInfo extends Component {
         </Grid>
         <Grid item xs={2}>
           <Typography align="center" variant="body2">
-            PRICE
+            Price
           </Typography>
           <Typography align="center" variant="h5">
             {!isNaN(price) ? formatPrice(parseFloat(price)) : price}$
@@ -41,7 +41,7 @@ export class OrderBasicInfo extends Component {
         </Grid>
         <Grid item xs={3}>
           <Typography align="center" variant="body2">
-            QUANTITY
+            Quantity
           </Typography>
           <Typography align="center" variant="h5">
             {!isNaN(currentValues.quantity) ? formatPrice(parseFloat(currentValues.quantity)) : currentValues.quantity}$
@@ -49,7 +49,7 @@ export class OrderBasicInfo extends Component {
         </Grid>
         <Grid item xs={2}>
           <Typography align="center" variant="body2">
-            MARGIN TO PRICE
+            Margin to price
           </Typography>
           <Typography align="center" variant="h5">
             {margin}%
@@ -57,7 +57,7 @@ export class OrderBasicInfo extends Component {
         </Grid>
         <Grid item xs={2}>
           <Typography align="center" variant="body2">
-            CREATED
+            Created
           </Typography>
           <Typography align="center" variant="h5">
             {timeAgo}

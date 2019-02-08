@@ -34,17 +34,10 @@ class Dashboard extends React.Component {
       const userInfo = auth.getProfile();
       const { email = '' } = userInfo;
 
-      const userRequestData = {
-        method: 'POST',
-        body: JSON.stringify({ email }),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
-
-      const userPreferencesFetch = await fetch(`http://${api}/api/user/preferences`, userRequestData);
+      // Get the user preferences
+      const userPreferencesFetch = await fetch(`http://${api}/api/user/preferences?email=${email}`);
       const userPreferences = await userPreferencesFetch.json();
-  
+
       const allCoinsFetch = await fetch(`http://${api}/api/coin/all`);
       const coins = await allCoinsFetch.json();
   
