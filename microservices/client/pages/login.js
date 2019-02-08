@@ -1,13 +1,19 @@
 import React, { Component } from 'react';
 import Grid from '@material-ui/core/Grid';
-import { Typography, CircularProgress } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 import Auth from '../components/authentication/Auth';
+import Loading from '../components/common/utils/Loading';
+import Router from 'next/router';
 
 export class CallbackPage extends Component {
 
   componentDidMount() {
     const auth = new Auth();
-    auth.login();
+    if (!auth.isAuthenticated()) {
+      auth.login();
+    } else {
+      Router.push("/dashboard");
+    }
   }
 
   render() {
@@ -18,12 +24,7 @@ export class CallbackPage extends Component {
             rémora
           </Typography>
         </Grid>
-        <CircularProgress variant="indeterminate"/>
-        <Grid item xs={12}>
-          <Typography align="center" variant="body2">
-            Redirecting you to the login page...
-          </Typography>
-        </Grid>
+        <Loading/>
       </Grid>
     )
   }

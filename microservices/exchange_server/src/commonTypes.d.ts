@@ -17,7 +17,9 @@ export type TCoinWhaleOrders = {
 export type TPricesList = number[];
 
 export type TCoinRedisKeys = {
+  PREVIOUS_BUY_ORDER: string,
   BUY_ORDER: string,
+  PREVIOUS_SELL_ORDER: string,
   SELL_ORDER: string,
   PRICES_LIST: string,
   VOLUME_DIFFERENCE: string,

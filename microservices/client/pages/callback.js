@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import Grid from '@material-ui/core/Grid';
-import { Typography, CircularProgress } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 import Auth from '../components/authentication/Auth';
+import Loading from '../components/common/utils/Loading';
 
 export class CallbackPage extends Component {
 
@@ -18,7 +19,7 @@ export class CallbackPage extends Component {
             rémora
           </Typography>
         </Grid>
-        <CircularProgress variant="indeterminate" />
+        <Loading/>
         <Grid item xs={12}>
           <Typography align="center" variant="body2">
             Reading your data to find the best whales for you...

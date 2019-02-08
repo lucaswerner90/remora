@@ -5,6 +5,14 @@ import flush from 'styled-jsx/server';
 
 
 class MyDocument extends Document {
+  componentDidMount(){
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      window.dataLayer.push(arguments)
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-134152146-1');
+  }
   render() {
     const { pageContext } = this.props;
 
@@ -24,15 +32,17 @@ class MyDocument extends Document {
           />
           <link
             rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Roboto:100,200,300,400,500"
+            href="https://fonts.googleapis.com/css?family=Roboto:100,200,300,400,500,700"
           />
           <meta name="description" content=""/>
           <meta name="author" content=""/>
           <meta name="viewport" content="width=device-width, initial-scale=1"/>
           <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
-          <link rel="icon" href="favicon.ico" type="im</link>age/x-icon"/>
+          <link rel="icon" href="favicon.ico" type="im</link>age/x-icon" />
+          <script src="https://www.googletagmanager.com/gtag/js?id=UA-134152146-1"></script>
+
         </Head>
-        <body style={{ background: 'linear-gradient(63deg, rgb(0,153,204), rgb(22,38,99))'}}>
+        <body style={{ background: 'linear-gradient(63deg, rgb(0,152,201), rgb(21,36,97))'}}>
             <Main />
             <NextScript />
         </body>

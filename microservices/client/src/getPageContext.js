@@ -25,17 +25,26 @@ const theme = createMuiTheme({
         flexGrow:1
       },
       elevation0:{
-        background: 'rgba(226, 226, 226, 0.08)'
+        background: 'rgba(226, 226, 226, 0.08)',
+        paddingTop:'2%',
+        paddingBottom:'2%',
+        paddingLeft:'5%',
+        paddingRight:'5%',
       },
       elevation1:{
-        background: 'rgba(226, 226, 226, 0.08)'
+        background: '#3082b41f',
+        paddingTop:'0%',
+        paddingBottom:'1%',
+        paddingLeft:'5%',
+        paddingRight: '5%',
+        boxShadow:'none'
       }
     }
   },
   palette: {
     type:'dark',
     primary: {
-      main: '#fff',
+      main: 'rgb(102,255,255)',
       light: 'rgb(102,255,255)',
       dark: 'rgb(0,153,204)'
     },
@@ -47,7 +56,7 @@ const theme = createMuiTheme({
     useNextVariants: true,
     body1: {
       fontSize: '0.875rem',
-      fontWeight:100
+      fontWeight:500
     },
     body2: {
       fontWeight: 300,
@@ -58,11 +67,12 @@ const theme = createMuiTheme({
       fontSize:'3.5rem'
     },
     h4: {
-      fontWeight: 500,
-      fontSize:'1.25rem'
+      fontWeight: 300,
+      fontSize:'1.5rem'
     },
     h5: {
-      fontSize:'1.375rem'
+      fontWeight: 500,
+      fontSize:'1.25rem'
     },
     h6: {
       fontSize: '0.9375rem',

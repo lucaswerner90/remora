@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
 
-import { Grid, Typography } from '@material-ui/core';
+import { Grid, Typography, Paper } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 
@@ -19,7 +19,7 @@ import { connect } from 'react-redux';
 import PriceChart from './subcomponents/charts/PriceChart';
 import BasicInfo from './subcomponents/info/CoinBasicInfo';
 import Loading from '../common/utils/Loading';
-import TabsInfo from './subcomponents/info/TabsInfo';
+import OrderInfo from './subcomponents/info/OrderInfo';
 
 const mapReduxStateToComponentProps = state => ({
   selectedCoin: state.user.userPreferences.selectedCoin,
@@ -30,6 +30,8 @@ const initialState = {
   volumeDifference: 0,
   pricesList: [],
   price: 0,
+  previousBuyOrder: {},
+  previousSellOrder: {},
   buyOrder: {},
   sellOrder: {},
   priceChange: 0
@@ -59,12 +61,22 @@ export class CoinDetailView extends Component {
     this.getCoinPrice(selectedCoin);
   }
 
+  managePreviousOrder = (info = { type: '', order: {price:0}}) => {
+    const order = this.state[info.type === 'buy' ? 'buyOrder' : 'sellOrder'];
+    if (order.price !== undefined) {
+      this.setState({
+        ...this.state,
+        [info.type === 'buy' ? 'previousBuyOrder' : 'previousSellOrder']: info.order
+      });
+    }
+  }
   onSocketData = ({ info = {}, message = '' }) => {
     switch (message) {
       case 'volume_difference':
         this.setState({ ...this.state, volumeDifference: info.volumeDifference });
         break;
       case 'order':
+        this.managePreviousOrder(info);
         this.setState({
           ...this.state,
           [info.type === 'buy' ? 'buyOrder' : 'sellOrder']: info.order
@@ -73,6 +85,7 @@ export class CoinDetailView extends Component {
       case 'price_change_24hr':
         this.setState({ ...this.state, priceChange: parseFloat(info.price) });
         break;
+      
       case 'latest_price':
         if (info.price !== this.state.price) {
           this.setState({
@@ -98,7 +111,7 @@ export class CoinDetailView extends Component {
           'Content-Type': 'application/json'
         }
       };
-      const response = await fetch(`${document.location.origin}:8080/api/coin/property`, userRequestData);
+      const response = await fetch(`${api}/api/coin/property`, userRequestData);
       const { value = {} } = await response.json();
       return value;
     } else {
@@ -148,10 +161,10 @@ export class CoinDetailView extends Component {
   render() {
     const { coinInfo = {exchange:'', name:'', symbol:'', url:''} } = this.props;
 
-    const { pricesList = [], buyOrder = {}, sellOrder = {}, priceChange = 0, price = 0, volumeDifference = 0 } = this.state;
+    const { pricesList = [], buyOrder = {}, previousBuyOrder = {}, previousSellOrder = {}, sellOrder = {}, priceChange = 0, price = 0, volumeDifference = 0 } = this.state;
     if (coinInfo.name) {
       return (
-        <Grid container direction="row" justify="space-around" alignItems="center" spacing={16}>
+        <Grid container direction="row" justify="space-around" alignItems="center" spacing={40}>
 
           <Grid item xs={12}>
             <Typography align="center" style={{ textTransform:'uppercase'}} variant="body2">
@@ -164,20 +177,30 @@ export class CoinDetailView extends Component {
               </IconButton>
             </Typography>
           </Grid>
-          
-          <Grid item xs={12} style={{ marginTop: '0px', marginBottom: '0px' }}>
-            <PriceChart prices={pricesList} buy={buyOrder} sell={sellOrder}/>
-          </Grid>
 
+          
+          <Grid item xs={12} style={{ marginBottom: '0px', marginTop: '-80px' }}>
+            <PriceChart prices={pricesList} buy={buyOrder} sell={sellOrder} />
+          </Grid>
+          
           <BasicInfo volumeDifference={volumeDifference} price={price} priceChange={priceChange} />
 
           <Grid item xs={12}>
-            <TabsInfo sellOrder={sellOrder} buyOrder={buyOrder} coinPrice={price}/>
+            <Grid container spacing={16}>
+              <Grid item xs={6}>
+                <OrderInfo order={buyOrder} previous={previousBuyOrder} message="Buy order" coinPrice={price}/>
+              </Grid>
+              <Grid item xs={6}>
+                <OrderInfo order={sellOrder} previous={previousSellOrder} message="Sell order" coinPrice={price}/>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       );
     } else {
-      return <Loading height={'90vh'} message="Waiting for the whales to appear..."/>
+      return (
+        <Loading style={{width:'100%', height:'100vh'}}/>
+      );
     }
   }
 }

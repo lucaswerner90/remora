@@ -10,16 +10,16 @@ export class BasicInfo extends Component {
     return (
       <Grid container spacing={40} alignItems="center" alignContent="space-around">
         <Grid item xs={4}>
-          <Typography align="center" variant="body2">
+          <Typography align="center" variant="body1">
             VOLUME DIFFERENCE
             </Typography>
-          <Typography align="center" style={{ color: volumeDifference < 0 ? red[500] : lightGreen[500] }} variant="h3">
+          <Typography align="center" color="primary" variant="h3">
             {volumeDifference}
             <span style={{ fontSize: '20px' }}>%</span>
             </Typography>
         </Grid>
         <Grid item xs={4}>
-          <Typography align="center" variant="body2">
+          <Typography align="center" variant="body1">
             PRICE
             </Typography>
           <Typography align="center" variant="h3">
@@ -28,10 +28,10 @@ export class BasicInfo extends Component {
             </Typography>
         </Grid>
         <Grid item xs={4}>
-          <Typography align="center" variant="body2">
+          <Typography align="center" variant="body1">
             PRICE 24HR
           </Typography>
-          <Typography align="center" variant="h3" style={{ color: priceChange < 0 ? red[500] : lightGreen[500] }}>
+          <Typography align="center" variant="h3" color="primary">
             {priceChange}
             <span style={{fontSize:'20px'}}>%</span>
           </Typography>

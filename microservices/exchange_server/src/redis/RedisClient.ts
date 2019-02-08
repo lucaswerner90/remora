@@ -40,7 +40,14 @@ export default class RedisClient {
     this.clientPublisher.publish('price_list', value);
     this.client.set(key, value);
   }
+  public setPreviousOrderValue(key: string, value: string) {
+    this.clientPublisher.publish('previous_order', value);
+    this.client.set(key, value);
+  }
   public setOrderValue(key: string, value: string) {
+    if (JSON.parse(value).order.price !== undefined) {
+      this.setPreviousOrderValue(`${key}_previous`, value);
+    }
     this.clientPublisher.publish('order', value);
     this.client.set(key, value);
   }

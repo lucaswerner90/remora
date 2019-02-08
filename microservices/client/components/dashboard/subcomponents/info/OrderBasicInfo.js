@@ -1,69 +1,66 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Grid, Typography } from '@material-ui/core';
-import { getTimeAgo } from '../../../common/utils/Time';
-import { formatPrice } from '../../../common/utils/Format';
-
+import { formatPriceToFixed } from '../../../common/utils/Format';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 
 export class OrderBasicInfo extends Component {
   static propTypes = {
     order: PropTypes.object.isRequired,
     coinPrice: PropTypes.number.isRequired,
-    message: PropTypes.string.isRequired,
   }
 
   render() {
-    const { order = {}, coinPrice = 0, message = '' } = this.props;
+    const { order = {}, coinPrice = 0, disabled = false } = this.props;
     
-    const { price = '-', createdAt = 0, currentValues = { position: '-', quantity: '-' }, events = { price: {} } } = order;
+    const { price = 0, currentValues = { position: '-', quantity: '-' }, initialValues = {quantity: '-', position:'-'} } = order;
     
     let margin = '-';
-    let timeAgo = createdAt ? getTimeAgo(new Date(createdAt).getTime()) : '-';
 
-    if (!isNaN(price)) {
+    if (price > 0) {
       margin = Math.round((Math.abs(price - coinPrice) / coinPrice) * 10000) / 100;
     }
+    
+    const color = 'primary';
+    // const color = disabled ? 'textSecondary' : 'primary';
 
     return (
-      <Grid container spacing={40} alignItems="center">
-        <Grid item xs={3} style={{ borderRight: '1px solid white' }}>
-          <Typography align="left" variant="h6">
-            {message}
-          </Typography>
+      <React.Fragment>
+        <Grid container spacing={0} justify="space-between">
+          <Grid item>
+            <Typography align="left" variant="body1">
+              PRICE
+            </Typography>
+            <Typography align="left" variant="h4" color={color}>
+              {price > 0 ? formatPriceToFixed(parseFloat(price)) : '-'}
+              <span style={{ fontSize: '12px' }}>$</span>
+            </Typography>
+          </Grid>
+          <Grid item style={{ borderRight: '1px solid white' }}></Grid>
+          <Grid item>
+            <Typography align="left" variant="body1">
+              QUANTITY
+            </Typography>
+            <Typography align="left" variant="h4" color={color}>
+              {initialValues.quantity <= currentValues.quantity && <ArrowDropUpIcon color={color}/>}
+              {initialValues.quantity > currentValues.quantity && <ArrowDropDownIcon color={color}/>}
+              {!isNaN(currentValues.quantity) ? formatPriceToFixed(parseFloat(currentValues.quantity)) : currentValues.quantity}
+              <span style={{ fontSize: '12px' }}>$</span>
+              </Typography>
+          </Grid>
+          <Grid item style={{borderRight:'1px solid white'}}></Grid>
+          <Grid item>
+            <Typography align="left" variant="body1">
+              MARGIN TO PRICE
+            </Typography>
+            <Typography align="left" variant="h4" color={color}>
+              {margin}
+              <span style={{ fontSize: '12px' }}>%</span>
+            </Typography>
+          </Grid>
         </Grid>
-        <Grid item xs={2}>
-          <Typography align="center" variant="body2">
-            Price
-          </Typography>
-          <Typography align="center" variant="h5">
-            {!isNaN(price) ? formatPrice(parseFloat(price)) : price}$
-          </Typography>
-        </Grid>
-        <Grid item xs={3}>
-          <Typography align="center" variant="body2">
-            Quantity
-          </Typography>
-          <Typography align="center" variant="h5">
-            {!isNaN(currentValues.quantity) ? formatPrice(parseFloat(currentValues.quantity)) : currentValues.quantity}$
-          </Typography>
-        </Grid>
-        <Grid item xs={2}>
-          <Typography align="center" variant="body2">
-            Margin to price
-          </Typography>
-          <Typography align="center" variant="h5">
-            {margin}%
-          </Typography>
-        </Grid>
-        <Grid item xs={2}>
-          <Typography align="center" variant="body2">
-            Created
-          </Typography>
-          <Typography align="center" variant="h5">
-            {timeAgo}
-          </Typography>
-        </Grid>
-      </Grid>
+      </React.Fragment>
     );
   }
 }

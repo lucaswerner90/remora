@@ -20,7 +20,7 @@ const sendPostRequest = async (payload = {}, type = '') => {
     }
   };
 
-  const response = await fetch(`${document.location.origin}:8080/api/user/${type}`, userRequestData);
+  const response = await fetch(`${api}/api/user/${type}`, userRequestData);
   return await response.json();
   
 

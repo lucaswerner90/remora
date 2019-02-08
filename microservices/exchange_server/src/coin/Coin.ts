@@ -36,6 +36,8 @@ export default class Coin {
     this._exchange = exchange;
 
     this._redisKeys = {
+      PREVIOUS_SELL_ORDER: `${this.id}_sell_order_previous`,
+      PREVIOUS_BUY_ORDER: `${this.id}_buy_order_previous`,
       BUY_ORDER: `${this.id}_buy_order`,
       SELL_ORDER: `${this.id}_sell_order`,
       PRICES_LIST: `${this.id}_prices_list`,
@@ -73,6 +75,14 @@ export default class Coin {
     };
   }
   public set meanOrderValue(newValue: { buy: number; sell: number; }) {
+    // Try to reset the order value from time to time
+    const reset = Math.round(Math.random() * 1000) === 500;
+    if (reset) {
+      this._meanOrderValue = {
+        buy: 0,
+        sell: 0,
+      };
+    }
     this._meanOrderValue = {
       buy: Math.round((this._meanOrderValue.buy + newValue.buy) / 2),
       sell: Math.round((this._meanOrderValue.sell + newValue.sell) / 2),
@@ -153,7 +163,7 @@ export default class Coin {
    * @memberof Coin
    */
   public set pricesList(prices: TPricesList) {
-    this._pricesList = prices.splice(prices.length - 100, prices.length - 1);
+    this._pricesList = prices.splice(prices.length - 50, prices.length - 1);
     // Set the new value for the redis key's last order
     const redisValue = {
       ...this._commonRedisProperties,
@@ -335,7 +345,13 @@ export default class Coin {
   }
 
   public getOrdersProperties(type: 'buy' | 'sell' = 'buy') {
-    return type === 'buy' ? this.whaleOrders.buy[this.buyPosition].toJSON() : this.whaleOrders.sell[this.sellPosition].toJSON();
+    if (type === 'buy' && this.whaleOrders.buy[this.buyPosition] && this.whaleOrders.buy[this.buyPosition].toJSON()) {
+      return this.whaleOrders.buy[this.buyPosition].toJSON();
+    // tslint:disable-next-line:no-else-after-return
+    } else if (this.whaleOrders.sell[this.sellPosition] && this.whaleOrders.sell[this.sellPosition].toJSON()) {
+      return this.whaleOrders.sell[this.sellPosition].toJSON();
+    }
+    return undefined;
   }
   public containsOrders() {
     return this.containsBuyOrders() || this.containsSellOrders();

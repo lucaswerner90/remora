@@ -66,6 +66,12 @@ export class Chat extends Component {
       chatMessages: [...this.state.chatMessages, info],
       pendingNotifications: this.state.pendingNotifications+1
     });
+    this.newMessagePlayAudio();
+  }
+  
+  newMessagePlayAudio = () => {
+    const audio = new Audio('/static/sounds/new_chat_message.mp3');
+    audio.play();  
   }
 
   handleMessageChange = (event = new Event()) => {
@@ -105,7 +111,7 @@ export class Chat extends Component {
         'Content-Type': 'application/json'
       }
     };
-    const messagesFetch = await fetch(`${document.location.origin}:8080/api/chat/messages`, request);
+    const messagesFetch = await fetch(`${api}/api/chat/messages`, request);
     const { messages } = await messagesFetch.json();
     if (this.state.open) {
       this.setState({
@@ -201,6 +207,7 @@ export class Chat extends Component {
                 onKeyPress={({ key }) => {
                   if (key === 'Enter') this.onSendMessage();
                 }}
+                autoFocus={true}
                 onChange={this.handleMessageChange}
                 margin="dense"
                 InputLabelProps={{
@@ -209,7 +216,7 @@ export class Chat extends Component {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton color="primary" onClick={() => this.onSendMessage()} aria-label="Send message">
+                      <IconButton   onClick={() => this.onSendMessage()} aria-label="Send message">
                         <SendIcon />
                       </IconButton>
                     </InputAdornment>

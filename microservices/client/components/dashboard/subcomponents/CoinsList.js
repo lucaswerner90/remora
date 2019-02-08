@@ -106,7 +106,7 @@ class CoinsList extends React.Component {
                 <Grid container alignItems="flex-end">
                   <Grid item xs={12}>
                     <Typography component="span" variant="body1">
-                      {`${coin.name} (${coin.symbol}-${coin.against})`}
+                      <strong>{`${coin.name} (${coin.symbol}-${coin.against})`}</strong>
                     </Typography>
                   </Grid>
                 </Grid>
@@ -114,8 +114,8 @@ class CoinsList extends React.Component {
             }
             secondary={
               <React.Fragment>
-                <Typography component="span" style={{textTransform:'uppercase'}} color="textPrimary">
-                  {coin.exchange}
+                <Typography component="span" style={{textTransform:'lowercase'}} variant="body2">
+                  {coin.exchange.toLowerCase()}
                 </Typography>
               </React.Fragment>
             }
@@ -136,7 +136,7 @@ class CoinsList extends React.Component {
     const { favorites } = this.props;
     return coins.map(coin => {
       const isFavorite = favorites.indexOf(coin.id) > -1;
-      const color = isFavorite ? 'primary' : 'grey';
+      const color = isFavorite ? 'textPrimary' : 'textSecondary';
       return (
         <ListItem key={coin.id} onClick={() => this.selectCoin(coin.id)} dense button>
           <ListItemText
@@ -144,7 +144,7 @@ class CoinsList extends React.Component {
               <React.Fragment>
                 <Grid container alignItems="flex-end">
                   <Grid item xs={12}>
-                    <Typography component="span" variant="body1" style={{color}}>
+                    <Typography component="span" color={color} variant="body1">
                       {`${coin.name} (${coin.symbol}-${coin.against})`}
                     </Typography>
                   </Grid>

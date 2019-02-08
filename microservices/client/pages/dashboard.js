@@ -35,10 +35,10 @@ class Dashboard extends React.Component {
       const { email = '' } = userInfo;
 
       // Get the user preferences
-      const userPreferencesFetch = await fetch(`${document.location.origin}:8080/api/user/preferences?email=${email}`);
+      const userPreferencesFetch = await fetch(`${api}/api/user/preferences?email=${email}`);
       const userPreferences = await userPreferencesFetch.json();
 
-      const allCoinsFetch = await fetch(`${document.location.origin}:8080/api/coin/all`);
+      const allCoinsFetch = await fetch(`${api}/api/coin/all`);
       const coins = await allCoinsFetch.json();
   
       Object.keys(coins).map(coinID => coins[coinID] = JSON.parse(coins[coinID]));

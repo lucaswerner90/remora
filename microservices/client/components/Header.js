@@ -20,20 +20,25 @@ export class Header extends Component {
         <Grid item>
           <HeaderMenu />
         </Grid>
-        <Grid item xs={1}>
+        <Grid item>
           <Link href="/">
             <Typography variant="h4" align="left">
               rémora
             </Typography>
           </Link>
         </Grid>
+        
         <Grid item xs={9}>
-          <Typography variant="body2" align="right">
-            Welcome <strong>{name}</strong>!
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Avatar alt={name} src={avatar} style={{textAlign:'right'}}/>
+          <Grid container spacing={0} alignItems="center" justify="flex-end">
+            <Grid item >
+              <Typography variant="body2" align="right" style={{marginRight:10}}>
+                Welcome <strong>{name}</strong>!
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Avatar alt={name} src={avatar} style={{textAlign:'right'}}/>
+            </Grid>
+          </Grid>
         </Grid>
       </Grid>
     )

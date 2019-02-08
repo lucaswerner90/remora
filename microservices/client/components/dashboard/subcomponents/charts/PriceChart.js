@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import dynamic from 'next/dynamic';
-import { green, lightBlue } from '@material-ui/core/colors';
+import { green } from '@material-ui/core/colors';
 import Loading from '../../../common/utils/Loading';
 
 const Chart = dynamic(import('react-apexcharts'), { ssr: false });
@@ -60,64 +60,74 @@ class PriceChart extends React.Component {
         text: `Sell at ${sell.price}$`,
       }
     } : {};
+
     const graphOptions = {
       options: {
         tooltip: {
           enabled: false,
         },
         chart: {
-          animations: {
-            enabled: true,
-            easing: 'linear',
-            animateGradually: {
-              enabled: true,
-              speed:2000
-            },
-            dynamicAnimation: {
-              enabled: true,
-              speed: 2000
-            }
-          },
           toolbar: {
             show: false
           },
+          fontFamily: 'Roboto',
+          foreColor:'white'
         },
         yaxis: {
           axisBorder: {
             show: false,
           },
-        },
-        xaxis: {
           labels: {
             show:false,
+            style:{
+              color:'white'
+            }
+          },
+          max: sell.price ? Math.max(sell.price, Math.max(...prices)) * 1.01 : Math.max(...prices) * 1.01,
+          min: buy.price ? Math.min(buy.price, Math.min(...prices)) * 0.99: Math.min(...prices) * 0.99,
+        },
+        xaxis: {
+          categories:[
+            'Past',
+            'Now',
+            'Future'
+          ],
+          labels: {
+            show: false,
+            style: {
+              fontSize: '1rem',
+              colors:['white']
+            }
           },
           axisBorder: {
-            show: false,
+            show: false
           },
         },
         grid: {
-          show: false
+          borderColor:'white',
+          show: false,
+          yaxis: {
+            lines: {
+              show: false,
+              offsetX: 0,
+              offsetY: 0
+            }
+          },
         },
         annotations: {
           yaxis: [buyAnnotation, sellAnnotation],
         },
+       
+        colors:['white'],
         markers: {
           size: 0,
         },
         stroke: {
           curve: 'smooth',
-          width: 4
-        },
-        colors: ['white'],
-        fill: {
-          type: 'gradient',
-          gradient: {
-            shadeIntensity: 1,
-            inverseColors: false,
-            opacityFrom: 0.9,
-            opacityTo: 0,
-            stops: [0, 90, 100]
-          },
+          width: 4,
+          lineCap: 'round',
+          colors: ['white'],
+          dashArray: 0,  
         },
         dataLabels: {
           enabled: false
@@ -134,11 +144,11 @@ class PriceChart extends React.Component {
           series={graphOptions.series}
           type="area"
           width="100%"
-          height="250px"
+          height="350px"
         />
       );
     }
-    return <Loading height="250px" />;
+    return <Loading style={{ height: "250px" }} />;
   }
 }
 

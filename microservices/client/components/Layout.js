@@ -10,22 +10,17 @@ import Footer from './Footer';
 const styles = () => ({
   root: {
     width: "100%",
-    maxWidth:'1200px',
+    maxWidth:'90%',
     margin: "0 auto",
   },
 });
-
-const background = {
-  background: '#005C97',
-  background: 'linear-gradient(63deg, rgb(0,153,204), rgb(22,38,99))'
-}
 
 
 class Layout extends Component {
   render() {
     const { classes } = this.props;
     return (
-        <Grid container style={{...background}}>
+        <Grid container>
           <Grid container className={classes.root} spacing={24}>
             <Grid item xs={12}>
               <Header />

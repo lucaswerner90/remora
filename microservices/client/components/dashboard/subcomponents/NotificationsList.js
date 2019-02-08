@@ -9,11 +9,10 @@ import Avatar from '@material-ui/core/Avatar';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import ThumbUpAltIcon from '@material-ui/icons/ThumbUpAlt';
-import ThumbDownAltIcon from '@material-ui/icons/ThumbDownAlt';
+import TrendingUpIcon from '@material-ui/icons/TrendingUp';
+import TrendingDownIcon from '@material-ui/icons/TrendingDown';
+
 import { getTimeAgo } from '../../common/utils/Time';
-
-
 import io from 'socket.io-client';
 import getConfig from 'next/config';
 
@@ -24,16 +23,11 @@ const { api } = publicRuntimeConfig;
 
 import { connect } from 'react-redux';
 import { updateUserSelectedCoin, updateUserNotifications} from '../../../redux/actions/userPreferencesActions';
-import { CircularProgress } from '@material-ui/core';
 
 const mapReduxStateToComponentProps = state => ({
   favorites: state.user.userPreferences.favorites,
   notifications: state.user.userPreferences.notifications
 });
-
-const POSITIVE_COLOR = 'rgba(76, 175, 80, 0.5)';
-const NEGATIVE_COLOR = 'rgba(244, 67, 54, 0.5)';
-
 
 const notificationTypes = {
   COIN: {
@@ -120,6 +114,7 @@ class NotificationsList extends React.Component {
                 new Date(a.createdAt).getTime() > new Date(b.createdAt).getTime())
             });
             notifications[id]['orders'][type] = notificationInfo;
+            this.newNotificationPlayAudio();
           }
           this.props.updateUserNotifications(notifications);
         }
@@ -128,6 +123,11 @@ class NotificationsList extends React.Component {
         break;
     }
   }
+  newNotificationPlayAudio = () =>{
+    const audio = new Audio('/static/sounds/new_notification.mp3');
+    audio.play();
+  }
+
   selectCoin = (coinID = '') => {
     this.props.updateUserSelectedCoin(coinID);
   }
@@ -142,29 +142,24 @@ class NotificationsList extends React.Component {
       return (
         <ListItem key={Math.random()} onClick={() => this.selectCoin(coin.id)} dense button>
           <ListItemAvatar>
-            <Avatar style={{ color:'#fff', background: goodNews ? POSITIVE_COLOR : NEGATIVE_COLOR}}>
-              {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'buy' && <ThumbUpAltIcon />}
-              {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'sell' && <ThumbDownAltIcon/>}
+            <Avatar style={{ color:'#fff', background: 'transparent'}}>
+              {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'buy' && <TrendingUpIcon color="primary" />}
+              {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'sell' && <TrendingDownIcon color="secondary"/>}
             </Avatar>
           </ListItemAvatar>
           <ListItemText
             primary={
               <React.Fragment>
                 <Grid container alignItems="flex-end">
-                  <Grid item xs={8}>
-                    <Typography component="span" variant="body1" style={{fontWeight:500}}>
-                      {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'buy' && 'Buy order'}
-                      {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'sell' && 'Sell order'}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Typography component="span" align="right" style={{ fontSize: '0.625rem' }} variant="body2">
+                  <Grid item xs={12}>
+                    <Typography component="span" align="left" style={{ fontSize: '0.625rem' }} variant="body2">
                       {parsedTime}
                     </Typography>
                   </Grid>
                   <Grid item xs={12}>
-                    <Typography component="span" variant="body2">
-                      {`${coin.symbol}`}
+                    <Typography component="span" variant="body1" style={{ fontWeight: 500 }} color={goodNews ? 'primary' : 'secondary'}>
+                      {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'buy' && 'BUY ORDER'}
+                      {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'sell' && 'SELL ORDER'}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -173,7 +168,7 @@ class NotificationsList extends React.Component {
             secondary={
               <React.Fragment>
                 <Typography component="span" color="textPrimary">
-                  {coin.exchange.toUpperCase()}
+                  {coin.symbol} - <span style={{fontSize:'10px', textTransform:'uppercase'}}>{coin.exchange}</span>
                 </Typography>
               </React.Fragment>
             }

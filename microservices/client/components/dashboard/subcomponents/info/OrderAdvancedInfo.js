@@ -8,36 +8,43 @@ export class OrderAdvancedInfo extends Component {
 
   static propTypes = {
     order: PropTypes.object.isRequired,
-    coinPrice: PropTypes.number.isRequired,
-    message: PropTypes.string.isRequired,
+    coinPrice: PropTypes.number.isRequired
   }
 
   render() {
-    const { order = {}, message = '' } = this.props;
+    const { order = {}, disabled = false} = this.props;
 
     const { hasBeenExecuted = false, events = { price: {} } } = order;
     
     return (
-      <Grid container spacing={40} alignItems="center">
-        <Grid item xs={3} style={{ borderRight: '1px solid white' }}>
-          <Typography align="left" variant="h6">
-            {message}
+      <Grid container spacing={0} justify="space-between">
+        <Grid item>
+          <Typography align="left" variant="body1">
+            PRICE WHEN CREATED
+            </Typography>
+          <Typography align="left" variant="h4" color="primary">
+            {events.price.whenCreated > 0 ? formatPrice(events.price.whenCreated): '-'}
+            <span style={{ fontSize: '12px' }}>$</span>
           </Typography>
         </Grid>
-        <Grid item xs={3}>
-          <Typography align="center" variant="body2">
-            When created
+        <Grid item style={{ borderRight: '1px solid white' }}></Grid>
+        <Grid item>
+          <Typography align="left" variant="body1">
+            PRICE AFTER 5MIN
           </Typography>
-          <Typography align="center" variant="h5">
-            {formatPrice(events.price.whenCreated)}$
+          <Typography align="left" variant="h4" color="primary">
+            {events.price.afterCreated !== undefined && formatPrice(events.price.afterCreated.five)}
+            {events.price.afterCreated === undefined && '-'}
+            <span style={{ fontSize: '12px' }}>$</span>
           </Typography>
         </Grid>
-        <Grid item xs={1}>
-          <Typography align="center" variant="body2">
-            Executed
+        <Grid item style={{ borderRight: '1px solid white' }}></Grid>
+        <Grid item>
+          <Typography align="left" variant="body1">
+            EXECUTED
           </Typography>
-          <Typography align="center" variant="h5">
-            {hasBeenExecuted ? 'Yes' : 'No'}
+          <Typography align="left" variant="h4" color="primary">
+            {hasBeenExecuted === true ? 'Yes':'No'}
           </Typography>
         </Grid>
       </Grid>

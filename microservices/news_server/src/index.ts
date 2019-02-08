@@ -34,47 +34,6 @@ interface INewsResponse {
   articles: IArticle[];
 }
 
-const newsSchemaStringify = fastJSON({
-  type: 'array',
-  items: {
-    type: 'object',
-    properties: {
-      source: {
-        type: 'object',
-        properties: {
-          id: {
-            type: ['string', 'null'],
-          },
-          name: {
-            type: 'string',
-          },
-        },
-      },
-      author: {
-        type: ['string', 'null'],
-      },
-      title: {
-        type: 'string',
-      },
-      description: {
-        type: ['string', 'null'],
-      },
-      url: {
-        type: 'string',
-      },
-      urlToImage: {
-        type: ['string', 'null'],
-      },
-      publishedAt: {
-        type: 'string',
-      },
-      content: {
-        type: ['string', 'null'],
-      },
-    },
-  },
-});
-
 /**
  *
  *
@@ -90,7 +49,7 @@ export default class NewsAPIServer {
    * @type {string}
    * @memberof NewsAPIServer
    */
-  private keywords: string = 'ethereum,bitcoin,cryptocurrency,blockchain';
+  private keywords: string = 'ethereum,bitcoin,cryptocurrency,blockchain,litecoin,ripple';
 
   /**
    *
@@ -119,7 +78,7 @@ export default class NewsAPIServer {
       try {
         const response = await this.getHeadlines();
         if (response.status === 'ok' && response.articles.length) {
-          this.redisClient.setLastNews(newsSchemaStringify(response.articles));
+          this.redisClient.setLastNews(JSON.stringify(response.articles));
         }
       } catch (error) {
 
