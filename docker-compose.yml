@@ -8,7 +8,7 @@ services:
     command: yarn run start
     environment:
       - NODE_ENV=prod
-      - PRODUCTION_ENV=http://178.62.121.203
+      - PRODUCTION_ENV=https://remora.app
     ports: 
       - "9000"
     depends_on:

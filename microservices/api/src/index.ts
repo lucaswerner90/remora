@@ -38,7 +38,6 @@ app.use('/api/chat', ChatRouter);
 const mongo = new MongoConnection(() => {
   app.listen(PORT, () => {
     console.log(`Remora API listening on port ${PORT}!`);
-
   });
 });
 
