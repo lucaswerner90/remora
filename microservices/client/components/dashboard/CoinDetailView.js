@@ -98,7 +98,7 @@ export class CoinDetailView extends Component {
           'Content-Type': 'application/json'
         }
       };
-      const response = await fetch(`http://${api}/api/coin/property`, userRequestData);
+      const response = await fetch(`${document.location.origin}:8080/api/coin/property`, userRequestData);
       const { value = {} } = await response.json();
       return value;
     } else {

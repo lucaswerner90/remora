@@ -105,7 +105,7 @@ export class Chat extends Component {
         'Content-Type': 'application/json'
       }
     };
-    const messagesFetch = await fetch(`http://${api}/api/chat/messages`, request);
+    const messagesFetch = await fetch(`${document.location.origin}:8080/api/chat/messages`, request);
     const { messages } = await messagesFetch.json();
     if (this.state.open) {
       this.setState({
