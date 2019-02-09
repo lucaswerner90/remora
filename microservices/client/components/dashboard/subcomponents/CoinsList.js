@@ -145,8 +145,9 @@ class CoinsList extends React.Component {
               <React.Fragment>
                 <Grid container alignItems="flex-end">
                   <Grid item xs={12}>
-                    <Typography component="span" color={color} variant="body1">
-                      {`${coin.name} (${coin.symbol}-${coin.against})`}
+                    <Typography color={color} component="h5" variant="h5">
+                      {coin.name}
+                      <span style={{ fontSize: '12px' }}>  ({coin.symbol}-{coin.against})  </span>
                     </Typography>
                   </Grid>
                 </Grid>
@@ -154,7 +155,7 @@ class CoinsList extends React.Component {
             }
             secondary={
               <React.Fragment>
-                <Typography component="span" style={{ textTransform: 'uppercase' }} style={{ color }}>
+                <Typography component="span" style={{ textTransform: 'uppercase' }} variant="body2" style={{ color }}>
                   {coin.exchange.toString().toUpperCase()}
                 </Typography>
               </React.Fragment>

@@ -42,7 +42,7 @@ class MyDocument extends Document {
           <script src="https://www.googletagmanager.com/gtag/js?id=UA-134152146-1"></script>
 
         </Head>
-        <body style={{ background: 'linear-gradient(63deg, rgb(0,152,201), rgb(21,36,97))'}}>
+        <body style={{ background: 'linear-gradient(to left, #000428, #004e92)'}}>
             <Main />
             <NextScript />
         </body>

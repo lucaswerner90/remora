@@ -91,8 +91,8 @@ class Dashboard extends React.Component {
       return (
         <Fade in={!loading} timeout={{ enter: 2 * 1000, exit: 5 * 1000 }}>
           <Layout>
-            <Grid container style={{ flexGrow: 1, height: '150vh' }} spacing={16}>
-              <Grid item xs={9}>
+            <Grid container style={{ flexGrow: 1, height: '150vh' }} spacing={24}>
+              <Grid item xs={9} style={{ borderRight: '1px solid #ffffff40'}}>
                 <CoinDetailView />
               </Grid>
               <Grid item xs={3}>

@@ -173,23 +173,22 @@ export class CoinDetailView extends Component {
       return (
         <Fade in={coinInfo.name.length > 0} timeout={{enter:2*1000, exit:2*1000}}>
         
-        <Grid container direction="row" spacing={0}>
-          <Grid container spacing={16}>
+          <Grid container direction="row" spacing={16}>
             <Grid item xs={12}>
               <Paper elevation={1}>
-                <Grid container spacing={24}>
-                  <Grid item xs={12} style={{zIndex:100}}>
+                <Grid container spacing={8}>
+                  <Grid item xs={12} style={{ zIndex: 100 }}>
                     <Typography align="center" style={{ textTransform: 'uppercase' }} variant="body2">
                       {`${coinInfo.exchange}`}
                     </Typography>
-                    <Typography align="center" variant="h5">
-                      <strong>{`${coinInfo.name} (${coinInfo.symbol})`}</strong>
+                    <Typography align="center" variant="h4">
+                      {`${coinInfo.name} (${coinInfo.symbol})`}
                       <IconButton aria-label="Open coin url" onClick={() => window.open(coinInfo.url, 'blank')}>
                         <OpenInNew />
                       </IconButton>
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} style={{ marginBottom: '0px', marginTop: '-80px' }}>
+                  <Grid item xs={12} style={{ marginBottom: '-20px', marginTop: '-40px' }}>
                     <PriceChart prices={pricesList} buy={buyOrder.price ? buyOrder : previousBuyOrder} sell={sellOrder.price ? sellOrder : previousSellOrder} />
                   </Grid>
                   <Grid item xs={12} >
@@ -198,20 +197,28 @@ export class CoinDetailView extends Component {
                 </Grid>
               </Paper>
             </Grid>
-          </Grid>
+              
 
-
-            <Grid item xs={12}>
-              <Grid container spacing={16} justify="space-between">
-                <Grid item xs={6}>
-                  <OrderInfo order={buyOrder} previous={previousBuyOrder} message="Buy order" coinPrice={price} />
-                </Grid>
-                <Grid item xs={6}>
-                  <OrderInfo order={sellOrder} previous={previousSellOrder} message="Sell order" coinPrice={price} />
-                </Grid>
+          <Grid item xs={6}>
+            <Grid container spacing={16}>
+              <Grid item xs={12}>
+                <OrderInfo order={buyOrder} previous={previousBuyOrder} message="Buy order" coinPrice={price} />
+              </Grid>
+              <Grid item xs={12}>
+                  <OrderInfo order={sellOrder} previous={previousSellOrder} message="Generate" coinPrice={price} />
               </Grid>
             </Grid>
-          
+          </Grid>
+          <Grid item xs={6}>
+            <Grid container spacing={16}>
+              <Grid item xs={12}>
+                <OrderInfo order={sellOrder} previous={previousSellOrder} message="Sell order" coinPrice={price} />
+              </Grid>
+              <Grid item xs={12}>
+                <OrderInfo order={sellOrder} previous={previousSellOrder} message="News" coinPrice={price} />
+              </Grid>
+            </Grid>
+          </Grid>
         </Grid>
         </Fade>
       );

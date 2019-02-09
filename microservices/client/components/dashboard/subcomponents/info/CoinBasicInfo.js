@@ -13,7 +13,7 @@ export class BasicInfo extends Component {
   render() {
     const { volumeDifference = 0, price = 0, priceChange = 0 } = this.props;
     return (
-      <Grid container spacing={40} alignItems="center" alignContent="space-around">
+      <Grid container spacing={16} alignItems="center" alignContent="space-around">
         <Grid item xs={4}>
           <Typography align="center" variant="body1">
             VOLUME DIFFERENCE

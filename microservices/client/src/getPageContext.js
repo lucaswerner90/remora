@@ -43,7 +43,7 @@ const theme = createMuiTheme({
         flexGrow:1
       },
       elevation0:{
-        background: 'rgba(226, 226, 226, 0.02)',
+        background: 'rgba(226, 226, 226, 0.05)',
         paddingTop:'2%',
         paddingBottom:'2%',
         paddingLeft:'5%',
@@ -55,7 +55,7 @@ const theme = createMuiTheme({
       },
       elevation1:{
         background: '#1b3f772e',
-        paddingTop:'0%',
+        paddingTop:'1%',
         paddingBottom:'1%',
         paddingLeft:'5%',
         paddingRight: '5%',

@@ -11,7 +11,6 @@ import { Typography, Paper, Switch, FormControlLabel } from '@material-ui/core';
 const styles = () => ({
   root: {
     flexGrow: 1,
-    marginTop:'5%'
   },
 });
 

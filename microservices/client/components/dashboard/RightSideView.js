@@ -44,7 +44,7 @@ class RightSideView extends React.Component {
   }
   render() {
     return (
-      <Grid container spacing={40} direction="row" alignContent="center" style={{ marginLeft: '0px', borderLeft: '1px solid rgba(255, 255, 255, 0.18)' }}>
+      <Grid container spacing={40} direction="row" alignContent="center">
         <Grid item xs={12} style={{paddingTop:0}}>
           {this.renderSearchInput()}
         </Grid>

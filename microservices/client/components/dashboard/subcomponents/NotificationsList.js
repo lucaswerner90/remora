@@ -43,7 +43,7 @@ const styles = theme => ({
   list: {
     backgroundColor: 'transparent',
     overflow: 'hidden',
-    height: '30vh',
+    height: '50vh',
     overflowY:'auto'
   },
   padding: {
@@ -153,14 +153,10 @@ class NotificationsList extends React.Component {
               <React.Fragment>
                 <Grid container alignItems="flex-end">
                   <Grid item xs={12}>
-                    <Typography component="span" align="left" style={{ fontSize: '0.625rem' }} variant="body2">
-                      {parsedTime}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography component="span" variant="body1" style={{ fontWeight: 500 }} color={goodNews ? 'primary' : 'secondary'}>
+                    <Typography component="span" variant="h5" color={goodNews ? 'primary' : 'secondary'}>
                       {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'buy' && `BUY ORDER`}
                       {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'sell' && `SELL ORDER`}
+                      <span style={{ fontSize: '12px', textAlign:'right' }}>  {parsedTime}  </span>
                     </Typography>
                   </Grid>
                 </Grid>
@@ -168,7 +164,7 @@ class NotificationsList extends React.Component {
             }
             secondary={
               <React.Fragment>
-                <Typography component="span" color="textPrimary">
+                <Typography component="span" variant="h6" color="textPrimary">
                   {coin.symbol} - <span style={{fontSize:'10px', textTransform:'uppercase'}}>{coin.exchange}</span>
                 </Typography>
               </React.Fragment>
