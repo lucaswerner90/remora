@@ -18,14 +18,18 @@ export class Header extends Component {
       <Grid container spacing={0} justify="space-between"
         alignItems="center">
         <Grid item>
-          <HeaderMenu />
-        </Grid>
-        <Grid item>
-          <Link href="/">
-            <Typography variant="h4" align="left">
-              rémora
-            </Typography>
-          </Link>
+          <Grid container spacing={0} alignItems="center" justify="flex-start">
+            <Grid item>
+              <HeaderMenu />
+            </Grid>
+            <Grid item>
+              <Link href="/">
+                <Typography variant="h4" align="left">
+                  rémora
+                </Typography>
+              </Link>
+            </Grid>
+          </Grid>
         </Grid>
         
         <Grid item xs={9}>

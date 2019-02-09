@@ -24,6 +24,7 @@ import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 // Redux
 import { connect } from 'react-redux';
 import { updateUserSelectedCoin, updateUserFavorites } from '../../../redux/actions/userPreferencesActions';
+import { Fade } from '@material-ui/core';
 
 
 const mapReduxStateToComponentProps = state => ({
@@ -137,7 +138,7 @@ class CoinsList extends React.Component {
     return coins.map(coin => {
       const isFavorite = favorites.indexOf(coin.id) > -1;
       const color = isFavorite ? 'textPrimary' : 'textSecondary';
-      return (
+      return (        
         <ListItem key={coin.id} onClick={() => this.selectCoin(coin.id)} dense button>
           <ListItemText
             primary={
@@ -166,7 +167,6 @@ class CoinsList extends React.Component {
             </IconButton>
           </ListItemSecondaryAction>
         </ListItem>
-
       );
     });
   }
@@ -201,14 +201,17 @@ class CoinsList extends React.Component {
             COINS
           </Typography>
         </Grid>
-        <Grid item xs={12} md={12}>
-          <Paper elevation={0}>
+        <Fade in={coins.length > 0} timeout={{enter:2*1000}}>
+          <Grid item xs={12} md={12}>
+            <Paper elevation={0}>
               <List dense={dense} className={classes.list}>
                 {!filter.length && this.showFavorites(filteredCoins)}
                 {filter.length > 0 && this.generateItems(filteredCoins)}
               </List>
-          </Paper>
+            </Paper>
           </Grid>
+        </Fade>
+        
       </Grid>
     );
   }

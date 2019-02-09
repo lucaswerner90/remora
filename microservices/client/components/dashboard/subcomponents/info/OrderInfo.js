@@ -52,24 +52,24 @@ class OrderInfo extends React.Component {
   handleChange = (event, open) => {
     this.setState({ open });
   };
-  renderBasicInfo = (disabled) => {
-    const { coinPrice, order } = this.props;
+  renderBasicInfo = (order) => {
+    const { coinPrice } = this.props;
     return (
-      <OrderBasicInfo order={order} disabled={disabled} coinPrice={coinPrice} />
+      <OrderBasicInfo order={order} coinPrice={coinPrice} />
     );
   }
-  renderAdvancedInfo = (disabled) => {
-    const { coinPrice, order } = this.props;
+  renderAdvancedInfo = (order) => {
+    const { coinPrice } = this.props;
     return (
-      <OrderAdvancedInfo order={order} disabled={disabled} coinPrice={coinPrice} />
+      <OrderAdvancedInfo order={order} coinPrice={coinPrice} />
     );
   }
   render() {
-    const { classes, message = '', order} = this.props;
+    const { classes, message = '', order:currentOrder = {}, previous = {}} = this.props;
     const { open = false } = this.state;
-    const usingSavedOrder = this.props.order.price === undefined;
-
-    let timeAgo = order.createdAt ? `${getTimeAgo(new Date(order.createdAt).getTime())} ago` : '-';
+    const usingSavedOrder = currentOrder.price === undefined;
+    const order = usingSavedOrder ? previous : currentOrder;
+    let timeAgo = order.createdAt ? `${getTimeAgo(new Date(order.createdAt).getTime())} ago` : ' - ';
     return (
       <Paper elevation={1}>
         <Grid container spacing={16} alignItems="center" className={classes.root}>
@@ -96,8 +96,8 @@ class OrderInfo extends React.Component {
           </Grid>
           
           <Grid item xs={12}>
-            {open === false && this.renderBasicInfo(usingSavedOrder)}
-            {open === true && this.renderAdvancedInfo(usingSavedOrder)}
+            {open === false && this.renderBasicInfo(order)}
+            {open === true && this.renderAdvancedInfo(order)}
           </Grid>
           <Grid item xs={12}>
             <Typography align="right" variant="body2" style={{ marginTop: '5px' }}>

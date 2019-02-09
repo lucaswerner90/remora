@@ -6,6 +6,7 @@
     "price_list",
     "latest_price",
     "price_change_24hr",
+    "previous_order",
     "last_news"
   ],
   "chatCoins":[

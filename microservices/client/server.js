@@ -1,6 +1,5 @@
 const express = require('express');
 const next = require('next');
-const cookieParser = require('cookie-parser');
 
 console.log(`NextJS server file NODE_ENV = ${process.env.NODE_ENV}`);
 const PORT = process.env.PORT || 3000;
@@ -13,7 +12,6 @@ const handle = app.getRequestHandler();
 app.prepare().then(() => {
   const server = express();
   server.use(express.static(__dirname + '/static'));
-  server.use(cookieParser());
   server.get('/', (_req, res) => {
     res.sendFile(`${__dirname}/static/index.html`).end();
   });

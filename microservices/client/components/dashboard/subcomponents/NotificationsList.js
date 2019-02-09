@@ -12,14 +12,11 @@ import Typography from '@material-ui/core/Typography';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 
-import { getTimeAgo } from '../../common/utils/Time';
 import io from 'socket.io-client';
 import getConfig from 'next/config';
 
 const { publicRuntimeConfig } = getConfig();
 const { api } = publicRuntimeConfig;
-
-
 
 import { connect } from 'react-redux';
 import { updateUserSelectedCoin, updateUserNotifications} from '../../../redux/actions/userPreferencesActions';
@@ -39,6 +36,9 @@ const styles = theme => ({
   root: {
     flexGrow: 1,
     maxWidth: '100%',
+  },
+  warningColor:{
+    color: theme.palette.sell,
   },
   list: {
     backgroundColor: 'transparent',
@@ -133,6 +133,7 @@ class NotificationsList extends React.Component {
   }
   generateItems = (notifications = []) => {
     return notifications.map(notification => {
+      const { classes } = this.props;
       const { coin, type, info } = notification;
       const time = new Date(info.createdAt);
       const parsedMinutes = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes();
@@ -158,8 +159,8 @@ class NotificationsList extends React.Component {
                   </Grid>
                   <Grid item xs={12}>
                     <Typography component="span" variant="body1" style={{ fontWeight: 500 }} color={goodNews ? 'primary' : 'secondary'}>
-                      {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'buy' && 'BUY ORDER'}
-                      {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'sell' && 'SELL ORDER'}
+                      {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'buy' && `BUY ORDER`}
+                      {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'sell' && `SELL ORDER`}
                     </Typography>
                   </Grid>
                 </Grid>

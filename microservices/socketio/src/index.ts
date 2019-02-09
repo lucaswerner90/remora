@@ -95,6 +95,8 @@ class SocketIOServer {
           finalData = { pricesList: messageParsed.prices };
           break;
         case 'order':
+          finalData = messageParsed;
+          break;
         case 'previous_order':
           finalData = messageParsed;
           break;

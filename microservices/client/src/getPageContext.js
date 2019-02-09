@@ -1,6 +1,5 @@
 import { SheetsRegistry } from 'jss';
 import { createMuiTheme, createGenerateClassName } from '@material-ui/core/styles';
-import { blue, lightGreen } from '@material-ui/core/colors';
 
 // A theme with custom primary and secondary color.
 // It's optional.
@@ -19,20 +18,43 @@ const theme = createMuiTheme({
         "color": '#fff'
       },
     },
+    // MuiInput:{
+    //   "underline": {
+    //     '&::before': {
+    //       "borderBottom":"none"
+    //     }
+    //   }
+    // },
+    MuiInputLabel: {
+      marginDense: {
+        fontSize:'1rem',
+        fontWeight: 300,
+      }
+    },
+    MuiInputBase: {
+      "root": {
+
+      }
+    },
     MuiPaper: {
       root: {
-        background: 'rgba(226, 226, 226, 0.08)',
+        background: 'none',
+        boxShadow:'none',
         flexGrow:1
       },
       elevation0:{
-        background: 'rgba(226, 226, 226, 0.08)',
+        background: 'rgba(226, 226, 226, 0.02)',
         paddingTop:'2%',
         paddingBottom:'2%',
         paddingLeft:'5%',
         paddingRight:'5%',
       },
+      elevation16:{
+        background: 'none',
+        boxShadow:'none'
+      },
       elevation1:{
-        background: '#3082b41f',
+        background: '#1b3f772e',
         paddingTop:'0%',
         paddingBottom:'1%',
         paddingLeft:'5%',
@@ -71,12 +93,12 @@ const theme = createMuiTheme({
       fontSize:'1.5rem'
     },
     h5: {
-      fontWeight: 500,
+      fontWeight: 300,
       fontSize:'1.25rem'
     },
     h6: {
-      fontSize: '0.9375rem',
-      fontWeight: 300
+      fontSize: '1rem',
+      fontWeight: 200
     },
     display1: {
       fontSize: '0.5rem',

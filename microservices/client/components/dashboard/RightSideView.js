@@ -44,14 +44,14 @@ class RightSideView extends React.Component {
   }
   render() {
     return (
-      <Grid container spacing={40} alignContent="center" style={{ borderLeft:'1px solid #ffffff63'}}>
-        <Grid item xs={12}>
+      <Grid container spacing={40} direction="row" alignContent="center" style={{ marginLeft: '0px', borderLeft: '1px solid rgba(255, 255, 255, 0.18)' }}>
+        <Grid item xs={12} style={{paddingTop:0}}>
           {this.renderSearchInput()}
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} style={{ paddingTop: 0 }}>
           <CoinsList filter={this.state.filter} style={{height:'30vh'}}/>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} style={{ paddingTop: 0 }}>
           <NotificationsList filter={this.state.filter} style={{ height: '40vh' }}/>
         </Grid>
       </Grid>

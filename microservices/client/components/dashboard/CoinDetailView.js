@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
 
-import { Grid, Typography, Paper } from '@material-ui/core';
+import { Grid, Typography, Paper, Fade } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 
@@ -55,20 +55,9 @@ export class CoinDetailView extends Component {
 
   componentDidMount() {
     const { selectedCoin = '' } = this.props;
+    this.getAllProperties(selectedCoin);
     this.socket = io(api, { forceNew: true });
     this.socket.on(selectedCoin, this.onSocketData);
-    this.getCoinPricesList(selectedCoin);
-    this.getCoinPrice(selectedCoin);
-  }
-
-  managePreviousOrder = (info = { type: '', order: {price:0}}) => {
-    const order = this.state[info.type === 'buy' ? 'buyOrder' : 'sellOrder'];
-    if (order.price !== undefined) {
-      this.setState({
-        ...this.state,
-        [info.type === 'buy' ? 'previousBuyOrder' : 'previousSellOrder']: info.order
-      });
-    }
   }
   onSocketData = ({ info = {}, message = '' }) => {
     switch (message) {
@@ -76,12 +65,19 @@ export class CoinDetailView extends Component {
         this.setState({ ...this.state, volumeDifference: info.volumeDifference });
         break;
       case 'order':
-        this.managePreviousOrder(info);
         this.setState({
           ...this.state,
           [info.type === 'buy' ? 'buyOrder' : 'sellOrder']: info.order
         });
         break;
+      case 'previous_order':
+        info.order.hasDissapeared = true;
+        this.setState({
+          ...this.state,
+          [info.type === 'buy' ? 'previousBuyOrder' : 'previousSellOrder']: info.order
+        });
+        break;
+      
       case 'price_change_24hr':
         this.setState({ ...this.state, priceChange: parseFloat(info.price) });
         break;
@@ -91,7 +87,7 @@ export class CoinDetailView extends Component {
           this.setState({
             ...this.state,
             price: info.price,
-            pricesList: [...this.state.pricesList.slice(1), info.price],
+            pricesList: [...this.state.pricesList, info.price].slice(1),
           });
         }
         break;
@@ -121,7 +117,7 @@ export class CoinDetailView extends Component {
   getCoinPricesList = async (coinID) => {
     const value = await this.getCoinProperty(coinID, 'prices_list');
     const prices = value && value.prices && value.prices.length ? value.prices : [];
-    this.setState({ ...this.state, pricesList: prices ? prices.splice(Math.round(prices.length / 2)) : [] });
+    this.setState({ ...this.state, pricesList: prices });
   }
   getCoinPrice = async (coinID) => {
     const value = await this.getCoinProperty(coinID, 'price');
@@ -138,6 +134,13 @@ export class CoinDetailView extends Component {
     const priceChange = value && value.price ? value.priceChange : 0;
     this.setState({ ...this.state, priceChange });
   }
+  getPreviousOrders = async (coinID) => {
+    const {order:previousBuyOrder={}} = await this.getCoinProperty(coinID, 'buy_order_previous');
+    const { order: previousSellOrder = {} } = await this.getCoinProperty(coinID, 'sell_order_previous');
+    previousBuyOrder.hasDissapeared = true;
+    previousSellOrder.hasDissapeared = true;
+    this.setState({ ...this.state, previousBuyOrder:previousBuyOrder, previousSellOrder:previousSellOrder});
+  }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.selectedCoin && nextProps.selectedCoin !== this.props.selectedCoin) {
@@ -151,55 +154,76 @@ export class CoinDetailView extends Component {
       // Stablish a new connection with the next coin
       this.socket.on(nextProps.selectedCoin, this.onSocketData);
 
-      this.getCoinPricesList(nextProps.selectedCoin);
-      this.getCoinPrice(nextProps.selectedCoin);
-      this.getVolumeDifference(nextProps.selectedCoin);
-      this.getPriceChange(nextProps.selectedCoin);
+      this.getAllProperties(nextProps.selectedCoin);
     }
   }
-
+  getAllProperties = (coinID) =>{
+    this.getPreviousOrders(coinID);
+    this.getCoinPricesList(coinID);
+    this.getCoinPrice(coinID);
+    this.getVolumeDifference(coinID);
+    this.getPriceChange(coinID);
+  }
   render() {
     const { coinInfo = {exchange:'', name:'', symbol:'', url:''} } = this.props;
 
-    const { pricesList = [], buyOrder = {}, previousBuyOrder = {}, previousSellOrder = {}, sellOrder = {}, priceChange = 0, price = 0, volumeDifference = 0 } = this.state;
+    const { pricesList = [], buyOrder, previousBuyOrder, previousSellOrder, sellOrder, priceChange = 0, price = 0, volumeDifference = 0 } = this.state;
+
     if (coinInfo.name) {
       return (
-        <Grid container direction="row" justify="space-around" alignItems="center" spacing={40}>
-
-          <Grid item xs={12}>
-            <Typography align="center" style={{ textTransform:'uppercase'}} variant="body2">
-              {`${coinInfo.exchange}`}
-            </Typography>
-            <Typography align="center" variant="h5">
-              <strong>{`${coinInfo.name} (${coinInfo.symbol})`}</strong>
-              <IconButton aria-label="Open coin url" onClick={() => window.open(coinInfo.url, 'blank')}>
-                <OpenInNew />
-              </IconButton>
-            </Typography>
-          </Grid>
-
-          
-          <Grid item xs={12} style={{ marginBottom: '0px', marginTop: '-80px' }}>
-            <PriceChart prices={pricesList} buy={buyOrder} sell={sellOrder} />
-          </Grid>
-          
-          <BasicInfo volumeDifference={volumeDifference} price={price} priceChange={priceChange} />
-
-          <Grid item xs={12}>
-            <Grid container spacing={16}>
-              <Grid item xs={6}>
-                <OrderInfo order={buyOrder} previous={previousBuyOrder} message="Buy order" coinPrice={price}/>
-              </Grid>
-              <Grid item xs={6}>
-                <OrderInfo order={sellOrder} previous={previousSellOrder} message="Sell order" coinPrice={price}/>
-              </Grid>
+        <Fade in={coinInfo.name} timeout={{enter:2*1000, exit:2*1000}}>
+        
+        <Grid container direction="row" spacing={0}>
+          <Grid container spacing={16}>
+            <Grid item xs={12}>
+              <Paper elevation={1}>
+                <Grid container spacing={24}>
+                  <Grid item xs={12}>
+                    <Typography align="center" style={{ textTransform: 'uppercase' }} variant="body2">
+                      {`${coinInfo.exchange}`}
+                    </Typography>
+                    <Typography align="center" variant="h5">
+                      <strong>{`${coinInfo.name} (${coinInfo.symbol})`}</strong>
+                      <IconButton aria-label="Open coin url" onClick={() => window.open(coinInfo.url, 'blank')}>
+                        <OpenInNew />
+                      </IconButton>
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} style={{ marginBottom: '0px', marginTop: '-80px' }}>
+                    <PriceChart prices={pricesList} buy={buyOrder.price ? buyOrder : previousBuyOrder} sell={sellOrder.price ? sellOrder : previousSellOrder} />
+                  </Grid>
+                  <Grid item xs={12} >
+                    <BasicInfo volumeDifference={volumeDifference} price={price} priceChange={priceChange} />
+                  </Grid>
+                </Grid>
+              </Paper>
             </Grid>
           </Grid>
+
+
+            <Grid item xs={12}>
+              <Grid container spacing={16} justify="space-between">
+                <Grid item xs={6}>
+                  <OrderInfo order={buyOrder} previous={previousBuyOrder} message="Buy order" coinPrice={price} />
+                </Grid>
+                <Grid item xs={6}>
+                  <OrderInfo order={sellOrder} previous={previousSellOrder} message="Sell order" coinPrice={price} />
+                </Grid>
+              </Grid>
+            </Grid>
+          
         </Grid>
+        </Fade>
       );
     } else {
       return (
-        <Loading style={{width:'100%', height:'100vh'}}/>
+        <Fade in={!coinInfo.name} timeout={{enter: 500, exit:2*1000}}>
+          <Grid container spacing={0} justify="center" style={{flexGrow:1, height:'90vh'}} alignItems="center">
+            <Grid item xs={12}>
+            </Grid>
+            <Loading/>
+          </Grid>
+        </Fade>
       );
     }
   }

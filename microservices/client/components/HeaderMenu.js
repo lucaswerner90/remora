@@ -5,7 +5,6 @@ import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import HomeIcon from '@material-ui/icons/Home';
-import SettingsIcon from '@material-ui/icons/Settings';
 import TimelineIcon from '@material-ui/icons/Timeline';
 import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew';
 import List from '@material-ui/core/List';
@@ -19,7 +18,7 @@ const styles = {
   fullList: {
     width: 250,
     paddingTop: '40px',
-    height:'100vh',
+    height:'40vh',
     background: 'rgb(7, 16, 43)'
   },
 };
@@ -46,7 +45,9 @@ class HeaderMenu extends React.Component {
         <List>
           <Link href="/">
             <ListItem button key="home">
-              <ListItemIcon><HomeIcon style={{ color: 'white' }} /></ListItemIcon>
+              <ListItemIcon>
+                <HomeIcon style={{ color: 'white' }} />
+              </ListItemIcon>
               <ListItemText primary='Home' />
             </ListItem>
           </Link>
@@ -56,12 +57,7 @@ class HeaderMenu extends React.Component {
               <ListItemText primary='Dashboard' />
             </ListItem>
           </Link>
-          <Link href="/settings">
-            <ListItem button key="settings">
-              <ListItemIcon><SettingsIcon style={{ color: 'white' }} /></ListItemIcon>
-              <ListItemText primary='Settings' />
-            </ListItem>
-          </Link>
+
           <Divider style={{marginTop:'60px', marginBottom:'10px'}}/>
           <ListItem button key="logout" onClick={() => new Auth().logout()} >
             <ListItemIcon><PowerSettingsNewIcon style={{ color: 'white' }} /></ListItemIcon>
