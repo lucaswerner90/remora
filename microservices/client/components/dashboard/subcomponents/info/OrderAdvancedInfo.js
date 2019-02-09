@@ -14,10 +14,11 @@ export class OrderAdvancedInfo extends Component {
 
   render() {
     const { order = {}} = this.props;
-    const { hasBeenExecuted = false, events = { price: {} }, currentValues, hasDissapeared = false } = order;
-    const color = hasDissapeared ? 'textSecondary' : 'primary';
+    const { hasBeenExecuted = false, events = { price: {} }, currentValues, hasDissapeared = false, type='' } = order;
+    const primaryColor = type === 'buy' ? 'primary' : 'secondary';
+    const color = hasDissapeared ? 'textSecondary' : primaryColor;
     return (
-      <Fade in={order.price > 0 && currentValues.position && events.price.whenCreated} timeout={{ enter: animationTime }}>
+      <Fade in={!!(order.price > 0 && currentValues.position && events.price.whenCreated)} timeout={{ enter: animationTime }}>
         <React.Fragment>
           <Grid container spacing={16} justify="space-between">
             <Grid item xs={12}>

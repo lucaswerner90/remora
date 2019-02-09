@@ -6,6 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import { getTimeAgo } from '../../../../components/common/utils/Time';
 import OrderBasicInfo from './OrderBasicInfo';
 import OrderAdvancedInfo from './OrderAdvancedInfo';
+import LensIcon from '@material-ui/icons/LensRounded';
 import { Typography, Paper, Switch, FormControlLabel } from '@material-ui/core';
 
 const styles = () => ({
@@ -45,6 +46,8 @@ class OrderInfo extends React.Component {
 
     if (currentOrder.price !== nextOrder.price) {
       this.setState({ ...this.state, order: currentOrder });
+      const audio = new Audio('/static/sounds/activate_order.mp3');
+      audio.play();
     }
   }
 
@@ -77,7 +80,7 @@ class OrderInfo extends React.Component {
               <Grid item>
                 <Typography variant="h5" align="left">
                   {message}
-                  <span style={{ fontSize: '10px', color: usingSavedOrder ? 'darkgray' : 'greenyellow' }}>{`    ${usingSavedOrder ? 'INACTIVE' : 'ACTIVE'}`}</span>
+                  {!usingSavedOrder && <LensIcon  style={{fontSize:'8px', marginLeft:'5px', marginTop:'2px'}} color={order.type === 'buy' ? 'primary':'secondary'}/>}
                 </Typography>
               </Grid>
               <Grid item>

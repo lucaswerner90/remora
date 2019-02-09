@@ -205,7 +205,7 @@ export class CoinDetailView extends Component {
                 <OrderInfo order={buyOrder} previous={previousBuyOrder} message="Buy order" coinPrice={price} />
               </Grid>
               <Grid item xs={12}>
-                  <OrderInfo order={sellOrder} previous={previousSellOrder} message="Generate" coinPrice={price} />
+                  <OrderInfo order={sellOrder} previous={previousSellOrder} message="General" coinPrice={price} />
               </Grid>
             </Grid>
           </Grid>

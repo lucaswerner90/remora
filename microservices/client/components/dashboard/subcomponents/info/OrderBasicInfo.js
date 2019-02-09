@@ -20,16 +20,16 @@ export class OrderBasicInfo extends Component {
   render() {
     const { order = {}, coinPrice = 0 } = this.props;
     
-    const { price = 0, currentValues = { position: ' - ', quantity: ' - ' }, hasDissapeared = false} = order;
-    
+    const { price = 0, currentValues = { position: ' - ', quantity: ' - ' }, hasDissapeared = false, type = 'buy'} = order;
     let margin = ' - ';
 
     if (price !== Infinity && price > 0) {
       margin = Math.round((Math.abs(price - coinPrice) / coinPrice) * 10000) / 100;
     }
     
+    const primaryColor = type === 'buy' ? 'primary' : 'secondary';
     // const color = 'primary';
-    const color = hasDissapeared ? 'textSecondary' : 'primary';
+    const color = hasDissapeared ? 'textSecondary' : primaryColor;
     
     return (
         <Fade in={margin !== ' - ' && margin !== Infinity} timeout={{ enter: animationTime}}>  

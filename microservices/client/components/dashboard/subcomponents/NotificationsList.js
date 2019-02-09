@@ -22,6 +22,7 @@ import { connect } from 'react-redux';
 import { updateUserSelectedCoin, updateUserNotifications} from '../../../redux/actions/userPreferencesActions';
 
 const mapReduxStateToComponentProps = state => ({
+  selected: state.user.userPreferences.selectedCoin,
   favorites: state.user.userPreferences.favorites,
   notifications: state.user.userPreferences.notifications
 });
@@ -114,8 +115,8 @@ class NotificationsList extends React.Component {
                 new Date(a.createdAt).getTime() > new Date(b.createdAt).getTime())
             });
             notifications[id]['orders'][type] = notificationInfo;
-            this.newNotificationPlayAudio();
           }
+
           this.props.updateUserNotifications(notifications);
         }
         break;
@@ -123,17 +124,11 @@ class NotificationsList extends React.Component {
         break;
     }
   }
-  newNotificationPlayAudio = () =>{
-    const audio = new Audio('/static/sounds/new_notification.mp3');
-    audio.play();
-  }
-
   selectCoin = (coinID = '') => {
     this.props.updateUserSelectedCoin(coinID);
   }
   generateItems = (notifications = []) => {
     return notifications.map(notification => {
-      const { classes } = this.props;
       const { coin, type, info } = notification;
       const time = new Date(info.createdAt);
       const parsedMinutes = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes();
@@ -156,7 +151,7 @@ class NotificationsList extends React.Component {
                     <Typography component="span" variant="h5" color={goodNews ? 'primary' : 'secondary'}>
                       {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'buy' && `BUY ORDER`}
                       {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'sell' && `SELL ORDER`}
-                      <span style={{ fontSize: '12px', textAlign:'right' }}>  {parsedTime}  </span>
+                      <span style={{ fontSize: '12px', color: 'white' }}>  {parsedTime}  </span>
                     </Typography>
                   </Grid>
                 </Grid>

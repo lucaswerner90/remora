@@ -18,13 +18,54 @@ const theme = createMuiTheme({
         "color": '#fff'
       },
     },
-    // MuiInput:{
-    //   "underline": {
-    //     '&::before': {
-    //       "borderBottom":"none"
-    //     }
-    //   }
-    // },
+    MuiSwitch: {
+      root: {
+        display: 'inline-flex',
+        width: 62,
+        position: 'relative',
+        flexShrink: 0,
+        zIndex: 0, // Reset the stacking context.
+        // For correct alignment with the text.
+        verticalAlign: 'middle',
+      },
+      colorSecondary: {
+        '&$checked': {
+          color: '#67ffff',
+          '& + $bar': {
+            backgroundColor: '#67ffff',
+          },
+        },
+      },
+      icon: {
+        boxShadow: 'none',
+        backgroundColor: 'currentColor',
+        width: 20,
+        height: 20,
+        borderRadius: '50%',
+      },
+      iconChecked: {
+        boxShadow: 'none',
+      },
+      switchBase: {
+        padding: 0,
+        height: 48,
+        width: 48,
+      },
+      bar: {
+        borderRadius: 14 / 2,
+        display: 'block',
+        position: 'absolute',
+        zIndex: -1,
+        width: 34,
+        height: 14,
+        top: '50%',
+        left: '50%',
+        marginTop: -7,
+        marginLeft: -17,
+        backgroundColor: 'white',
+        opacity: 0.3,
+      },
+    },
     MuiInputLabel: {
       marginDense: {
         fontSize:'1rem',
