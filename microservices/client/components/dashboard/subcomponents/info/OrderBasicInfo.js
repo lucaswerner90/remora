@@ -36,7 +36,7 @@ export class OrderBasicInfo extends Component {
           <Grid container spacing={0} justify="space-around">
             <Grid item>
               <Typography align="left" variant="body1">
-                PRICE
+                AT PRICE
               </Typography>
               <Fade in={price > 0} timeout={{ enter: animationTime }}>
                 <Typography align="left" variant="h4" color={color}>
@@ -48,7 +48,7 @@ export class OrderBasicInfo extends Component {
             <Grid item style={{ width: '1px', borderRight: '1px solid white' }}></Grid>
             <Grid item>
               <Typography align="left" variant="body1">
-                QUANTITY
+                VALUE
               </Typography>
               <Fade in={!isNaN(currentValues.quantity)} timeout={{ enter: animationTime }}>
                 <Typography align="left" variant="h4" color={color}>

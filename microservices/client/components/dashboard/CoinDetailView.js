@@ -171,14 +171,14 @@ export class CoinDetailView extends Component {
 
     if (coinInfo.name) {
       return (
-        <Fade in={coinInfo.name} timeout={{enter:2*1000, exit:2*1000}}>
+        <Fade in={coinInfo.name.length > 0} timeout={{enter:2*1000, exit:2*1000}}>
         
         <Grid container direction="row" spacing={0}>
           <Grid container spacing={16}>
             <Grid item xs={12}>
               <Paper elevation={1}>
                 <Grid container spacing={24}>
-                  <Grid item xs={12}>
+                  <Grid item xs={12} style={{zIndex:100}}>
                     <Typography align="center" style={{ textTransform: 'uppercase' }} variant="body2">
                       {`${coinInfo.exchange}`}
                     </Typography>
@@ -217,7 +217,7 @@ export class CoinDetailView extends Component {
       );
     } else {
       return (
-        <Fade in={!coinInfo.name} timeout={{enter: 500, exit:2*1000}}>
+        <Fade in={coinInfo.name.length === 0} timeout={{enter: 500, exit:2*1000}}>
           <Grid container spacing={0} justify="center" style={{flexGrow:1, height:'90vh'}} alignItems="center">
             <Grid item xs={12}>
             </Grid>

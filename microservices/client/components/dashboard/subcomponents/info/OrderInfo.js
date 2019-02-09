@@ -78,6 +78,7 @@ class OrderInfo extends React.Component {
               <Grid item>
                 <Typography variant="h5" align="left">
                   {message}
+                  <span style={{ fontSize: '10px', color: usingSavedOrder ? 'darkgray' : 'greenyellow' }}>{`    ${usingSavedOrder ? 'INACTIVE' : 'ACTIVE'}`}</span>
                 </Typography>
               </Grid>
               <Grid item>

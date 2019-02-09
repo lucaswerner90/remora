@@ -72,11 +72,11 @@ class Dashboard extends React.Component {
     if (loading) {
       return (
         <Fade in={loading} timeout={{ enter: 2 * 1000, exit: 2 * 1000 }}>
-          <Grid container justify="center" direction="row" alignContent="center" style={{ flexGrow: 1, height: '100vh' }} spacing={40}>
+          <Grid container justify="center" direction="row" alignContent="center" style={{ flexGrow: 1, height: '110vh' }} spacing={40}>
             <Grid item xs={12}>
               <Typography align="center" variant="h3">
                 rémora
-            </Typography>
+              </Typography>
             </Grid>
             <Loading/>
             <Grid item xs={12}>
@@ -91,7 +91,7 @@ class Dashboard extends React.Component {
       return (
         <Fade in={!loading} timeout={{ enter: 2 * 1000, exit: 5 * 1000 }}>
           <Layout>
-            <Grid container style={{ flexGrow: 1, height: '100vh' }} spacing={16}>
+            <Grid container style={{ flexGrow: 1, height: '150vh' }} spacing={16}>
               <Grid item xs={9}>
                 <CoinDetailView />
               </Grid>
