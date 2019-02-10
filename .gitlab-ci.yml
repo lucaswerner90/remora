@@ -23,9 +23,8 @@ step-deploy-production:
   only:
     - master
   script:
-    - docker-compose build --no-cache
-    - docker-compose down --remove-orphans
-    - docker-compose -p remora up -d --scale socketio=5
+    - docker-compose stop
+    - docker-compose -p remora up -d --build --scale socketio=5 --scale nextjs=5
     - docker system prune -a -f
   tags:
     - production
