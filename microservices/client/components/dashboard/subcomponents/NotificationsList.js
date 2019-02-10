@@ -147,7 +147,7 @@ class NotificationsList extends React.Component {
             primary={
               <React.Fragment>
                 <Grid container alignItems="flex-end">
-                  <Grid item xs={12}>
+                  <Grid item xs={12} sm={12} md={12}>
                     <Typography component="span" variant="h5" color={goodNews ? 'primary' : 'secondary'}>
                       {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'buy' && `BUY ORDER`}
                       {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'sell' && `SELL ORDER`}
@@ -180,12 +180,12 @@ class NotificationsList extends React.Component {
     ) : notifications;
     return (
       <Grid container spacing={16} style={{ height: '40vh' }}>
-        <Grid item xs={12}>
+        <Grid item xs={12} sm={12} md={12}>
           <Typography className={classes.padding} variant="h6">
             NOTIFICATIONS
           </Typography>
         </Grid>
-        <Grid item xs={12} md={12}>
+        <Grid item xs={12} sm={12} md={12} md={12}>
           <Paper elevation={0}>
             <List dense className={classes.list}>
               {this.generateItems(filteredNotifications)}

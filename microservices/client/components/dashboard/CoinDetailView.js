@@ -76,10 +76,10 @@ export class CoinDetailView extends Component {
         <Fade in={true} timeout={{enter:2*1000, exit:5*1000}}>
         
           <Grid container direction="row" spacing={16}>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={12} md={12}>
               <Paper elevation={1}>
                 <Grid container spacing={8}>
-                  <Grid item xs={12} style={{ zIndex: 100 }}>
+                  <Grid item xs={12} sm={12} md={12} style={{ zIndex: 100 }}>
                     <Typography align="center" style={{ textTransform: 'uppercase' }} variant="body2">
                       {`${coinInfo.exchange}`}
                     </Typography>
@@ -90,15 +90,15 @@ export class CoinDetailView extends Component {
                       </IconButton>
                     </Typography>
                   </Grid>
-                  <Grid item xs={1}>
+                  <Grid item xs={12} sm={12} md={1}>
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid item xs={12} sm={12} md={12}>
                     <ChartTimelineSelector/>
                     <PriceChart />
                   </Grid>
-                  <Grid item xs={1}>
+                  <Grid item xs={12} sm={12} md={1}>
                   </Grid>
-                  <Grid item xs={12} >
+                  <Grid item xs={12} sm={12} md={12} >
                   <BasicInfo />
                   </Grid>
                 </Grid>
@@ -106,16 +106,16 @@ export class CoinDetailView extends Component {
             </Grid>
               
 
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={12} md={6}>
             <Grid container spacing={16}>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={12} md={12}>
                 <OrderInfo order={buyOrder} previous={previousBuyOrder} message="Buy order" coinPrice={price} />
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={12} md={6}>
             <Grid container spacing={16}>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={12} md={12}>
                 <OrderInfo order={sellOrder} previous={previousSellOrder} message="Sell order" coinPrice={price} />
               </Grid>
             </Grid>
@@ -127,7 +127,7 @@ export class CoinDetailView extends Component {
       return (
         <Fade in={coinInfo.name.length === 0} timeout={{enter: 500, exit:2*1000}}>
           <Grid container spacing={0} justify="center" style={{flexGrow:1, height:'90vh'}} alignItems="center">
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={12} md={12}>
             </Grid>
             <Loading/>
           </Grid>

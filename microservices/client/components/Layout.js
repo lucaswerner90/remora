@@ -21,13 +21,13 @@ class Layout extends Component {
     const { classes } = this.props;
     return (
       <Grid container className={classes.root} spacing={24}>
-        <Grid item xs={12}>
+        <Grid item xs={12} sm={12} md={12}>
           <Header />
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} sm={12} md={12}>
           {this.props.children}
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} sm={12} md={12}>
           <Footer />
         </Grid>
       </Grid>

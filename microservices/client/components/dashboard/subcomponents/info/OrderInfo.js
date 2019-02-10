@@ -82,7 +82,7 @@ class OrderInfo extends React.Component {
     return (
       <Paper elevation={1}>
         <Grid container spacing={16} alignItems="center" className={classes.root}>
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={12} md={12}>
             <Grid container spacing={0} alignItems="center" justify="space-between">
               <Grid item>
                 <Typography variant="h5" align="left">
@@ -105,11 +105,11 @@ class OrderInfo extends React.Component {
             </Grid>
           </Grid>
           
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={12} md={12}>
             {open === false && this.renderBasicInfo(order)}
             {open === true && this.renderAdvancedInfo(order)}
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={12} md={12}>
             <Typography align="right" variant="body2" style={{ marginTop: '5px' }}>
               {timeAgo}
             </Typography>

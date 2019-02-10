@@ -106,7 +106,7 @@ class CoinsList extends React.Component {
             primary={
               <React.Fragment>
                 <Grid container alignItems="flex-end">
-                  <Grid item xs={12}>
+                  <Grid item xs={12} sm={12} md={12}>
                     <Typography component="span" variant="body1">
                       <strong>{`${coin.name} (${coin.symbol}-${coin.against})`}</strong>
                     </Typography>
@@ -145,7 +145,7 @@ class CoinsList extends React.Component {
             primary={
               <React.Fragment>
                 <Grid container alignItems="flex-end">
-                  <Grid item xs={12}>
+                  <Grid item xs={12} sm={12} md={12}>
                     <Typography color={color} component="h5" variant="h5">
                       {coin.name}
                       <span style={{ fontSize: '12px', color:'white' }}>  ({coin.symbol}-{coin.against})  </span>
@@ -198,13 +198,13 @@ class CoinsList extends React.Component {
     ]
     return (
       <Grid container spacing={16} alignItems="center">
-        <Grid item xs={10}>
+        <Grid item xs={12} sm={12} md={10}>
           <Typography className={classes.padding} align="left" variant="h6">
             COINS
           </Typography>
         </Grid>
         <Fade in={coins.length > 0} timeout={{enter:2*1000}}>
-          <Grid item xs={12} md={12}>
+          <Grid item xs={12} sm={12} md={12} md={12}>
             <Paper elevation={0}>
               <List dense={dense} className={classes.list}>
                 {!filter.length && this.showFavorites(filteredCoins)}

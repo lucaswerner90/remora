@@ -73,13 +73,13 @@ class Dashboard extends React.Component {
       return (
         <Fade in={loading} timeout={{ enter: 2 * 1000, exit: 2 * 1000 }}>
           <Grid container justify="center" direction="row" alignContent="center" style={{ flexGrow: 1, height: '110vh' }} spacing={40}>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={12} md={12}>
               <Typography align="center" variant="h3">
                 rémora
               </Typography>
             </Grid>
             <Loading/>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={12} md={12}>
               <Typography align="center" variant="h6">
                 {introMessages[Math.round(Math.random() * (introMessages.length - 1))]}
               </Typography>
@@ -92,10 +92,10 @@ class Dashboard extends React.Component {
         <Fade in={!loading} timeout={{ enter: 2 * 1000, exit: 5 * 1000 }}>
           <Layout>
             <Grid container style={{ flexGrow: 1, height: '150vh' }} spacing={24}>
-              <Grid item xs={9} style={{ borderRight: '1px solid #ffffff40'}}>
+              <Grid item xs={12} sm={12} md={9} style={{ borderRight: '1px solid #ffffff40'}}>
                 <CoinDetailView />
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={12} sm={12} md={3}>
                 <RightSideView />
               </Grid>
             </Grid>

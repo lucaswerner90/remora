@@ -15,7 +15,7 @@ class RightSideView extends React.Component {
   }
   renderSearchInput = () => {
     return (
-      <Grid item xs={12}>
+      <Grid item xs={12} sm={12} md={12}>
         <TextField
           label="Search coins or notifications"
           type="text"
@@ -45,13 +45,13 @@ class RightSideView extends React.Component {
   render() {
     return (
       <Grid container spacing={40} direction="row" alignContent="center">
-        <Grid item xs={12} style={{paddingTop:0}}>
+        <Grid item xs={12} sm={12} md={12} style={{paddingTop:0}}>
           {this.renderSearchInput()}
         </Grid>
-        <Grid item xs={12} style={{ paddingTop: 0 }}>
+        <Grid item xs={12} sm={12} md={12} style={{ paddingTop: 0 }}>
           <CoinsList filter={this.state.filter} style={{height:'30vh'}}/>
         </Grid>
-        <Grid item xs={12} style={{ paddingTop: 0 }}>
+        <Grid item xs={12} sm={12} md={12} style={{ paddingTop: 0 }}>
           <NotificationsList filter={this.state.filter} style={{ height: '40vh' }}/>
         </Grid>
       </Grid>

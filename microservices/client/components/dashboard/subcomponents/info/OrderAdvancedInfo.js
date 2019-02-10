@@ -21,7 +21,7 @@ export class OrderAdvancedInfo extends Component {
       <Fade in={!!(order.price > 0 && currentValues.position && events.price.whenCreated)} timeout={{ enter: animationTime }}>
         <React.Fragment>
           <Grid container spacing={16} justify="space-between">
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={12} md={12}>
               <Typography variant="h6">
                 Prices variation
               </Typography>
@@ -56,7 +56,7 @@ export class OrderAdvancedInfo extends Component {
             </Grid>
           </Grid>
           <Grid container spacing={16} justify="space-between">
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={12} md={12}>
               <Typography variant="h6">
                 More data
               </Typography>

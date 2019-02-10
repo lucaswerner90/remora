@@ -15,13 +15,13 @@ export class CallbackPage extends Component {
     return (
       <Fade in={true} timeout={{enter:2*1000,exit:2*1000}}>
         <Grid container justify="center" direction="row" alignContent="center" style={{ flexGrow: 1, height: '100vh' }} spacing={40}>
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={12} md={12}>
             <Typography align="center" variant="h3">
               rémora
             </Typography>
           </Grid>
           <Loading/>
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={12} md={12}>
             <Typography align="center" variant="h6">
               Reading your data to find the best whales for you...
             </Typography>

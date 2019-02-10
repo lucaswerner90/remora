@@ -32,7 +32,7 @@ export class Header extends Component {
           </Grid>
         </Grid>
         
-        <Grid item xs={9}>
+        <Grid item xs={12} sm={12} md={9}>
           <Grid container spacing={0} alignItems="center" justify="flex-end">
             <Grid item >
               <Typography variant="body2" align="right" style={{marginRight:10}}>

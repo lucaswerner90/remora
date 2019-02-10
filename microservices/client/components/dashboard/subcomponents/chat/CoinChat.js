@@ -151,12 +151,12 @@ export class Chat extends Component {
         <ListItemText
           primary={
               <Grid container alignItems="center">
-                <Grid item xs={10}>
+                <Grid item xs={12} sm={12} md={10}>
                   <Typography component="span" variant="body1" color="textPrimary" align="left" style={{display: 'inline-block'}}>
                     {name}
                   </Typography>
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item xs={12} sm={12} md={2}>
                   <Typography component="span" variant="body2" color="textPrimary" align="right" style={{display: 'inline-block'}}>
                     {parsedTime}
                   </Typography>
@@ -187,7 +187,7 @@ export class Chat extends Component {
             <Fade in={open} timeout={{ enter: 1 * 1000, exit: 1 * 1000 }}>
             
             <Grid container spacing={16} style={{ background: 'rgba(4, 21, 51, 0.85)', padding: 20, borderRadius: 10 }}>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={12} md={12}>
                 <Typography variant="h6">
                   {coinInfo.name} ({coinInfo.symbol}{coinInfo.against})
                 </Typography>
@@ -196,13 +196,13 @@ export class Chat extends Component {
                 </Typography>
                 <Divider style={{ marginTop: '10px' }} />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={12} md={12}>
                 <List dense={true} style={{ overflowY: 'auto', height: '40vh' }}>
                   {this.renderMessages(chatMessages)}
                   <div ref={this.ref} id="lastListItem"></div>
                 </List>
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={12} md={12}>
                 <TextField
                   placeholder="Send a message"
                   fullWidth

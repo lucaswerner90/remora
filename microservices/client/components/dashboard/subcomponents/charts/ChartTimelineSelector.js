@@ -17,7 +17,7 @@ class ChartTimelineSelector extends Component {
     const { selected } = this.props;
     return (
       <Grid container justify="center" style={{flexGrow:1}} alignItems="center">
-        <Grid item xs={12}>
+        <Grid item xs={12} sm={12} md={12}>
           <RadioGroup
             aria-label="position"
             name="position"

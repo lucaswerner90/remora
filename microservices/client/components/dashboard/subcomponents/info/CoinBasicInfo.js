@@ -22,7 +22,7 @@ export class BasicInfo extends Component {
     const { volumeDifference = 0, price = 0, priceChange = 0 } = this.props;
     return (
       <Grid container spacing={16} alignItems="center" alignContent="space-around">
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={12} md={4}>
           <Typography align="center" variant="body1">
             VOLUME DIFFERENCE
             </Typography>
@@ -33,7 +33,7 @@ export class BasicInfo extends Component {
               </Typography>
           </Fade>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={12} md={4}>
           <Typography align="center" variant="body1">
             PRICE
             </Typography>
@@ -45,7 +45,7 @@ export class BasicInfo extends Component {
           </Fade>
           
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={12} md={4}>
           <Typography align="center" variant="body1">
             PRICE 24HR
           </Typography>
