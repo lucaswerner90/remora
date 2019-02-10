@@ -19,7 +19,7 @@ const styles = {
     width: 250,
     paddingTop: '40px',
     height:'40vh',
-    background: 'rgb(7, 16, 43)'
+    background: 'rgba(7, 16, 43, 0.56)'
   },
 };
 

@@ -1,28 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Grid, Typography, Fade, Paper } from '@material-ui/core';
+import { Grid, Typography, Fade } from '@material-ui/core';
 import { formatPriceToFixed, formatPriceToFixed0 } from '../../../common/utils/Format';
 
 
 import { connect } from 'react-redux';
 const mapReduxStateToComponentProps = state => ({
-  coinPrice: state.live.price,
-  loadingData: state.live.loading,
+  coinPrice: state.live.price
 });
 
 const animationTime = 2 * 1000;
-
-const fakeDivsStyle = {
-  backgroundColor: '#3ca5c4',
-  background: 'linear-gradient(to right, #757f9a, #d7dde8);',
-  height: '4px',
-  margin: '8px',
-  // Selects every two elements among any group of siblings.
-  '&:nthChild(2n)': {
-    marginRight: '16px',
-  },
-};
-const fakeDivs = <div style={fakeDivsStyle} />;
 
 export class OrderBasicInfo extends Component {
   static propTypes = {
@@ -31,8 +18,8 @@ export class OrderBasicInfo extends Component {
   }
 
   render() {
-    const { order = {}, coinPrice = 0, loadingData } = this.props;
-    console.log(loadingData);
+    const { order = {}, coinPrice = 0 } = this.props;
+
     const { price = 0, currentValues = { position: ' - ', quantity: ' - ' }, hasDissapeared = false, type = 'buy'} = order;
     let margin = ' - ';
 
