@@ -58,14 +58,50 @@ export default class BinanceConnection extends ExchangeConnection{
         coin.actualPrice = parseFloat(last);
         // Update coin prices.
         const newPrices = [];
-        Object.keys(chart).forEach((tick) => {
+        Object.keys(chart).forEach((tick, i) => {
           const chartTick = chart[tick];
           const price = parseFloat(chartTick.close);
-          newPrices.push(price);
+          const time = Date.now() - ((i + 1) * 60 * 1000);
+          newPrices.push([time, price]);
         });
 
         if (newPrices.length) {
-          coin.pricesList = newPrices;
+          coin.pricesList1min = newPrices;
+        }
+      }
+
+    });
+    Binance.websockets.chart(coin.symbol, BinanceConnection.TIMES.MIN['5MIN'], (symbol: string, interval: any, chart: { [x: string]: any; }) => {
+      const tick = Binance.last(chart);
+      if (tick && chart[tick] && chart[tick].close) {
+        const newPrices = [];
+        Object.keys(chart).forEach((tick, i) => {
+          const chartTick = chart[tick];
+          const price = parseFloat(chartTick.close);
+          const time = Date.now() - ((i + 1) * 5 * 60 * 1000);
+          newPrices.push([time, price]);
+        });
+
+        if (newPrices.length) {
+          coin.pricesList5min = newPrices;
+        }
+      }
+
+    });
+    Binance.websockets.chart(coin.symbol, BinanceConnection.TIMES.MIN['15MIN'], (symbol: string, interval: any, chart: { [x: string]: any; }) => {
+      const tick = Binance.last(chart);
+      if (tick && chart[tick] && chart[tick].close) {
+        // Update coin prices.
+        const newPrices = [];
+        Object.keys(chart).forEach((tick, i) => {
+          const chartTick = chart[tick];
+          const price = parseFloat(chartTick.close);
+          const time = Date.now() - ((i + 1) * 15 * 60 * 1000);
+          newPrices.push([time, price]);
+        });
+
+        if (newPrices.length) {
+          coin.pricesList15min = newPrices;
         }
       }
 

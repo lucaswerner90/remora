@@ -16,6 +16,7 @@ import getConfig from 'next/config';
 import {connect} from 'react-redux';
 import { updateUserPreferences, updateUserInfo } from '../redux/actions/userPreferencesActions';
 import { updateAllCoins } from '../redux/actions/coinsActions';
+import { updateChartTimeline } from '../redux/actions/dashboardActions';
 import Loading from '../components/common/utils/Loading';
 
 const { publicRuntimeConfig } = getConfig();
@@ -62,11 +63,10 @@ class Dashboard extends React.Component {
       this.props.updateUserPreferences(userPreferences);
       this.props.updateUserInfo(userInfo);
       this.props.updateAllCoins(coins);
-
+      
       this.setState({ loading: false });
     }
   }
-
   render() {
     const { loading = true } = this.state;
     if (loading) {
@@ -107,4 +107,4 @@ class Dashboard extends React.Component {
   }
 }
 
-export default connect(null, { updateUserPreferences, updateUserInfo, updateAllCoins })(withStyles(styles)(Dashboard));
+export default connect(null, { updateUserPreferences, updateUserInfo, updateAllCoins, updateChartTimeline })(withStyles(styles)(Dashboard));

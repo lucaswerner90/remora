@@ -39,7 +39,7 @@ class GenericPriceChart extends Component {
   }
 
   constructor(props) {
-    super(props, `${props.exchange}_${props.coinID}_price_list`);
+    super(props, `${props.exchange}_${props.coinID}_price_list_1min`);
   }
 
   shouldComponentUpdate(nextProps = {buyOrder:{}, sellOrder:{}, prices:[]}) {

@@ -1,9 +1,13 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 import rootReducer from './reducers';
+import { timelineChartValues } from '../components/common/constants';
 
-const initialState = {};
-
+const initialState = {
+  dashboard: {
+    chartTimeline: timelineChartValues.FIFTEEN
+  }
+};
 const middleware = [thunk];
 
 const store = createStore(
@@ -13,5 +17,4 @@ const store = createStore(
     applyMiddleware(...middleware)
   )
 );
-
 export default store;

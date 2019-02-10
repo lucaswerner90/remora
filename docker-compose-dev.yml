@@ -21,6 +21,8 @@ services:
   redis:
     build: ./microservices/redis
     restart: always
+    volumes: 
+    - ./microservices/redis/data:/data
     ports: 
       - "6379"
 

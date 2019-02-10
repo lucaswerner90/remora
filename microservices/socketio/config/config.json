@@ -3,8 +3,11 @@
     "order",
     "mean_order_value",
     "volume_difference",
-    "price_list",
+    "price_list_1min",
+    "price_list_5min",
+    "price_list_15min",
     "latest_price",
+    "count_orders",
     "price_change_24hr",
     "previous_order",
     "last_news"
@@ -14,6 +17,7 @@
     "binance_ETHUSDT",
     "binance_TRXUSDT",
     "binance_XRPUSDT",
+    "binance_LTCUSDT",
     "binance_EOSUSDT"
   ]
 }

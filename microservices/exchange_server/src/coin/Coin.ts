@@ -13,7 +13,9 @@ export default class Coin {
   private _actualPrice: number = 0;
   private _buyPosition: number;
   private _sellPosition: number;
-  private _pricesList: TPricesList = [];
+  private _pricesList1min: TPricesList = [];
+  private _pricesList5min: TPricesList = [];
+  private _pricesList15min: TPricesList = [];
   private _whaleOrders: TCoinWhaleOrders = { buy: {}, sell:{} };
   private _alarm: TCoinAlarm;
   private _exchange: string;
@@ -40,7 +42,9 @@ export default class Coin {
       PREVIOUS_BUY_ORDER: `${this.id}_buy_order_previous`,
       BUY_ORDER: `${this.id}_buy_order`,
       SELL_ORDER: `${this.id}_sell_order`,
-      PRICES_LIST: `${this.id}_prices_list`,
+      PRICES_LIST_1MIN: `${this.id}_price_list_1min`,
+      PRICES_LIST_5MIN: `${this.id}_price_list_5min`,
+      PRICES_LIST_15MIN: `${this.id}_price_list_15min`,
       MEAN_ORDER_VALUE: `${this.id}_mean_order_value`,
       LATEST_PRICE: `${this.id}_latest_price`,
       VOLUME_DIFFERENCE: `${this.id}_volume_difference`,
@@ -162,14 +166,32 @@ export default class Coin {
    * @param {[]} {prices}
    * @memberof Coin
    */
-  public set pricesList(prices: TPricesList) {
-    this._pricesList = prices.splice(prices.length - 50, prices.length - 1);
+  public set pricesList1min(prices: TPricesList) {
+    this._pricesList1min = prices.splice(prices.length - 200, prices.length - 1);
     // Set the new value for the redis key's last order
     const redisValue = {
       ...this._commonRedisProperties,
-      prices: this._pricesList,
+      prices: this._pricesList1min,
     };
-    redis.setPricesList(this._redisKeys.PRICES_LIST, JSON.stringify(redisValue));
+    redis.setPricesList1min(this._redisKeys.PRICES_LIST_1MIN, JSON.stringify(redisValue));
+  }
+  public set pricesList5min(prices: TPricesList) {
+    this._pricesList5min = prices.splice(prices.length - 200, prices.length - 1);
+    // Set the new value for the redis key's last order
+    const redisValue = {
+      ...this._commonRedisProperties,
+      prices: this._pricesList5min,
+    };
+    redis.setPricesList5min(this._redisKeys.PRICES_LIST_5MIN, JSON.stringify(redisValue));
+  }
+  public set pricesList15min(prices: TPricesList) {
+    this._pricesList15min = prices.splice(prices.length - 200, prices.length - 1);
+    // Set the new value for the redis key's last order
+    const redisValue = {
+      ...this._commonRedisProperties,
+      prices: this._pricesList15min,
+    };
+    redis.setPricesList15min(this._redisKeys.PRICES_LIST_15MIN, JSON.stringify(redisValue));
   }
 
   /**

@@ -126,7 +126,7 @@ export default class GDAXConnection extends ExchangeConnection{
             const historicalDate = data.slice(1).reverse();
             // Create the price list
             const newPrices = historicalDate.map(chartTick => chartTick[4]);
-            coin.pricesList = newPrices;
+            coin.pricesList1min = newPrices;
           }
         }
       });

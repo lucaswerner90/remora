@@ -6,13 +6,6 @@ import { Grid, Typography, Paper, Fade } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 
-
-import io from 'socket.io-client';
-
-import getConfig from 'next/config';
-const { publicRuntimeConfig } = getConfig();
-const { api } = publicRuntimeConfig;
-
 import { connect } from 'react-redux';
 
 
@@ -20,24 +13,30 @@ import PriceChart from './subcomponents/charts/PriceChart';
 import BasicInfo from './subcomponents/info/CoinBasicInfo';
 import Loading from '../common/utils/Loading';
 import OrderInfo from './subcomponents/info/OrderInfo';
+import ChartTimelineSelector from './subcomponents/charts/ChartTimelineSelector';
+import coinSocket from '../common/socket/CoinSocket';
+
+import {getAllProperties} from '../common/utils/FetchCoinData';
 
 const mapReduxStateToComponentProps = state => ({
   selectedCoin: state.user.userPreferences.selectedCoin,
-  coinInfo: state.coins.coins[state.user.userPreferences.selectedCoin]
+  coinInfo: state.coins.coins[state.user.userPreferences.selectedCoin],
+  chartTimeline: state.dashboard.chartTimeline,
+  buyOrder: state.live.buyOrder,
+  sellOrder: state.live.sellOrder,
+  previousBuyOrder: state.live.previousBuyOrder,
+  previousSellOrder: state.live.previousSellOrder
 });
 
-const initialState = {
-  volumeDifference: 0,
-  pricesList: [],
-  price: 0,
-  previousBuyOrder: {},
-  previousSellOrder: {},
-  buyOrder: {},
-  sellOrder: {},
-  priceChange: 0
+const timelineChartValues = {
+  REALTIME: 'REAL',
+  MINUTE: 'MINUTE',
+  FIVE: 'FIVE',
+  FIFTEEN: 'FIFTEEN'
 }
+
+
 export class CoinDetailView extends Component {
-  state = { ...initialState };
 
   static propTypes = {
     selectedCoin: PropTypes.string.isRequired,
@@ -55,123 +54,26 @@ export class CoinDetailView extends Component {
 
   componentDidMount() {
     const { selectedCoin = '' } = this.props;
-    this.getAllProperties(selectedCoin);
-    this.socket = io(api, { forceNew: true });
-    this.socket.on(selectedCoin, this.onSocketData);
-  }
-  onSocketData = ({ info = {}, message = '' }) => {
-    switch (message) {
-      case 'volume_difference':
-        this.setState({ ...this.state, volumeDifference: info.volumeDifference });
-        break;
-      case 'order':
-        this.setState({
-          ...this.state,
-          [info.type === 'buy' ? 'buyOrder' : 'sellOrder']: info.order
-        });
-        break;
-      case 'previous_order':
-        info.order.hasDissapeared = true;
-        this.setState({
-          ...this.state,
-          [info.type === 'buy' ? 'previousBuyOrder' : 'previousSellOrder']: info.order
-        });
-        break;
-      
-      case 'price_change_24hr':
-        this.setState({ ...this.state, priceChange: parseFloat(info.price) });
-        break;
-      
-      case 'latest_price':
-        if (info.price !== this.state.price) {
-          this.setState({
-            ...this.state,
-            price: info.price,
-            pricesList: [...this.state.pricesList, info.price].slice(1),
-          });
-        }
-        break;
-      default:
-        break;
-    }
+    getAllProperties(selectedCoin);
+    coinSocket.openCoinConnections(selectedCoin);
   }
   componentWillUnmount() {
-    this.socket.disconnect();
+    const { selectedCoin = '' } = this.props;
+    coinSocket.closeCoinConnections(selectedCoin);
   }
-  getCoinProperty = async (coinID, property) => {
-    if (coinID) {
-      const userRequestData = {
-        method: 'POST',
-        body: JSON.stringify({ property, coinID }),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
-      const response = await fetch(`${api}/api/coin/property`, userRequestData);
-      const { value = {} } = await response.json();
-      return value;
-    } else {
-      return {};
-    }
-  }
-  getCoinPricesList = async (coinID) => {
-    const value = await this.getCoinProperty(coinID, 'prices_list');
-    const prices = value && value.prices && value.prices.length ? value.prices : [];
-    this.setState({ ...this.state, pricesList: prices });
-  }
-  getCoinPrice = async (coinID) => {
-    const value = await this.getCoinProperty(coinID, 'price');
-    const price = value && value.price ? value.price : 0;
-    this.setState({ ...this.state, price });
-  }
-  getVolumeDifference = async (coinID) => {
-    const value = await this.getCoinProperty(coinID, 'volume_difference');
-    const volumeDifference = value && value.volumeDifference ? value.volumeDifference : 0;
-    this.setState({ ...this.state, volumeDifference });
-  }
-  getPriceChange = async (coinID) => {
-    const value = await this.getCoinProperty(coinID, 'price_change_24hr');
-    const priceChange = value && value.price ? value.priceChange : 0;
-    this.setState({ ...this.state, priceChange });
-  }
-  getPreviousOrders = async (coinID) => {
-    const {order:previousBuyOrder={}} = await this.getCoinProperty(coinID, 'buy_order_previous');
-    const { order: previousSellOrder = {} } = await this.getCoinProperty(coinID, 'sell_order_previous');
-    previousBuyOrder.hasDissapeared = true;
-    previousSellOrder.hasDissapeared = true;
-    this.setState({ ...this.state, previousBuyOrder:previousBuyOrder, previousSellOrder:previousSellOrder});
-  }
-
   componentWillReceiveProps(nextProps) {
     if (nextProps.selectedCoin && nextProps.selectedCoin !== this.props.selectedCoin) {
-
-      // Reset all the component state
-      this.setState({ ...this.state, initialState });
-
-      // Disconnect from the previous coin
-      if (this.socket) this.socket.off(this.props.selectedCoin);
-
-      // Stablish a new connection with the next coin
-      this.socket.on(nextProps.selectedCoin, this.onSocketData);
-
-      this.getAllProperties(nextProps.selectedCoin);
+      coinSocket.closeCoinConnections(this.props.selectedCoin);
+      coinSocket.openCoinConnections(nextProps.selectedCoin);
+      getAllProperties(nextProps.selectedCoin);
     }
   }
-  getAllProperties = (coinID) =>{
-    this.getPreviousOrders(coinID);
-    this.getCoinPricesList(coinID);
-    this.getCoinPrice(coinID);
-    this.getVolumeDifference(coinID);
-    this.getPriceChange(coinID);
-  }
   render() {
-    const { coinInfo = {exchange:'', name:'', symbol:'', url:''} } = this.props;
-
-    const { pricesList = [], buyOrder, previousBuyOrder, previousSellOrder, sellOrder, priceChange = 0, price = 0, volumeDifference = 0 } = this.state;
+    const { previousBuyOrder, previousSellOrder, buyOrder, sellOrder, price = 0, coinInfo } = this.props;
 
     if (coinInfo.name) {
       return (
-        <Fade in={coinInfo.name.length > 0} timeout={{enter:2*1000, exit:2*1000}}>
+        <Fade in={true} timeout={{enter:2*1000, exit:5*1000}}>
         
           <Grid container direction="row" spacing={16}>
             <Grid item xs={12}>
@@ -188,11 +90,16 @@ export class CoinDetailView extends Component {
                       </IconButton>
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} style={{ marginBottom: '-20px', marginTop: '-40px' }}>
-                    <PriceChart prices={pricesList} buy={buyOrder.price ? buyOrder : previousBuyOrder} sell={sellOrder.price ? sellOrder : previousSellOrder} />
+                  <Grid item xs={1}>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <ChartTimelineSelector/>
+                    <PriceChart />
+                  </Grid>
+                  <Grid item xs={1}>
                   </Grid>
                   <Grid item xs={12} >
-                    <BasicInfo volumeDifference={volumeDifference} price={price} priceChange={priceChange} />
+                  <BasicInfo />
                   </Grid>
                 </Grid>
               </Paper>
@@ -204,18 +111,12 @@ export class CoinDetailView extends Component {
               <Grid item xs={12}>
                 <OrderInfo order={buyOrder} previous={previousBuyOrder} message="Buy order" coinPrice={price} />
               </Grid>
-              <Grid item xs={12}>
-                  <OrderInfo order={sellOrder} previous={previousSellOrder} message="General" coinPrice={price} />
-              </Grid>
             </Grid>
           </Grid>
           <Grid item xs={6}>
             <Grid container spacing={16}>
               <Grid item xs={12}>
                 <OrderInfo order={sellOrder} previous={previousSellOrder} message="Sell order" coinPrice={price} />
-              </Grid>
-              <Grid item xs={12}>
-                <OrderInfo order={sellOrder} previous={previousSellOrder} message="News" coinPrice={price} />
               </Grid>
             </Grid>
           </Grid>

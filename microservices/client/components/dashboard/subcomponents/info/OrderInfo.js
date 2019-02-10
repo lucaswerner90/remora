@@ -46,8 +46,15 @@ class OrderInfo extends React.Component {
 
     if (currentOrder.price !== nextOrder.price) {
       this.setState({ ...this.state, order: currentOrder });
+      this.playAudioNotification();
+    }
+  }
+  playAudioNotification = () => {
+    try {
       const audio = new Audio('/static/sounds/activate_order.mp3');
       audio.play();
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -57,7 +64,7 @@ class OrderInfo extends React.Component {
   renderBasicInfo = (order) => {
     const { coinPrice } = this.props;
     return (
-      <OrderBasicInfo order={order} coinPrice={coinPrice} />
+      <OrderBasicInfo order={order} coinPrice={parseFloat(coinPrice)} />
     );
   }
   renderAdvancedInfo = (order) => {
@@ -104,7 +111,7 @@ class OrderInfo extends React.Component {
           </Grid>
           <Grid item xs={12}>
             <Typography align="right" variant="body2" style={{ marginTop: '5px' }}>
-              Created <strong>{timeAgo}</strong>
+              {timeAgo}
             </Typography>
           </Grid>
         </Grid>

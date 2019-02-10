@@ -85,13 +85,18 @@ class SocketIOServer {
       const finalChannel = messageParsed.coin.id;
       let finalData: any = {};
       switch (channel) {
+        case 'count_orders':
+          finalData = messageParsed;
+          break;
         case 'latest_price':
           finalData = { price: messageParsed.price };
           break;
         case 'price_change_24hr':
           finalData = { price: messageParsed.price };
           break;
-        case 'price_list':
+        case 'price_list_1min':
+        case 'price_list_5min':
+        case 'price_list_15min':
           finalData = { pricesList: messageParsed.prices };
           break;
         case 'order':
@@ -110,6 +115,7 @@ class SocketIOServer {
           break;
       }
       this.ioServer.sockets.emit(finalChannel, { message: channel, info: finalData });
+      this.ioServer.sockets.emit(`${finalChannel}_${channel}`, { message: channel, info: finalData });
 
     }
   }

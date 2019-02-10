@@ -5,6 +5,14 @@ import { formatPrice } from '../../../common/utils/Format';
 const animationTime = 2 * 1000;
 
 
+import { connect } from 'react-redux';
+
+const mapReduxStateToComponentProps = state => ({
+  volumeDifference: state.live.volumeDifference,
+  price: state.live.price,
+  priceChange: state.live.priceChange,
+});
+
 export class BasicInfo extends Component {
   shouldComponentUpdate() {
     const { volumeDifference = 0, price = 0, priceChange = 0 } = this.props;
@@ -53,4 +61,4 @@ export class BasicInfo extends Component {
   }
 }
 
-export default BasicInfo;
+export default connect(mapReduxStateToComponentProps)(BasicInfo);

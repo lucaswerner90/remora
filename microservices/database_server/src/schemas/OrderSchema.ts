@@ -4,6 +4,11 @@ import * as mongoose from 'mongoose';
 
 const MongoSchema = mongoose.Schema;
 
+const day = 24 * 60 * 60 * 1000;
+const week = 7 * 24 * 60 * 60 * 1000;
+
+const times = { day, week };
+
 const schema = {
   _id: {
     type: String,
@@ -93,10 +98,35 @@ export default class OrderSchema extends Schema{
   }
 
   writeToDB() {
-    OrderSchema.model.findByIdAndUpdate(this.info.id, this.info, this._writeOptions, (err, res) => {
+    const { order, coin } = this.info;
+    order.price = parseFloat(order.price);
+    if (!order.id) console.log(order);
+    OrderSchema.model.findByIdAndUpdate(order.id, { ...order, coin } , this._writeOptions, (err, res) => {
       if (err) {
         console.log(err);
       }
+      this.getTotalCount(coin.id, order.type, 'day');
+      this.getTotalCount(coin.id, order.type, 'week');
     });
+  }
+
+  getTotalCount(coinID = 'binance_BTCUSDT', type: 'buy' | 'sell' = 'buy', timeAgo: 'day' | 'week' = 'day') {
+    const now = Date.now();
+    OrderSchema.model.find({ 'coin.id': coinID })
+      .where('createdAt')
+      .gt(times[timeAgo])
+      .lt(now)
+      .where('type')
+      .equals(type)
+      .countDocuments((err, data) => {
+        if (err) throw err;
+        this.updateTotalCount(coinID, data, type, timeAgo);
+      });
+  }
+
+  updateTotalCount(coinID:string= 'binance_BTCUSDT', count:number= 0, type: 'buy'|'sell' = 'buy', timeAgo:'day'|'week'= 'day') {
+    const countInfo = { timeAgo, type, count, coin: this.info.coin };
+    OrderSchema.redis.set(`${coinID}_${type}_${timeAgo}`, count.toString());
+    OrderSchema.redis.publish('count_orders', JSON.stringify(countInfo));
   }
 }

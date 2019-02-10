@@ -37,9 +37,12 @@ class DBServerConnection {
 
   private redisOnMessage(channel: string, message: string) {
     const messageParsed = JSON.parse(message);
+
     if (messageParsed.coin && messageParsed.coin.exchange === this._exchange) {
       if (channel === 'order') {
-        new OrderSchema(channel, messageParsed);
+        if (parseFloat(messageParsed.order.price) > 0 && messageParsed.order.id) {
+          new OrderSchema(channel, messageParsed);
+        }
       } else {
         new CoinSchema(channel, messageParsed);
       }

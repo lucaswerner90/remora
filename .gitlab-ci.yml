@@ -25,7 +25,7 @@ step-deploy-production:
   script:
     - docker-compose build --no-cache
     - docker-compose down --remove-orphans
-    - docker-compose -p remora up -d  
+    - docker-compose -p remora up -d --scale socketio=5
     - docker system prune -a -f
   tags:
     - production

@@ -32,7 +32,7 @@ export class OrderAdvancedInfo extends Component {
                 AFTER 5MIN
                 </Typography>
               <Typography align="left" variant="h4" color={color}>
-                {events.price.afterCreated.five && events.price.afterCreated.five > 0 ? formatPrice(events.price.afterCreated.five) : ' - '}
+                {events.price.afterCreated && events.price.afterCreated.five && events.price.afterCreated.five > 0 ? formatPrice(events.price.afterCreated.five) : ' - '}
                 <span style={{ fontSize: '12px' }}>$</span>
               </Typography>
             </Grid>
@@ -41,7 +41,7 @@ export class OrderAdvancedInfo extends Component {
                 AFTER 10MIN
               </Typography>
               <Typography align="left" variant="h4" color={color}>
-                {events.price.afterCreated.five && events.price.afterCreated.five > 0 ? formatPrice(events.price.afterCreated.five) : ' - '}
+                {events.price.afterCreated && events.price.afterCreated.ten && events.price.afterCreated.ten > 0 ? formatPrice(events.price.afterCreated.ten) : ' - '}
                 <span style={{ fontSize: '12px' }}>$</span>
               </Typography>
             </Grid>
@@ -50,7 +50,7 @@ export class OrderAdvancedInfo extends Component {
                 AFTER 20MIN
               </Typography>
               <Typography align="left" variant="h4" color={color}>
-                {events.price.afterCreated.five && events.price.afterCreated.five > 0 ? formatPrice(events.price.afterCreated.five) : ' - '}
+                {events.price.afterCreated && events.price.afterCreated.twenty && events.price.afterCreated.twenty > 0 ? formatPrice(events.price.afterCreated.twenty) : ' - '}
                 <span style={{ fontSize: '12px' }}>$</span>
               </Typography>
             </Grid>

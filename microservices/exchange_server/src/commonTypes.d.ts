@@ -14,14 +14,16 @@ export type TCoinWhaleOrders = {
   sell: TCoinWhaleOrder;
 };
 
-export type TPricesList = number[];
+export type TPricesList = any[];
 
 export type TCoinRedisKeys = {
   PREVIOUS_BUY_ORDER: string,
   BUY_ORDER: string,
   PREVIOUS_SELL_ORDER: string,
   SELL_ORDER: string,
-  PRICES_LIST: string,
+  PRICES_LIST_1MIN: string,
+  PRICES_LIST_5MIN: string,
+  PRICES_LIST_15MIN: string,
   VOLUME_DIFFERENCE: string,
   LATEST_PRICE: string,
   MEAN_ORDER_VALUE: string,

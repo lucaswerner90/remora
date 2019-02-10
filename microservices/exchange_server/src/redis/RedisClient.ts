@@ -36,8 +36,16 @@ export default class RedisClient {
     this.clientPublisher.publish('latest_price', value);
     this.client.set(key, value);
   }
-  public setPricesList(key: string, value: string) {
-    this.clientPublisher.publish('price_list', value);
+  public setPricesList1min(key: string, value: string) {
+    this.clientPublisher.publish('price_list_1min', value);
+    this.client.set(key, value);
+  }
+  public setPricesList5min(key: string, value: string) {
+    this.clientPublisher.publish('price_list_5min', value);
+    this.client.set(key, value);
+  }
+  public setPricesList15min(key: string, value: string) {
+    this.clientPublisher.publish('price_list_15min', value);
     this.client.set(key, value);
   }
   public setPreviousOrderValue(key: string, value: string) {

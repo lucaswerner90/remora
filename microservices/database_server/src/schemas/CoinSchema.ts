@@ -24,7 +24,8 @@ const schema = {
     min: 0,
   },
   listOfPrices: {
-    type: [Number],
+    type: [],
+    default:[],
   },
   tendency: {
     type: String,
@@ -32,6 +33,7 @@ const schema = {
   },
   currentVolumeDifference: {
     type: Number,
+    default: 0,
   },
 };
 
@@ -52,7 +54,7 @@ export default class CoinSchema extends Schema{
       case 'latest_price':
         this.writeLatestPrice(this.info);
         break;
-      case 'price_list':
+      case 'price_list_1min':
         this.writePriceList(this.info);
         break;
       case 'volume_difference':

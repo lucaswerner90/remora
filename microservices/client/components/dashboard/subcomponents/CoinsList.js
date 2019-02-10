@@ -99,6 +99,7 @@ class CoinsList extends React.Component {
     const { favorites } = this.props;
     const orderCoins = [...coins.filter(coin => favorites.indexOf(coin.id) > -1), ...coins.filter(coin => favorites.indexOf(coin.id) === -1)];
     return orderCoins.map(coin => {
+      console.log(coin)
       return (
         <ListItem key={coin.id} onClick={() => this.selectCoin(coin.id)} dense button>
           <ListItemText
