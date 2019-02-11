@@ -19,6 +19,7 @@ test:
     - development
   only:
     - develop
+    - master
   cache:
     untracked: true
     policy: pull-push
