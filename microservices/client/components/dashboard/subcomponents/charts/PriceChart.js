@@ -160,14 +160,21 @@ class PriceChart extends React.Component {
           size: 0
         },
         tooltip: {
-          enabled:false,
+          enabled: true,
+          style:{
+            color:'red'
+          },
+          x: {
+            show: true,
+            format:'HH:mm'
+          },
+          y: {
+            formatter:(value) => `${value}$`
+          },
           marker: {
             show: false,
           },
-          style: {
-            fontFamily: 'Roboto',
-            fontSize: '0.75rem'
-          }
+          theme:'dark'
         },
         xaxis: {
           type: "datetime",
@@ -210,6 +217,7 @@ class PriceChart extends React.Component {
       }];
       return (
         <Fade in={prices.length > 0} timeout={{ enter: 2 * 1000 }}>
+          
           <Chart
             options={options}
             series={series}
@@ -221,9 +229,9 @@ class PriceChart extends React.Component {
       );
     }
     return (
-      <div style={{ height: '350px', width: '100%', paddingTop: '11rem', textAlign: 'center' }}>
+      <div style={{ height: '350px', width: '100%', display:'flex', justifyContent: 'center', alignItems:'center' }}>
         <Fade in={prices.length > 0} timeout={{ enter: 2 * 1000, exit: 2 * 1000 }}>
-          <Loading style={{ height: "250px" }} />
+          <Loading style={{ height: "350px" }} />
         </Fade>
       </div>
     );

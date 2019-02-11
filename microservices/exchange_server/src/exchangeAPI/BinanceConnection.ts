@@ -127,6 +127,6 @@ export default class BinanceConnection extends ExchangeConnection{
   }
 
   config() {
-    Binance.options({ APIKEY: BinanceConnection.API_KEY, APISECRET: BinanceConnection.SECRET_KEY, reconnect: true, useServerTime: true });
+    Binance.options({ APIKEY: BinanceConnection.API_KEY, APISECRET: BinanceConnection.SECRET_KEY, reconnect: true, useServerTime: false });
   }
 }
