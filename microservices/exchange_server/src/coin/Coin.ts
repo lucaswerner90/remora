@@ -26,7 +26,9 @@ export default class Coin {
   private _against: string;
   private _meanOrderValue = { buy: 0, sell: 0 };
   private _minWhaleOrderValue = { buy: 0, sell: 0 };
-  private _minTimesHigher: number = 15;
+  private _minTimesHigher: number = 20;
+  private sellMaximumQuantityPrice: number;
+  private buyMaximumQuantityPrice: number;
 
   constructor(symbol: string = '', { acronym = '', url = '', name = '', alarm = { order : 0, volume : 0 } }, against = 'USD', exchange: string = '') {
     this.symbol = symbol;
@@ -151,7 +153,7 @@ export default class Coin {
         ...this._commonRedisProperties,
         price: this._actualPrice,
       };
-      this.updateNearOrders();
+      this.updateNearOrders(this.buyMaximumQuantityPrice, this.sellMaximumQuantityPrice);
       redis.setLatestPrice(this._redisKeys.LATEST_PRICE, JSON.stringify(redisValue));
     }
   }
@@ -211,7 +213,7 @@ export default class Coin {
 
       if (!whaleOrdersArray[price]) {
           // If the order doesn't exist previously, we create a new one.
-        whaleOrdersArray[price] = new Order(this, type, price, parseFloat(properties.value), properties.position);
+        whaleOrdersArray[price] = new Order(this, type, parseFloat(price), parseFloat(properties.value), properties.position);
       } else {
           // Update the new properties if they are different
         if (properties.position !== whaleOrdersArray[price].lastPosition) {
@@ -241,8 +243,11 @@ export default class Coin {
     this.whaleOrders.sell = this._deleteWhaleOrders(this.whaleOrders.sell, sellOrders, this._minWhaleOrderValue.sell);
 
     // Detect new whale orders
-    const { sumVolume: buyOrdersVolume, orders: newBuyWhaleOrders } = this._detectWhaleOrders(buyOrders, this._minWhaleOrderValue.buy);
-    const { sumVolume: sellOrdersVolume, orders: newSellWhaleOrders } = this._detectWhaleOrders(sellOrders, this._minWhaleOrderValue.sell);
+    const { sumVolume: buyOrdersVolume, orders: newBuyWhaleOrders, maximumQuantityPrice: buyMaximumQuantityPrice } = this._detectWhaleOrders(buyOrders, this._minWhaleOrderValue.buy);
+    const { sumVolume: sellOrdersVolume, orders: newSellWhaleOrders, maximumQuantityPrice: sellMaximumQuantityPrice } = this._detectWhaleOrders(sellOrders, this._minWhaleOrderValue.sell);
+
+    this.buyMaximumQuantityPrice = buyMaximumQuantityPrice;
+    this.sellMaximumQuantityPrice = sellMaximumQuantityPrice;
 
     this.meanOrderValue = {
       buy: buyOrdersVolume / Object.keys(buyOrders).length,
@@ -258,7 +263,6 @@ export default class Coin {
     // Create/update the whale sell orders
     this.whaleOrders.sell = this._assignWhaleOrders('sell', newSellWhaleOrders, this.whaleOrders.sell);
   }
-
   /**
    *
    * Update the orders
@@ -266,22 +270,20 @@ export default class Coin {
    * @private
    * @memberof Coin
    */
-  private updateNearOrders() {
+  private updateNearOrders(buyMaximum:number, sellMaximum:number) {
 
     if (this.containsBuyOrders()) {
-      const validKeys = Object.keys(this.whaleOrders.buy)
-        .map(key => parseFloat(key))
-        .filter(key => key <= this.actualPrice);
-      this.buyPosition = Math.max(...validKeys);
+      if (this.whaleOrders.buy[buyMaximum.toString()] !== undefined && buyMaximum <= this.actualPrice) {
+        this.buyPosition = buyMaximum;
+      }
     } else {
       this.buyPosition = -1;
     }
 
     if (this.containsSellOrders()) {
-      const validKeys = Object.keys(this.whaleOrders.sell)
-        .map(key => parseFloat(key))
-        .filter(key => key >= this.actualPrice);
-      this.sellPosition = Math.min(...validKeys);
+      if (this.whaleOrders.sell[sellMaximum.toString()] && sellMaximum >= this.actualPrice) {
+        this.sellPosition = sellMaximum;
+      }
     } else {
       this.sellPosition = -1;
     }
@@ -348,22 +350,23 @@ export default class Coin {
   }
 
   public _detectWhaleOrders(newOrders = {}, minOrderValue = 0) {
-    const meanAlarm = minOrderValue;
     const orders = {};
     let sumVolume: number = 0;
     let position: number = 0;
+    let maximumQuantity = 0;
     for (const price in newOrders) {
       if (newOrders.hasOwnProperty(price)) {
         const quantity = newOrders[price];
         const value = Math.round(parseFloat(price) * parseFloat(quantity));
         position++;
         sumVolume += value;
-        if (meanAlarm && value >= meanAlarm) {
+        if (minOrderValue && value >= minOrderValue) {
           orders[price] = { value, position };
+          maximumQuantity = maximumQuantity < value ? parseFloat(price) : maximumQuantity;
         }
       }
     }
-    return { sumVolume, orders };
+    return { sumVolume, orders, maximumQuantityPrice: maximumQuantity };
   }
 
   public getOrdersProperties(type: 'buy' | 'sell' = 'buy') {

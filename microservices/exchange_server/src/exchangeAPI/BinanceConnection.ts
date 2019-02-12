@@ -57,12 +57,12 @@ export default class BinanceConnection extends ExchangeConnection{
         const last = chart[tick].close;
         coin.actualPrice = parseFloat(last);
         // Update coin prices.
+
         const newPrices = [];
         Object.keys(chart).forEach((tick, i) => {
           const chartTick = chart[tick];
           const price = parseFloat(chartTick.close);
-          const time = Date.now() - ((i + 1) * 60 * 1000);
-          newPrices.push([time, price]);
+          newPrices.push([parseFloat(tick), price]);
         });
 
         if (newPrices.length) {
@@ -78,8 +78,7 @@ export default class BinanceConnection extends ExchangeConnection{
         Object.keys(chart).forEach((tick, i) => {
           const chartTick = chart[tick];
           const price = parseFloat(chartTick.close);
-          const time = Date.now() - ((i + 1) * 5 * 60 * 1000);
-          newPrices.push([time, price]);
+          newPrices.push([parseFloat(tick), price]);
         });
 
         if (newPrices.length) {
@@ -96,8 +95,7 @@ export default class BinanceConnection extends ExchangeConnection{
         Object.keys(chart).forEach((tick, i) => {
           const chartTick = chart[tick];
           const price = parseFloat(chartTick.close);
-          const time = Date.now() - ((i + 1) * 15 * 60 * 1000);
-          newPrices.push([time, price]);
+          newPrices.push([parseFloat(tick), price]);
         });
 
         if (newPrices.length) {

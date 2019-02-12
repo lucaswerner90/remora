@@ -83,7 +83,8 @@ export default class Order {
 
       try {
         const { price = 0 } = await redis.getKeyValue(redisKey);
-        this._events.price.afterCreated.five = parseInt(price);
+        this._events.price.afterCreated.five = price;
+        redis.updateOrderEvents(JSON.stringify(this.toJSON()));
       } catch (error) {
         throw error;
       }
@@ -93,7 +94,8 @@ export default class Order {
 
       try {
         const { price = 0 } = await redis.getKeyValue(redisKey);
-        this._events.price.afterCreated.ten = parseInt(price);
+        this._events.price.afterCreated.ten = price;
+        redis.updateOrderEvents(JSON.stringify(this.toJSON()));
       } catch (error) {
         throw error;
       }
@@ -103,7 +105,8 @@ export default class Order {
 
       try {
         const { price = 0 } = await redis.getKeyValue(redisKey);
-        this._events.price.afterCreated.twenty = parseInt(price);
+        this._events.price.afterCreated.twenty = price;
+        redis.updateOrderEvents(JSON.stringify(this.toJSON()));
       } catch (error) {
         throw error;
       }
@@ -153,7 +156,8 @@ export default class Order {
 
       try {
         const { price = 0 } = await redis.getKeyValue(redisKey);
-        this._events.price.afterExecuted.five = parseInt(price);
+        this._events.price.afterExecuted.five = price;
+        redis.updateOrderEvents(JSON.stringify(this.toJSON()));
       } catch (error) {
         throw error;
       }
@@ -163,7 +167,8 @@ export default class Order {
 
       try {
         const { price = 0 } = await redis.getKeyValue(redisKey);
-        this._events.price.afterExecuted.ten = parseInt(price);
+        this._events.price.afterExecuted.ten = price;
+        redis.updateOrderEvents(JSON.stringify(this.toJSON()));
       } catch (error) {
         throw error;
       }
@@ -173,7 +178,8 @@ export default class Order {
 
       try {
         const { price = 0 } = await redis.getKeyValue(redisKey);
-        this._events.price.afterExecuted.twenty = parseInt(price);
+        this._events.price.afterExecuted.twenty = price;
+        redis.updateOrderEvents(JSON.stringify(this.toJSON()));
       } catch (error) {
         throw error;
       }

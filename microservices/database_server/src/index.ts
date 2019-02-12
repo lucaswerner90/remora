@@ -39,7 +39,7 @@ class DBServerConnection {
     const messageParsed = JSON.parse(message);
 
     if (messageParsed.coin && messageParsed.coin.exchange === this._exchange) {
-      if (channel === 'order') {
+      if (channel === 'order' || channel === 'db_order_event') {
         if (parseFloat(messageParsed.order.price) > 0 && messageParsed.order.id) {
           new OrderSchema(channel, messageParsed);
         }

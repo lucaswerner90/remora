@@ -70,6 +70,10 @@ export default class RedisClient {
   public appendCoin(value) {
     this.client.hset('coins', value.id, JSON.stringify(value));
   }
+  public async updateOrderEvents(value:string) {
+    this.clientPublisher.publish('db_order_event', value);
+  }
+
   public async getKeyValue(key: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.client.get(key, (err, reply) => {
