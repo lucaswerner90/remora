@@ -151,9 +151,9 @@ export default class Coin {
       this._actualPrice = newValue;
       this.updateNearOrders(this.buyMaximumQuantityPrice, this.sellMaximumQuantityPrice);
       const redisValue = {
-          ...this._commonRedisProperties,
-          price: this._actualPrice,
-        };
+        ...this._commonRedisProperties,
+        price: this._actualPrice,
+      };
       redis.setLatestPrice(this._redisKeys.LATEST_PRICE, JSON.stringify(redisValue));
     }
   }
