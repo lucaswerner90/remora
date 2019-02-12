@@ -149,11 +149,11 @@ export default class Coin {
   public set actualPrice(newValue: number) {
     if (newValue > 0) {
       this._actualPrice = newValue;
-      const redisValue = {
-        ...this._commonRedisProperties,
-        price: this._actualPrice,
-      };
       this.updateNearOrders(this.buyMaximumQuantityPrice, this.sellMaximumQuantityPrice);
+      const redisValue = {
+          ...this._commonRedisProperties,
+          price: this._actualPrice,
+        };
       redis.setLatestPrice(this._redisKeys.LATEST_PRICE, JSON.stringify(redisValue));
     }
   }
@@ -272,18 +272,14 @@ export default class Coin {
    */
   private updateNearOrders(buyMaximum:number, sellMaximum:number) {
 
-    if (this.containsBuyOrders()) {
-      if (this.whaleOrders.buy[buyMaximum.toString()] !== undefined && buyMaximum <= this.actualPrice) {
-        this.buyPosition = buyMaximum;
-      }
+    if (this.containsBuyOrders() && this.whaleOrders.buy[buyMaximum.toString()] !== undefined && buyMaximum <= this.actualPrice) {
+      this.buyPosition = buyMaximum;
     } else {
       this.buyPosition = -1;
     }
 
-    if (this.containsSellOrders()) {
-      if (this.whaleOrders.sell[sellMaximum.toString()] && sellMaximum >= this.actualPrice) {
-        this.sellPosition = sellMaximum;
-      }
+    if (this.containsSellOrders() && this.whaleOrders.sell[sellMaximum.toString()] && sellMaximum >= this.actualPrice) {
+      this.sellPosition = sellMaximum;
     } else {
       this.sellPosition = -1;
     }
