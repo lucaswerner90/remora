@@ -2,12 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import dynamic from 'next/dynamic';
-import { grey, blue } from '@material-ui/core/colors';
 import Loading from '../../../common/utils/Loading';
 import { Fade } from '@material-ui/core';
 import { connect } from 'react-redux';
 
-import { getTimeAgo } from '../../../common/utils/Time';
 import { timelineChartValues } from '../../../common/constants';
 const Chart = dynamic(import('react-apexcharts'), { ssr: false });
 
@@ -161,8 +159,9 @@ class PriceChart extends React.Component {
         },
         tooltip: {
           enabled: true,
-          style:{
-            color:'red'
+          style: {
+            fontSize: '20px',
+            fontFamily: 'Roboto'
           },
           x: {
             show: true,
@@ -184,7 +183,6 @@ class PriceChart extends React.Component {
           axisBorder: {
             show: false
           },
-          tickAmount: 6,
           labels: {
             offsetX: this.props.timeline === timelineChartValues.MINUTE ? 150 : this.props.timeline === timelineChartValues.FIVE ? 30 : 250,
             offsetY: -15,

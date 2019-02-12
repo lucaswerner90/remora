@@ -10,6 +10,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from '@material-ui/core/Avatar';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -31,9 +33,6 @@ const mapReduxStateToComponentProps = state => ({
   favorites: state.user.userPreferences.favorites,
   coins: Object.values(state.coins.coins)
 });
-
-const POSITIVE_COLOR = 'rgba(76, 175, 80, 0.5)';
-const NEGATIVE_COLOR = 'rgba(244, 67, 54, 0.5)';
 
 const styles = theme => ({
   root: {
@@ -57,11 +56,11 @@ const styles = theme => ({
 
 class CoinsList extends React.Component {
   state = {
-    dense: true,
+    onlyFavorites: false,
     showFilters: false,
   };
-  shouldComponentUpdate(nextProps) {
-    return nextProps.coins.length !== this.props.coins.length || nextProps.favorites !== this.props.favorites || nextProps.filter !== this.props.filter;
+  shouldComponentUpdate(nextProps,nextState) {
+    return nextState.onlyFavorites !== this.state.onlyFavorites || nextProps.coins.length !== this.props.coins.length || nextProps.favorites !== this.props.favorites || nextProps.filter !== this.props.filter;
   }
 
   selectCoin = (coinID = '') => {
@@ -94,47 +93,7 @@ class CoinsList extends React.Component {
       </Avatar>
     );
   }
-
-  generateItems = (coins = this.state.coins) => {
-    const { favorites } = this.props;
-    const orderCoins = [...coins.filter(coin => favorites.indexOf(coin.id) > -1), ...coins.filter(coin => favorites.indexOf(coin.id) === -1)];
-    return orderCoins.map(coin => {
-      console.log(coin)
-      return (
-        <ListItem key={coin.id} onClick={() => this.selectCoin(coin.id)} dense button>
-          <ListItemText
-            primary={
-              <React.Fragment>
-                <Grid container alignItems="flex-end">
-                  <Grid item xs={12} sm={12} md={12}>
-                    <Typography component="span" variant="body1">
-                      <strong>{`${coin.name} (${coin.symbol}-${coin.against})`}</strong>
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </React.Fragment>
-            }
-            secondary={
-              <React.Fragment>
-                <Typography component="span" style={{textTransform:'lowercase'}} variant="body2">
-                  {coin.exchange.toLowerCase()}
-                </Typography>
-              </React.Fragment>
-            }
-          />
-          <ListItemSecondaryAction>
-            <IconButton aria-label="Favorite" disabled={favorites.length === 1 && favorites.indexOf(coin.id) > -1} onClick={() => this.markAsFavorite(coin.id)}>
-              {favorites.indexOf(coin.id) > -1 && <StarIcon />}
-              {favorites.indexOf(coin.id) === -1 && <StarBorderIcon />}
-            </IconButton>
-          </ListItemSecondaryAction>
-        </ListItem>
-
-      );
-    });
-
-  }
-  showFavorites = (coins = this.state.coins) => {
+  showCoins = (coins = this.state.coins) => {
     const { favorites } = this.props;
     return coins.map(coin => {
       const isFavorite = favorites.indexOf(coin.id) > -1;
@@ -188,27 +147,48 @@ class CoinsList extends React.Component {
     const filterValue = event.target.value;
     this.setState({ ...this.state, filterValue });
   }
+  handleShowFavorites = (e, onlyFavorites) => {
+    this.setState({ ...this.state, onlyFavorites });
+  }
+  
   render() {
     const { classes, coins = [], filter = '', favorites = [] } = this.props;
-    const { dense = true } = this.state;
-    let filteredCoins = filter.length ? Object.values(coins).filter(this.filterCoin): Object.values(coins);
-    filteredCoins = [
-      ...filteredCoins.filter(coin => favorites.indexOf(coin.id) > -1).sort(this.sortCoin),
-      ...filteredCoins.filter(coin => favorites.indexOf(coin.id) === -1).sort(this.sortCoin),
-    ]
+    const { onlyFavorites = false } = this.state;
+    let filteredCoins = filter.length ? Object.values(coins).filter(this.filterCoin) : Object.values(coins);
+    if (onlyFavorites) {
+      filteredCoins = [
+        ...filteredCoins.filter(coin => favorites.indexOf(coin.id) > -1).sort(this.sortCoin)
+      ];
+    } else {
+      filteredCoins = [
+        ...filteredCoins.filter(coin => favorites.indexOf(coin.id) > -1).sort(this.sortCoin),
+        ...filteredCoins.filter(coin => favorites.indexOf(coin.id) === -1).sort(this.sortCoin),
+      ];
+    }
     return (
-      <Grid container spacing={16} alignItems="center">
-        <Grid item xs={12} sm={12} md={10}>
+      <Grid container spacing={16} alignItems="center" justify="space-between">
+        <Grid item>
           <Typography className={classes.padding} align="left" variant="h6">
             COINS
           </Typography>
         </Grid>
+        <Grid item>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={onlyFavorites}
+                onChange={this.handleShowFavorites}
+              />
+            }
+            labelPlacement="start"
+            label={onlyFavorites ? 'Favorites' : 'All'}
+          />
+        </Grid>
         <Fade in={coins.length > 0} timeout={{enter:2*1000}}>
           <Grid item xs={12} sm={12} md={12} md={12}>
             <Paper elevation={0}>
-              <List dense={dense} className={classes.list}>
-                {!filter.length && this.showFavorites(filteredCoins)}
-                {filter.length > 0 && this.generateItems(filteredCoins)}
+              <List dense={true} className={classes.list}>
+                {this.showCoins(filteredCoins)}
               </List>
             </Paper>
           </Grid>
