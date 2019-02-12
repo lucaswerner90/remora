@@ -107,7 +107,7 @@ class CoinsList extends React.Component {
                   <Grid item xs={12} sm={12} md={12}>
                     <Typography color={color} component="h5" variant="h5">
                       {coin.name}
-                      <span style={{ fontSize: '12px', color:'white' }}>  ({coin.symbol}-{coin.against})  </span>
+                      <span style={{ fontSize: '12px', color:'white' }}>  ({coin.symbol})  </span>
                     </Typography>
                   </Grid>
                 </Grid>

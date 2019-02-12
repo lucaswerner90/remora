@@ -70,17 +70,21 @@ const getPreviousOrders = async (coinID) => {
     getCoinProperty(coinID, 'buy_order_previous'),
     getCoinProperty(coinID, 'sell_order_previous')]
   );
-  previousBuyOrder.order.hasDissapeared = true;
-  previousSellOrder.order.hasDissapeared = true;
+  if (previousBuyOrder && previousBuyOrder.order) {
+    previousBuyOrder.order.hasDissapeared = true;
+    store.dispatch({
+      payload: previousBuyOrder,
+      type: UPDATE_PREVIOUS_ORDER,
+    });
+  }
+  if (previousSellOrder && previousSellOrder.order) {
+    previousSellOrder.order.hasDissapeared = true;
+    store.dispatch({
+      payload: previousSellOrder,
+      type: UPDATE_PREVIOUS_ORDER,
+    });
+  }
 
-  store.dispatch({
-    payload: previousBuyOrder,
-    type: UPDATE_PREVIOUS_ORDER,
-  });
-  store.dispatch({
-    payload: previousSellOrder,
-    type: UPDATE_PREVIOUS_ORDER,
-  });
 }
 
 export const getAllProperties = async (coinID) => {

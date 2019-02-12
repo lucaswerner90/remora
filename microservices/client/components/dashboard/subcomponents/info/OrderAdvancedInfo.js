@@ -64,7 +64,7 @@ export class OrderAdvancedInfo extends Component {
             </Grid>
             <Grid item>
               <Typography align="left" variant="body1">
-                CREATED AT
+                PRICE WHEN CREATED 
                 </Typography>
               <Typography align="left" variant="h4" color={color}>
                 {events.price.whenCreated > 0 ? formatPrice(events.price.whenCreated): ' - '}

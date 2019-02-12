@@ -8,7 +8,7 @@ const USD_COINS = require('../../config/exchanges/binance/coins_usdt.json');
 
 export default class BinanceConnection extends ExchangeConnection{
 
-  private static NUM_NEAR_ORDERS: number = parseInt(process.env.NEAR_ORDERS) || 50;
+  private static NUM_NEAR_ORDERS: number = parseInt(process.env.NEAR_ORDERS) || 100;
   private static SECRET_KEY = 'oSi2NTurIlSqQWEkr7MeMqvumQi4KEzijjXrEkVGaTxqiYsahLn7PErasmj4JT9D';
   private static API_KEY = 'dEz6IcC8Dkb50ruvZOoLaQg8X7PWGfJXVpoSXseAOuBDweuyWwQr5ttq51gANKjn';
   private static TIMES = {

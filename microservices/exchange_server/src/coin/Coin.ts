@@ -61,7 +61,8 @@ export default class Coin {
       exchange: this.exchange,
       against: this.against,
       name: this._name,
-      symbol: this._acronym,
+      acronym: this._acronym,
+      symbol: this.symbol,
     };
   }
   public get against() {
@@ -238,9 +239,9 @@ export default class Coin {
   public updateOrders(sellOrders = {}, buyOrders = {}) {
 
     // Delete previous whale orders if they just dissapear
-    this.whaleOrders.buy = this._deleteWhaleOrders(this.whaleOrders.buy, buyOrders, this._minWhaleOrderValue.buy);
+    this.whaleOrders.buy = this._deleteWhaleOrders(this.whaleOrders.buy, buyOrders);
 
-    this.whaleOrders.sell = this._deleteWhaleOrders(this.whaleOrders.sell, sellOrders, this._minWhaleOrderValue.sell);
+    this.whaleOrders.sell = this._deleteWhaleOrders(this.whaleOrders.sell, sellOrders);
 
     // Detect new whale orders
     const { sumVolume: buyOrdersVolume, orders: newBuyWhaleOrders, maximumQuantityPrice: buyMaximumQuantityPrice } = this._detectWhaleOrders(buyOrders, this._minWhaleOrderValue.buy);
@@ -318,10 +319,9 @@ export default class Coin {
    * @param {*} newCoinOrders
    * @memberof Coin
    */
-  private _deleteWhaleOrders(whaleOrders: TCoinWhaleOrder, newCoinOrders: { [s: string]: {}; } | ArrayLike<{}>, minValue = 0) {
+  private _deleteWhaleOrders(whaleOrders: TCoinWhaleOrder, newCoinOrders: { [s: string]: {}; } | ArrayLike<{}>) {
     for (const price in whaleOrders) {
-      const value = newCoinOrders[price] * parseFloat(price);
-      if (!newCoinOrders[price] || value < minValue * 0.5) {
+      if (!newCoinOrders[price]) {
         whaleOrders[price] = undefined;
       }
     }

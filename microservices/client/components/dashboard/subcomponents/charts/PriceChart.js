@@ -17,7 +17,8 @@ const mapReduxStateToComponentProps = state => ({
   sell: state.live.sellOrder,
   timeline: state.dashboard.chartTimeline,
   previousBuyOrder: state.live.previousBuyOrder,
-  previousSellOrder: state.live.previousSellOrder
+  previousSellOrder: state.live.previousSellOrder,
+  price: state.live.price
 });
 
 
@@ -41,8 +42,12 @@ class PriceChart extends React.Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    const { prices = [], buy, sell } = nextProps;
+    const { prices = [], buy, sell, price } = nextProps;
 
+    // The price has changed
+    if (nextProps.price !== this.props.price) {
+      return true;
+    }
     // The user has modified the scale
     if (nextProps.timeline !== this.props.timeline) {
       return true;
@@ -68,7 +73,7 @@ class PriceChart extends React.Component {
   }
 
   render() {
-    const { sell = {}, buy = {}, prices = [], previousBuyOrder, previousSellOrder } = this.props;
+    const { sell = {}, buy = {}, prices = [], previousBuyOrder, previousSellOrder, price } = this.props;
 
     // Either use the previous order or the current one checking if the price property exists
     const buyOrder = buy.price ? buy : previousBuyOrder;
@@ -77,46 +82,62 @@ class PriceChart extends React.Component {
     const buyAnnotation = buyOrder && buyOrder.price ? {
       y: buyOrder.price,
       strokeDashArray: 0,
-      // borderColor: 'linear-gradient(to left, #000428, #004e92)',
       borderColor: buyOrder.hasDissapeared ? '#66ffff3d' : 'rgb(102,255,255)',
       label: {
-        position: 'left',
-        offsetX: 400,
-        offsetY: 0,
+        position: 'right',
+        offsetX: -100,
+        offsetY: 17,
         borderColor: 'none',
         style: {
           color: buyOrder.hasDissapeared ? '#66ffff3d' : 'rgb(102,255,255)',
           background: 'transparent',
           fontFamily: 'Roboto',
-          fontWeight: '100',
+          fontWeight: 100,
           fontSize: buyOrder.hasDissapeared ? '0.875rem' : '1.125rem'
         },
         text: `buy at ${buyOrder.price}$`,
       }
     } : {};
-
     const sellAnnotation = sell && sellOrder.price ? {
       y: sellOrder.price,
       strokeDashArray: 0,
       borderColor: sellOrder.hasDissapeared ? '#ff00665e' : 'rgb(255,0,102)',
-      borderColor: sellOrder.hasDissapeared ? '#ff00665e' : 'rgb(255,0,102)',
       label: {
-        position: 'left',
-        offsetX: 250,
-        offsetY: 18,
+        position: 'right',
+        offsetX: -200,
+        offsetY: 0,
         borderColor: 'none',
         style: {
           color: sellOrder.hasDissapeared ? '#ff00665e' : 'rgb(255,0,102)',
           background: 'transparent',
           fontFamily: 'Roboto',
-          fontWeight: '100',
+          fontWeight: 100,
           fontSize: sellOrder.hasDissapeared ? '0.875rem':'1.125rem'
         },
         text: `sell at ${sellOrder.price}$`,
       }
     } : {};
 
-    if (prices.length > 0 && buyOrder.price && sellOrder.price) {
+    if (prices.length > 0 && buyOrder.price && sellOrder.price && price) {
+      const priceAnnotation = price > 0 ? {
+        y: price,
+        strokeDashArray: 0,
+        borderColor: '#ffffff7a',
+        label: {
+          position: 'right',
+          offsetX: -500,
+          offsetY: 0,
+          borderColor: 'none',
+          style: {
+            color: '#ffffff7a',
+            background: 'transparent',
+            fontFamily: 'Roboto',
+            fontWeight: 100,
+            fontSize: '0.75rem'
+          },
+          text: `${prices[prices.length - 1][1]}$`,
+        }
+      } : {};
       const values = prices.map(price => price[1]);
       const options = {
         chart: {
@@ -159,6 +180,7 @@ class PriceChart extends React.Component {
         },
         tooltip: {
           enabled: true,
+          theme:'dark',
           style: {
             fontSize: '20px',
             fontFamily: 'Roboto'
@@ -168,12 +190,12 @@ class PriceChart extends React.Component {
             format:'HH:mm'
           },
           y: {
+            show:true,
             formatter:(value) => `${value}$`
           },
           marker: {
             show: false,
           },
-          theme:'dark'
         },
         xaxis: {
           type: "datetime",
@@ -196,7 +218,7 @@ class PriceChart extends React.Component {
           format: 'HH:mm'
         },
         annotations: {
-          yaxis: buyAnnotation || sellAnnotation ? [buyAnnotation, sellAnnotation] : none,
+          yaxis: buyAnnotation || sellAnnotation ? [buyAnnotation, sellAnnotation, priceAnnotation] : [priceAnnotation]
         },
         yaxis: {
           axisBorder: {

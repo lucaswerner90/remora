@@ -39,7 +39,6 @@ class MyDocument extends Document {
           <meta name="viewport" content="width=device-width, initial-scale=1"/>
           <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
           <link rel="icon" href="favicon.ico" type="im</link>age/x-icon" />
-          <script src="https://www.googletagmanager.com/gtag/js?id=UA-134152146-1"></script>
 
         </Head>
         <body style={{ background: 'linear-gradient(to left, #000428, #004e92)'}}>

@@ -72,6 +72,13 @@ class CoinSocket{
           type: UPDATE_VOLUME_DIFFERENCE,
         });
         break;
+      case 'count_orders':
+        console.log(info);
+        // store.dispatch({
+        //   payload: info,
+        //   type: UPDATE_ORDER,
+        // });
+        break;
       case 'order':
         store.dispatch({
           payload: info,
