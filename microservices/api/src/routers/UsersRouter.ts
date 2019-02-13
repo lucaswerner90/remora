@@ -3,6 +3,19 @@ import UserSchema from '../db/schemas/UserSchema';
 
 const router = Router();
 
+router.post('/location', async (req, res) => {
+  try {
+    const { email = '', country = '' } = req.body;
+    console.log(`${email} logged in from ${country}`);
+    // Payload contains the new selected coin
+    // Write the new info into the DB
+    const user = new UserSchema();
+    const reply = await user.writeLastLoginUserLocation(email, country);
+    res.json({ message: reply });
+  } catch (error) {
+    res.json({ error });
+  }
+});
 router.post('/selected', async (req, res) => {
   try {
     const { email = '', payload = '' } = req.body;

@@ -13,6 +13,10 @@ const schema = {
     type: String,
     default: 'binance_ETHUSDT',
   },
+  country: {
+    type: String,
+    default: '',
+  },
   favorites: {
     type: Array,
     default: ['binance_ETHUSDT', 'binance_BTCUSDT'],
@@ -57,5 +61,16 @@ export default class UserSchema {
   }
   public async getUser(email: string = '') {
     return await UserSchema.model.findById(email);
+  }
+  public async writeLastLoginUserLocation(email = '', country = '') {
+    const model: any = await UserSchema.model.findById(email);
+    if (!model) {
+      const newUser = new UserSchema.model({ country, _id: email });
+      const reply = await newUser.save();
+      return reply;
+    }
+    model.country = country;
+    const reply = await model.save();
+    return reply;
   }
 }

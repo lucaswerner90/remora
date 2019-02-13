@@ -41,7 +41,17 @@ class Dashboard extends React.Component {
   state = {
     loading: true
   }
-
+  updateUserLastLoginLocation = async(email = '', country = '') =>{
+    const request = {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({ email, country }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+    return fetch(`${api}/api/user/location`, request);
+  }
   async componentDidMount() {
     const auth = new Auth();
     if (!auth.isAuthenticated()) {
@@ -51,6 +61,10 @@ class Dashboard extends React.Component {
       const userInfo = auth.getProfile();
       const { email = '' } = userInfo;
 
+      // Get the country where the user is currently logged in.
+      const { country_code = '' } = userInfo['https://remora.app/geoip'];
+      await this.updateUserLastLoginLocation(email, country_code);
+      
       // Get the user preferences
       const userPreferencesFetch = await fetch(`${api}/api/user/preferences?email=${email}`);
       const userPreferences = await userPreferencesFetch.json();
