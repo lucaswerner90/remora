@@ -8,6 +8,9 @@ services:
 
 variables:
   DOCKER_DRIVER: overlay2
+  PROJECT_NAME: remora
+  NUM_SOCKET_SERVERS: 5
+  NUM_WEB_SERVERS: 5
 
 stages:
   - test
@@ -24,15 +27,15 @@ test:
     untracked: true
     policy: pull-push
     paths:
-      - ./microservices/api/node_modules
-      - ./microservices/client/node_modules
-      - ./microservices/database_server/node_modules
-      - ./microservices/exchange_server/node_modules
-      - ./microservices/load_balancer/node_modules
-      - ./microservices/news_server/node_modules
-      - ./microservices/socketio/node_modules
+      - $CI_PROJECT_DIR/microservices/api/node_modules
+      - $CI_PROJECT_DIR/microservices/client/node_modules
+      - $CI_PROJECT_DIR/microservices/database_server/node_modules
+      - $CI_PROJECT_DIR/microservices/exchange_server/node_modules
+      - $CI_PROJECT_DIR/microservices/load_balancer/node_modules
+      - $CI_PROJECT_DIR/microservices/news_server/node_modules
+      - $CI_PROJECT_DIR/microservices/socketio/node_modules
   script:
-    - sudo docker-compose build
+    - docker-compose build
 
     
 step-deploy-production:
@@ -40,9 +43,10 @@ step-deploy-production:
   only:
     - master
   script:
-    - sudo docker image prune -f
-    - sudo docker-compose build
-    - sudo docker-compose up -d --scale socketio=5 --scale nextjs=5
+    - docker image prune -f
+    - docker-compose build
+    - docker-compose stop
+    - docker-compose -p $PROJECT_NAME up -d --scale socketio=$NUM_SOCKET_SERVERS --scale nextjs=$NUM_WEB_SERVERS
   tags:
     - production
   when: manual
