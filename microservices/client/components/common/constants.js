@@ -1,5 +1,7 @@
 export const timelineChartValues = {
   MINUTE: 'MINUTE',
   FIVE: 'FIVE',
-  FIFTEEN: 'FIFTEEN'
+  FIFTEEN: 'FIFTEEN',
+  HOUR: 'HOUR',
+  TWOHOURS: 'TWOHOURS',
 };

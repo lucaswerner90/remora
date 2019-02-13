@@ -5,6 +5,11 @@ import { createMuiTheme, createGenerateClassName } from '@material-ui/core/style
 // It's optional.
 const theme = createMuiTheme({
   overrides: {
+    MuiCircularProgress: {
+      colorSecondary:{
+        color:'white'
+      }
+    },
     MuiBadge: {
       "badge": {
         "margin": 10,
