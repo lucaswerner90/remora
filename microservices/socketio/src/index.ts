@@ -34,23 +34,28 @@ class SocketIOServer {
    * @type {redis.RedisClient}
    * @memberof SocketIOServer
    */
+  private redisClient: redis.RedisClient = redis.createClient(REDIS_CONFIGURATION);
   private redisSubscriber: redis.RedisClient = redis.createClient(REDIS_CONFIGURATION);
   private redisPublisher: redis.RedisClient = redis.createClient(REDIS_CONFIGURATION);
 
   private channelList: string[] = configJson.channelList;
-  private chatCoins: string[] = configJson.chatCoins || [
-    'binance_BTCUSDT',
-    'binance_ETHUSDT',
-    'binance_TRXUSDT',
-    'binance_XRPUSDT',
-    'binance_EOSUSDT',
-  ];
 
   constructor() {
     this.initConnection();
     this.initRedisSubscriber();
   }
 
+  public async getAllCoins(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.redisClient.hgetall('coins', (err, reply) => {
+        if (err) {
+          reject(err);
+        }
+        console.log(reply);
+        resolve(reply);
+      });
+    });
+  }
   private initRedisSubscriber() {
 
     this.redisSubscriber.on('ready', this.redisOnConnect.bind(this));
@@ -65,12 +70,13 @@ class SocketIOServer {
     });
   }
 
-  private initChat(socket:socketIo.Socket) {
-    for (let i = 0; i < this.chatCoins.length; i++) {
-      const coin = this.chatCoins[i];
-      socket.on(`${coin}_chat`, (msg) => {
-        this.redisPublisher.rpush(`${coin}_chat_messages`, JSON.stringify(msg));
-        this.ioServer.emit(`${coin}_chat`, msg);
+  private async initChat(socket:socketIo.Socket) {
+    const coins = await this.getAllCoins();
+    const coinsID = Object.keys(coins);
+    for (let i = 0; i < coinsID.length; i++) {
+      socket.on(`${coinsID[i]}_chat`, (msg) => {
+        this.redisPublisher.rpush(`${coinsID[i]}_chat_messages`, JSON.stringify(msg));
+        this.ioServer.emit(`${coinsID[i]}_chat`, msg);
       });
     }
   }
@@ -97,6 +103,8 @@ class SocketIOServer {
         case 'price_list_1min':
         case 'price_list_5min':
         case 'price_list_15min':
+        case 'price_list_1hour':
+        case 'price_list_2hour':
           finalData = { pricesList: messageParsed.prices };
           break;
         case 'order':

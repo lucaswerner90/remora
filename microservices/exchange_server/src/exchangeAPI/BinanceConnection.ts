@@ -14,11 +14,11 @@ export default class BinanceConnection extends ExchangeConnection{
   private static TIMES = {
     DAY: '1d',
     HOUR: {
-      '12HOUR': '1h',
+      '12HOUR': '12h',
       '1HOUR': '1h',
-      '2HOUR': '1h',
-      '4HOUR': '1h',
-      '6HOUR': '1h',
+      '2HOUR': '2h',
+      '4HOUR': '4h',
+      '6HOUR': '6h',
     },
     MIN: {
       '15MIN': '15m',
@@ -48,65 +48,79 @@ export default class BinanceConnection extends ExchangeConnection{
         break;
     }
   }
-
+  createPricesList(chart) {
+    const prices = [];
+    Object.keys(chart).forEach((tick, _i) => {
+      const chartTick = chart[tick];
+      const price = parseFloat(chartTick.close);
+      prices.push([parseFloat(tick), price]);
+    });
+    return prices;
+  }
   createCoinWebSockets(coin: Coin) {
     // Gets the last chart price of the coin
-    Binance.websockets.chart(coin.symbol, BinanceConnection.TIMES.MIN['1MIN'], (symbol: string, interval: any, chart: { [x: string]: any; }) => {
+    coin.webSockets.price['1MIN'] = Binance.websockets.chart(coin.symbol, BinanceConnection.TIMES.MIN['1MIN'], (_symbol: string, _interval: any, chart: { [x: string]: any; }) => {
       const tick = Binance.last(chart);
       if (tick && chart[tick] && chart[tick].close) {
         const last = chart[tick].close;
         coin.actualPrice = parseFloat(last);
         // Update coin prices.
+        const prices = this.createPricesList(chart);
 
-        const newPrices = [];
-        Object.keys(chart).forEach((tick, i) => {
-          const chartTick = chart[tick];
-          const price = parseFloat(chartTick.close);
-          newPrices.push([parseFloat(tick), price]);
-        });
-
-        if (newPrices.length) {
-          coin.pricesList1min = newPrices;
+        if (prices.length) {
+          coin.pricesList1min = prices;
         }
       }
 
     });
-    Binance.websockets.chart(coin.symbol, BinanceConnection.TIMES.MIN['5MIN'], (symbol: string, interval: any, chart: { [x: string]: any; }) => {
+    coin.webSockets.price['5MIN'] = Binance.websockets.chart(coin.symbol, BinanceConnection.TIMES.MIN['5MIN'], (_symbol: string, _interval: any, chart: { [x: string]: any; }) => {
       const tick = Binance.last(chart);
       if (tick && chart[tick] && chart[tick].close) {
-        const newPrices = [];
-        Object.keys(chart).forEach((tick, i) => {
-          const chartTick = chart[tick];
-          const price = parseFloat(chartTick.close);
-          newPrices.push([parseFloat(tick), price]);
-        });
 
-        if (newPrices.length) {
-          coin.pricesList5min = newPrices;
+        // Update coin prices.
+        const prices = this.createPricesList(chart);
+
+        if (prices.length) {
+          coin.pricesList5min = prices;
         }
       }
-
     });
-    Binance.websockets.chart(coin.symbol, BinanceConnection.TIMES.MIN['15MIN'], (symbol: string, interval: any, chart: { [x: string]: any; }) => {
+    coin.webSockets.price['15MIN'] = Binance.websockets.chart(coin.symbol, BinanceConnection.TIMES.MIN['15MIN'], (_symbol: string, _interval: any, chart: { [x: string]: any; }) => {
+      const tick = Binance.last(chart);
+      if (tick && chart[tick] && chart[tick].close) {
+
+        // Update coin prices.
+        const prices = this.createPricesList(chart);
+
+        if (prices.length) {
+          coin.pricesList15min = prices;
+        }
+      }
+    });
+    coin.webSockets.price['1HOUR'] = Binance.websockets.chart(coin.symbol, BinanceConnection.TIMES.HOUR['1HOUR'], (_symbol: string, _interval: any, chart: { [x: string]: any; }) => {
       const tick = Binance.last(chart);
       if (tick && chart[tick] && chart[tick].close) {
         // Update coin prices.
-        const newPrices = [];
-        Object.keys(chart).forEach((tick, i) => {
-          const chartTick = chart[tick];
-          const price = parseFloat(chartTick.close);
-          newPrices.push([parseFloat(tick), price]);
-        });
-
-        if (newPrices.length) {
-          coin.pricesList15min = newPrices;
+        const prices = this.createPricesList(chart);
+        if (prices.length) {
+          coin.pricesList1hour = prices;
         }
       }
 
     });
+    coin.webSockets.price['2HOUR'] = Binance.websockets.chart(coin.symbol, BinanceConnection.TIMES.HOUR['2HOUR'], (_symbol: string, _interval: any, chart: { [x: string]: any; }) => {
+      const tick = Binance.last(chart);
+      if (tick && chart[tick] && chart[tick].close) {
+        // Update coin prices.
+        const prices = this.createPricesList(chart);
+        if (prices.length) {
+          coin.pricesList2hour = prices;
+        }
+      }
+    });
 
     // Gets the bids/asks for a specific coin
-    Binance.websockets.depthCache([coin.symbol], (coinName: string, depth: { bids: any, asks: any }) => {
+    coin.webSockets.orders = Binance.websockets.depthCache([coin.symbol], (coinName: string, depth: { bids: any, asks: any }) => {
       const buyOrders = Binance.sortBids(depth.bids, BinanceConnection.NUM_NEAR_ORDERS);
       const sellOrders = Binance.sortAsks(depth.asks, BinanceConnection.NUM_NEAR_ORDERS);
 
@@ -118,7 +132,7 @@ export default class BinanceConnection extends ExchangeConnection{
       this.coinsArray[coinName].updateOrders(parsedSellOrders, parsedBuyOrders);
     });
 
-    Binance.websockets.prevDay([coin.symbol], (error: any, { percentChange }) => {
+    coin.webSockets.previousDay = Binance.websockets.prevDay([coin.symbol], (_error: any, { percentChange }) => {
       coin.priceChange24hr = percentChange;
     });
 

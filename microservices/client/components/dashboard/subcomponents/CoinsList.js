@@ -31,7 +31,7 @@ import { Fade } from '@material-ui/core';
 
 const mapReduxStateToComponentProps = state => ({
   favorites: state.user.userPreferences.favorites,
-  coins: Object.values(state.coins.coins)
+  coins: Object.values(state.coins.all)
 });
 
 const styles = theme => ({
@@ -66,7 +66,7 @@ class CoinsList extends React.Component {
   selectCoin = (coinID = '') => {
     this.props.updateUserSelectedCoin(coinID);
   }
-  componentWillReceiveProps({coins=[]}){
+  componentWillReceiveProps({ coins = [] }) {
     this.setState({ ...this.state, coins });
   }
 

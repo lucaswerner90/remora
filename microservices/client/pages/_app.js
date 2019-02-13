@@ -32,7 +32,7 @@ class MyApp extends App {
       
       <Container>
         <Head>
-          <title>Remora</title>
+          <title>Rémora</title>
         </Head>
         {/* Wrap every page in Jss and Theme providers */}
         <JssProvider

@@ -6,18 +6,12 @@
     "price_list_1min",
     "price_list_5min",
     "price_list_15min",
+    "price_list_1hour",
+    "price_list_2hour",
     "latest_price",
     "count_orders",
     "price_change_24hr",
     "previous_order",
     "last_news"
-  ],
-  "chatCoins":[
-    "binance_BTCUSDT",
-    "binance_ETHUSDT",
-    "binance_TRXUSDT",
-    "binance_XRPUSDT",
-    "binance_LTCUSDT",
-    "binance_EOSUSDT"
   ]
 }

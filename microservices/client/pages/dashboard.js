@@ -93,11 +93,6 @@ class Dashboard extends React.Component {
               </Typography>
             </Grid>
             <Loading/>
-            <Grid item xs={12} sm={12} md={12}>
-              <Typography align="center" variant="h6">
-                {introMessages[Math.round(Math.random() * (introMessages.length - 1))]}
-              </Typography>
-            </Grid>
           </Grid>
         </Fade>
       );

@@ -25,7 +25,7 @@ import { cyan } from '@material-ui/core/colors';
 
 const mapReduxStateToComponentProps = state => ({
   selectedCoin: state.user.userPreferences.selectedCoin,
-  coinInfo: state.coins.coins[state.user.userPreferences.selectedCoin],
+  coinInfo: state.coins.all[state.user.userPreferences.selectedCoin],
   name: state.user.userInfo.name,
   avatar: state.user.userInfo.picture,
 });
@@ -189,7 +189,7 @@ export class Chat extends Component {
             <Grid container spacing={16} style={{ background: 'rgba(4, 21, 51, 0.85)', padding: 20, borderRadius: 10 }}>
               <Grid item xs={12} sm={12} md={12}>
                 <Typography variant="h6">
-                  {coinInfo.name} ({coinInfo.symbol}{coinInfo.against})
+                  {coinInfo.name} ({coinInfo.symbol})
                 </Typography>
                 <Typography variant="body2" style={{ textTransform: 'uppercase' }}>
                   {coinInfo.exchange}

@@ -6,6 +6,11 @@ const redis: RedisClient = new RedisClient();
 
 export default class Coin {
   public symbol: string = '';
+  public webSockets = {
+    price: {},
+    previousDay: {},
+    orders:{},
+  };
   public _redisKeys: TCoinRedisKeys;
   private _url: string = '';
   private _acronym: string = '';
@@ -16,6 +21,8 @@ export default class Coin {
   private _pricesList1min: TPricesList = [];
   private _pricesList5min: TPricesList = [];
   private _pricesList15min: TPricesList = [];
+  private _pricesList1hour: TPricesList = [];
+  private _pricesList2hour: TPricesList = [];
   private _whaleOrders: TCoinWhaleOrders = { buy: {}, sell:{} };
   private _alarm: TCoinAlarm;
   private _exchange: string;
@@ -47,6 +54,8 @@ export default class Coin {
       PRICES_LIST_1MIN: `${this.id}_price_list_1min`,
       PRICES_LIST_5MIN: `${this.id}_price_list_5min`,
       PRICES_LIST_15MIN: `${this.id}_price_list_15min`,
+      PRICES_LIST_1HOUR: `${this.id}_price_list_1hour`,
+      PRICES_LIST_2HOUR: `${this.id}_price_list_2hour`,
       MEAN_ORDER_VALUE: `${this.id}_mean_order_value`,
       LATEST_PRICE: `${this.id}_latest_price`,
       VOLUME_DIFFERENCE: `${this.id}_volume_difference`,
@@ -195,6 +204,24 @@ export default class Coin {
       prices: this._pricesList15min,
     };
     redis.setPricesList15min(this._redisKeys.PRICES_LIST_15MIN, JSON.stringify(redisValue));
+  }
+  public set pricesList1hour(prices: TPricesList) {
+    this._pricesList1hour = prices.splice(prices.length - 200, prices.length - 1);
+    // Set the new value for the redis key's last order
+    const redisValue = {
+      ...this._commonRedisProperties,
+      prices: this._pricesList1hour,
+    };
+    redis.setPricesList1hour(this._redisKeys.PRICES_LIST_1HOUR, JSON.stringify(redisValue));
+  }
+  public set pricesList2hour(prices: TPricesList) {
+    this._pricesList2hour = prices.splice(prices.length - 200, prices.length - 1);
+    // Set the new value for the redis key's last order
+    const redisValue = {
+      ...this._commonRedisProperties,
+      prices: this._pricesList2hour,
+    };
+    redis.setPricesList2hour(this._redisKeys.PRICES_LIST_2HOUR, JSON.stringify(redisValue));
   }
 
   /**

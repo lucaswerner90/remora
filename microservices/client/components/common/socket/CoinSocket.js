@@ -8,11 +8,7 @@ import store from '../../../redux/store';
 import { UPDATE_PRICES_LIST, UPDATE_VOLUME_DIFFERENCE, UPDATE_PRICE, UPDATE_PRICE_CHANGE, UPDATE_ORDER, UPDATE_PREVIOUS_ORDER, UPDATE_COUNT_ORDER } from '../../../redux/actions/types';
 import { timelineChartValues } from '../constants';
 
-
-const channelList = [
-  'price_list_1min',
-  'price_list_5min',
-  'price_list_15min',
+const commonChannels = [
   'volume_difference',
   'order',
   'count_orders',
@@ -25,48 +21,61 @@ class CoinSocket{
   constructor() {
     this.socket = io(api, { forceNew: true });
   }
+  getTimelineChannelValue(timeline){
+    if (timeline === timelineChartValues.MINUTE) {
+      return 'price_list_1min';
+    } else if (timeline === timelineChartValues.FIVE) {
+      return 'price_list_5min';
+    } else if (timeline === timelineChartValues.FIFTEEN) {
+      return 'price_list_15min';
+    } else if (timeline === timelineChartValues.HOUR) {
+      return 'price_list_1hour';
+    } else if (timeline === timelineChartValues.TWOHOURS) {
+      return 'price_list_2hour';
+    }
+  }
+
   closeCoinConnections(coinID = '') {
     if (coinID) {
-      for (let i = 0; i < channelList.length; i++) {
-        const channel = channelList[i];
+      const timeline = store.getState().dashboard.chartTimeline;
+      for (let i = 0; i < commonChannels.length; i++) {
+        const channel = commonChannels[i];
         this.socket.off(`${coinID}_${channel}`);
       }
+      const priceChannel = this.getTimelineChannelValue(timeline);
+      this.socket.off(`${coinID}_${priceChannel}`);
+      
       this.socket.removeAllListeners();
     }
   }
   openCoinConnections(coinID = '') {
-    for (let i = 0; i < channelList.length; i++) {
-      const channel = channelList[i];
+    for (let i = 0; i < commonChannels.length; i++) {
+      const channel = commonChannels[i];
       this.socket.on(`${coinID}_${channel}`, this.onSocketData);
     }
-  }
-  onSocketData({ info = {}, message = '' }) {
     const timeline = store.getState().dashboard.chartTimeline;
+    const priceChannel = this.getTimelineChannelValue(timeline);
+    this.socket.on(`${coinID}_${priceChannel}`, this.onPricesSocketData);
+  }
+
+  openSpecificConnection(coinID, channel, callback) {
+    console.log(callback)
+    this.socket.on(`${coinID}_${channel}`, callback);
+  }
+
+  closeSpecificConnection(coinID, channel) {
+    this.socket.off(`${coinID}_${channel}`);
+  }
+
+  onPricesSocketData({ info = {}, message = '' }) {
+    store.dispatch({
+      payload: info.pricesList,
+      type: UPDATE_PRICES_LIST,
+    });
+  }
+
+  onSocketData({ info = {}, message = '' }) {
     switch (message) {
-      case 'price_list_1min':
-        if (timeline === timelineChartValues.MINUTE) {
-            store.dispatch({
-              payload: info.pricesList,
-              type: UPDATE_PRICES_LIST,
-            });
-        }
-        break;
-      case 'price_list_5min':
-        if (timeline === timelineChartValues.FIVE) {
-          store.dispatch({
-            payload: info.pricesList,
-            type: UPDATE_PRICES_LIST,
-          });
-        }
-        break;
-      case 'price_list_15min':
-        if (timeline === timelineChartValues.FIFTEEN) {
-          store.dispatch({
-            payload: info.pricesList,
-            type: UPDATE_PRICES_LIST,
-          });
-        }
-        break;
       case 'volume_difference':
         store.dispatch({
           payload: info.volumeDifference,

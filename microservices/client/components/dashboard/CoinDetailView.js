@@ -20,7 +20,7 @@ import {getAllProperties} from '../common/utils/FetchCoinData';
 
 const mapReduxStateToComponentProps = state => ({
   selectedCoin: state.user.userPreferences.selectedCoin,
-  coinInfo: state.coins.coins[state.user.userPreferences.selectedCoin],
+  coinInfo: state.coins.all[state.user.userPreferences.selectedCoin],
   chartTimeline: state.dashboard.chartTimeline,
   buyOrder: state.live.buyOrder,
   sellOrder: state.live.sellOrder,

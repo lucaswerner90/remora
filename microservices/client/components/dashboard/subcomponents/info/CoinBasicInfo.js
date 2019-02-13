@@ -24,7 +24,7 @@ export class BasicInfo extends Component {
       <Grid container spacing={16} alignItems="center" alignContent="space-around">
         <Grid item xs={12} sm={12} md={4}>
           <Typography align="center" variant="body1">
-            VOLUME DIFFERENCE
+            SELL/BUY
             </Typography>
           <Fade in={volumeDifference!==0} timeout={{enter:animationTime}}>
             <Typography align="center" color={volumeDifference >= 0 ? 'primary' : 'secondary'} variant="h3">
