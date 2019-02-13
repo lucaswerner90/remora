@@ -18,7 +18,7 @@ const styles = {
   fullList: {
     width: 250,
     paddingTop: '40px',
-    height:'40vh',
+    height:'100vh',
     background: 'rgba(7, 16, 43, 0.56)'
   },
 };

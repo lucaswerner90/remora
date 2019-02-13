@@ -5,7 +5,7 @@ const { publicRuntimeConfig } = getConfig();
 const { api } = publicRuntimeConfig;
 
 import store from '../../../redux/store';
-import { UPDATE_PRICES_LIST, UPDATE_VOLUME_DIFFERENCE, UPDATE_PRICE, UPDATE_PRICE_CHANGE, UPDATE_ORDER, UPDATE_PREVIOUS_ORDER } from '../../../redux/actions/types';
+import { UPDATE_PRICES_LIST, UPDATE_VOLUME_DIFFERENCE, UPDATE_PRICE, UPDATE_PRICE_CHANGE, UPDATE_ORDER, UPDATE_PREVIOUS_ORDER, UPDATE_COUNT_ORDER } from '../../../redux/actions/types';
 import { timelineChartValues } from '../constants';
 
 
@@ -15,6 +15,7 @@ const channelList = [
   'price_list_15min',
   'volume_difference',
   'order',
+  'count_orders',
   'previous_order',
   'price_change_24hr',
   'latest_price',
@@ -73,10 +74,10 @@ class CoinSocket{
         });
         break;
       case 'count_orders':
-        console.log(info);
+        // console.log(info);
         // store.dispatch({
         //   payload: info,
-        //   type: UPDATE_ORDER,
+        //   type: UPDATE_COUNT_ORDER,
         // });
         break;
       case 'order':
