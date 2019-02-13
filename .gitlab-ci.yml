@@ -32,7 +32,7 @@ test:
       - ./microservices/news_server/node_modules
       - ./microservices/socketio/node_modules
   script:
-    - sudo docker-compose build --no-cache
+    - sudo docker-compose build
 
     
 step-deploy-production:
@@ -41,7 +41,7 @@ step-deploy-production:
     - master
   script:
     - sudo docker image prune -f
-    - sudo docker-compose build --no-cache
+    - sudo docker-compose build
     - sudo docker-compose up -d --scale socketio=5 --scale nextjs=5
   tags:
     - production
