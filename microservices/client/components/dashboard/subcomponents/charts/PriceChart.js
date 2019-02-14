@@ -9,7 +9,14 @@ import { connect } from 'react-redux';
 import { timelineChartValues } from '../../../common/constants';
 const Chart = dynamic(import('react-apexcharts'), { ssr: false });
 
-
+const extendedMins = 60 * 1000 * 201;
+const extent = {
+  min: extendedMins,
+  five: extendedMins * 5,
+  fifteen: extendedMins * 15,
+  hour: extendedMins * 60,
+  twohours: extendedMins * 120
+};
 
 const mapReduxStateToComponentProps = state => ({
   prices: state.live.pricesList,
@@ -119,24 +126,26 @@ class PriceChart extends React.Component {
     } : {};
 
     if (prices.length > 0 && buyOrder.price && sellOrder.price && price) {
+      let offsetX = 60;
+      let extended = extent.min;
+      if (this.props.timeline === timelineChartValues.FIVE) {
+        offsetX = 40;
+        extended = extent.five;
+      } else if (this.props.timeline === timelineChartValues.FIFTEEN){
+        offsetX = 40;
+        extended = extent.fifteen;
+      } else if (this.props.timeline === timelineChartValues.HOUR) {
+        offsetX = 30;
+        extended = extent.hour;
+      } else if (this.props.timeline === timelineChartValues.TWOHOURS) {
+        offsetX = 30;
+        extended = extent.twohours;
+      }
+
       const priceAnnotation = price > 0 ? {
         y: price,
         strokeDashArray: 0,
-        borderColor: '#ffffff7a',
-        label: {
-          position: 'right',
-          offsetX: -500,
-          offsetY: 0,
-          borderColor: 'none',
-          style: {
-            color: '#ffffff7a',
-            background: 'transparent',
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '0.75rem'
-          },
-          text: `${prices[prices.length - 1][1]}$`,
-        }
+        borderColor: '#ffffff7a'
       } : {};
       const values = prices.map(price => price[1]);
       const options = {
@@ -144,6 +153,13 @@ class PriceChart extends React.Component {
           foreColor: "#ffffff12",
           toolbar: {
             show: false
+          },
+          events: {
+            // click: function (event, chartContext, config) {
+            //   console.log(event)
+            //   console.log(chartContext)
+            //   console.log(config)
+            // }
           }
         },
         colors: ["white"],
@@ -180,7 +196,12 @@ class PriceChart extends React.Component {
         },
         tooltip: {
           enabled: true,
-          theme:'dark',
+          theme: 'dark',
+          // custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+          //   return '<div class="arrow_box">' +
+          //     '<span>' + series[seriesIndex][dataPointIndex] + '</span>' +
+          //     '</div>'
+          // },
           style: {
             fontSize: '20px',
             fontFamily: 'Roboto'
@@ -206,7 +227,7 @@ class PriceChart extends React.Component {
             show: false
           },
           labels: {
-            offsetX: this.props.timeline === timelineChartValues.MINUTE ? 150 : this.props.timeline === timelineChartValues.FIVE ? 30 : 250,
+            offsetX,
             offsetY: -15,
             style: {
               fontFamily: 'Roboto',
@@ -215,10 +236,23 @@ class PriceChart extends React.Component {
               fontWeight:100
             }
           },
-          format: 'HH:mm'
+          format: 'HH:mm',
+          max: prices[prices.length - 1][0] + extended
         },
         annotations: {
-          yaxis: buyAnnotation || sellAnnotation ? [buyAnnotation, sellAnnotation, priceAnnotation] : [priceAnnotation]
+          yaxis: buyAnnotation || sellAnnotation ? [buyAnnotation, sellAnnotation, priceAnnotation] : [priceAnnotation],
+          points: [
+            {
+              x: prices[prices.length-1][0],
+              y: price,
+              marker: {
+                size: 7,
+                fillColor: "#fff",
+                strokeColor: "#ffffff12",
+                radius: 1
+              }
+            }
+          ]
         },
         yaxis: {
           axisBorder: {
@@ -237,7 +271,6 @@ class PriceChart extends React.Component {
       }];
       return (
         <Fade in={prices.length > 0} timeout={{ enter: 2 * 1000 }}>
-          
           <Chart
             options={options}
             series={series}

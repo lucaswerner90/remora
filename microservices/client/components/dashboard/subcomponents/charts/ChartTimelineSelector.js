@@ -61,7 +61,6 @@ class ChartTimelineSelector extends Component {
     }
     // Change the channel where we receive the price data
     const { coin } = this.props;
-    console.log(coin)
     coinSocket.closeSpecificConnection(coin, coinSocket.getTimelineChannelValue(this.props.selected));
     coinSocket.openSpecificConnection(coin, coinSocket.getTimelineChannelValue(timeline), coinSocket.onPricesSocketData);
 

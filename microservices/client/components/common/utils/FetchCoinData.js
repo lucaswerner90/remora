@@ -1,6 +1,6 @@
 import store from '../../../redux/store';
 import { timelineChartValues } from '../constants';
-import { UPDATE_PRICES_LIST, UPDATE_VOLUME_DIFFERENCE, UPDATE_PRICE, UPDATE_PRICE_CHANGE, UPDATE_PREVIOUS_ORDER, UPDATE_LOADING_INFO } from '../../../redux/actions/types';
+import { UPDATE_SELECTED_PRICES_LIST, UPDATE_SELECTED_VOLUME_DIFFERENCE, UPDATE_SELECTED_PRICE, UPDATE_SELECTED_PRICE_CHANGE, UPDATE_SELECTED_PREVIOUS_ORDER, UPDATE_LOADING_INFO } from '../../../redux/actions/types';
 
 
 import getConfig from 'next/config';
@@ -38,7 +38,7 @@ const getCoinPricesList = async (coinID) => {
   }
   store.dispatch({
     payload: value.prices,
-    type: UPDATE_PRICES_LIST,
+    type: UPDATE_SELECTED_PRICES_LIST,
   });
 }
 const getCoinPrice = async (coinID) => {
@@ -46,7 +46,7 @@ const getCoinPrice = async (coinID) => {
   const price = value && value.price ? value.price : 0;
   store.dispatch({
     payload: price,
-    type: UPDATE_PRICE,
+    type: UPDATE_SELECTED_PRICE,
   });
 }
 const getVolumeDifference = async (coinID) => {
@@ -54,7 +54,7 @@ const getVolumeDifference = async (coinID) => {
   const volumeDifference = value && value.volumeDifference ? value.volumeDifference : 0;
   store.dispatch({
     payload: volumeDifference,
-    type: UPDATE_VOLUME_DIFFERENCE,
+    type: UPDATE_SELECTED_VOLUME_DIFFERENCE,
   });
 }
 const getPriceChange = async (coinID) => {
@@ -62,7 +62,7 @@ const getPriceChange = async (coinID) => {
   const priceChange = value && value.price ? value.priceChange : 0;
   store.dispatch({
     payload: priceChange,
-    type: UPDATE_PRICE_CHANGE,
+    type: UPDATE_SELECTED_PRICE_CHANGE,
   });
 }
 const getPreviousOrders = async (coinID) => {
@@ -74,14 +74,14 @@ const getPreviousOrders = async (coinID) => {
     previousBuyOrder.order.hasDissapeared = true;
     store.dispatch({
       payload: previousBuyOrder,
-      type: UPDATE_PREVIOUS_ORDER,
+      type: UPDATE_SELECTED_PREVIOUS_ORDER,
     });
   }
   if (previousSellOrder && previousSellOrder.order) {
     previousSellOrder.order.hasDissapeared = true;
     store.dispatch({
       payload: previousSellOrder,
-      type: UPDATE_PREVIOUS_ORDER,
+      type: UPDATE_SELECTED_PREVIOUS_ORDER,
     });
   }
 

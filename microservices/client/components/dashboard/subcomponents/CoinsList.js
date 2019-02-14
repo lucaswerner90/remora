@@ -59,7 +59,7 @@ class CoinsList extends React.Component {
     onlyFavorites: false,
     showFilters: false,
   };
-  shouldComponentUpdate(nextProps,nextState) {
+  shouldComponentUpdate(nextProps, nextState) {
     return nextState.onlyFavorites !== this.state.onlyFavorites || nextProps.coins.length !== this.props.coins.length || nextProps.favorites !== this.props.favorites || nextProps.filter !== this.props.filter;
   }
 
@@ -104,7 +104,7 @@ class CoinsList extends React.Component {
             primary={
               <React.Fragment>
                 <Grid container alignItems="flex-end">
-                  <Grid item xs={12} sm={12} md={12}>
+                  <Grid item xs={12} sm={6} md={6}>
                     <Typography color={color} component="h5" variant="h5">
                       {coin.name}
                       <span style={{ fontSize: '12px', color:'white' }}>  ({coin.symbol})  </span>
@@ -152,7 +152,7 @@ class CoinsList extends React.Component {
   }
   
   render() {
-    const { classes, coins = [], filter = '', favorites = [] } = this.props;
+    const { classes, coins = [], filter = '', favorites = [], specific } = this.props;
     const { onlyFavorites = false } = this.state;
     let filteredCoins = filter.length ? Object.values(coins).filter(this.filterCoin) : Object.values(coins);
     if (onlyFavorites) {

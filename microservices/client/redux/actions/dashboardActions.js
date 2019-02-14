@@ -1,10 +1,10 @@
-import { UPDATE_CHART_TIMELINE, UPDATE_PRICES_LIST } from './types';
+import { UPDATE_CHART_TIMELINE, UPDATE_SELECTED_PRICES_LIST } from './types';
 import store from '../store';
 
 export const updateChartTimeline = (payload) => dispatch => {
   store.dispatch({
     payload: [],
-    type: UPDATE_PRICES_LIST
+    type: UPDATE_SELECTED_PRICES_LIST
   });
   dispatch({
     payload,
