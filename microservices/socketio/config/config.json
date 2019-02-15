@@ -12,6 +12,7 @@
     "count_orders",
     "price_change_24hr",
     "previous_order",
-    "last_news"
+    "last_news",
+    "tweets"
   ]
 }

@@ -20,6 +20,7 @@ export default class RedisClient {
    * @memberof RedisClient
    */
   private client: redis.RedisClient;
+  private clientPublisher: redis.RedisClient;
 
   /**
    *Creates an instance of RedisClient.
@@ -27,20 +28,14 @@ export default class RedisClient {
    */
   constructor() {
     this.client = redis.createClient(config.port, config.host);
+    this.clientPublisher = redis.createClient(config.port, config.host);
+    this.clientPublisher.on('error', (err) => {
+      console.log(`REDIS CLIENT ERROR: ${err}`);
+      this.clientPublisher = redis.createClient(config.port, config.host);
+    });
     this.client.on('error', (err) => {
       console.log(`REDIS CLIENT ERROR: ${err}`);
       this.client = redis.createClient(config.port, config.host);
-    });
-  }
-
-  public async getKeyValue(key: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.client.get(key, (err, reply) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(JSON.parse(reply));
-      });
     });
   }
   public async getAllCoins(): Promise<any> {
@@ -53,24 +48,10 @@ export default class RedisClient {
       });
     });
   }
-  public async getChatMessages(chat = ''): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.client.lrange(`${chat}_messages`, -20, -1, (err, reply) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(reply);
-      });
-    });
+  public publishTweet(value: string = '') {
+    this.clientPublisher.publish('tweets', value);
   }
-  public getLastTweets(coin: string = '') {
-    return new Promise((resolve, reject) => {
-      this.client.lrange(`${coin}_tweets`, 0, 20, (err, reply) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(reply);
-      });
-    });
+  public addTweet(coin: string = '', value: string = '') {
+    this.client.lpush(`${coin.toLowerCase()}_tweets`, value);
   }
 }

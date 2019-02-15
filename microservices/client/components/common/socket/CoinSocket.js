@@ -5,7 +5,7 @@ const { publicRuntimeConfig } = getConfig();
 const { api } = publicRuntimeConfig;
 
 import store from '../../../redux/store';
-import { UPDATE_SELECTED_PRICES_LIST, UPDATE_SELECTED_VOLUME_DIFFERENCE, UPDATE_SELECTED_PRICE, UPDATE_SELECTED_PRICE_CHANGE, UPDATE_SELECTED_ORDER, UPDATE_SELECTED_PREVIOUS_ORDER, UPDATE_SELECTED_COUNT_ORDER } from '../../../redux/actions/types';
+import { UPDATE_SELECTED_PRICES_LIST, UPDATE_SELECTED_VOLUME_DIFFERENCE, UPDATE_SELECTED_PRICE, UPDATE_SELECTED_PRICE_CHANGE, UPDATE_SELECTED_ORDER, UPDATE_SELECTED_PREVIOUS_ORDER } from '../../../redux/actions/types';
 import { timelineChartValues } from '../constants';
 
 const commonChannels = [
@@ -44,7 +44,7 @@ class CoinSocket{
       }
       const priceChannel = this.getTimelineChannelValue(timeline);
       this.socket.off(`${coinID}_${priceChannel}`);
-      
+
       this.socket.removeAllListeners();
     }
   }
@@ -66,7 +66,7 @@ class CoinSocket{
     this.socket.off(`${coinID}_${channel}`);
   }
 
-  onPricesSocketData({ info = {}, message = '' }) {
+  onPricesSocketData({ info = {} }) {
     store.dispatch({
       payload: info.pricesList,
       type: UPDATE_SELECTED_PRICES_LIST,

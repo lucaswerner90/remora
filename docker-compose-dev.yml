@@ -2,6 +2,21 @@ version: "3"
 
 services:
 
+  sentimentanalysis:
+    build: ./microservices/sentimentanalysis
+    restart: always
+    command: yarn run start-dev
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./microservices/sentimentanalysis/src:/src
+      - ./microservices/sentimentanalysis/node_modules:/node_modules
+      - ./microservices/sentimentanalysis/package.json:/package.json
+    ports: 
+      - "7600"
+    depends_on:
+      - redis
+
   api:
     build: ./microservices/api
     restart: always

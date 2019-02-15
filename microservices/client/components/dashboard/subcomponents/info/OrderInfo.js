@@ -5,9 +5,8 @@ import Grid from '@material-ui/core/Grid';
 
 import { getTimeAgo } from '../../../../components/common/utils/Time';
 import OrderBasicInfo from './OrderBasicInfo';
-import OrderAdvancedInfo from './OrderAdvancedInfo';
 import LensIcon from '@material-ui/icons/LensRounded';
-import { Typography, Paper, Switch, FormControlLabel } from '@material-ui/core';
+import { Typography, Paper } from '@material-ui/core';
 
 const styles = () => ({
   root: {
@@ -67,15 +66,8 @@ class OrderInfo extends React.Component {
       <OrderBasicInfo order={order} coinPrice={parseFloat(coinPrice)} />
     );
   }
-  renderAdvancedInfo = (order) => {
-    const { coinPrice } = this.props;
-    return (
-      <OrderAdvancedInfo order={order} coinPrice={coinPrice} />
-    );
-  }
   render() {
     const { classes, message = '', order:currentOrder = {}, previous = {}} = this.props;
-    const { open = false } = this.state;
     const usingSavedOrder = currentOrder.price === undefined;
     const order = usingSavedOrder ? previous : currentOrder;
     let timeAgo = order.createdAt ? `${getTimeAgo(new Date(order.createdAt).getTime())} ago` : ' - ';
@@ -90,24 +82,11 @@ class OrderInfo extends React.Component {
                   {!usingSavedOrder && <LensIcon  style={{fontSize:'8px', marginLeft:'5px', marginTop:'2px'}} color={order.type === 'buy' ? 'primary':'secondary'}/>}
                 </Typography>
               </Grid>
-              <Grid item>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={this.state.open}
-                      onChange={this.handleChange}
-                    />
-                  }
-                  labelPlacement="start"
-                  label={this.state.open ? 'Advanced' : 'Basic'}
-                />
-              </Grid>
             </Grid>
           </Grid>
           
           <Grid item xs={12} sm={12} md={12}>
-            {open === false && this.renderBasicInfo(order)}
-            {open === true && this.renderAdvancedInfo(order)}
+            {this.renderBasicInfo(order)}
           </Grid>
           <Grid item xs={12} sm={12} md={12}>
             <Typography align="right" variant="body2" style={{ marginTop: '5px' }}>

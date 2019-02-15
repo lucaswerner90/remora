@@ -17,6 +17,7 @@ import ChartTimelineSelector from './subcomponents/charts/ChartTimelineSelector'
 import coinSocket from '../common/socket/CoinSocket';
 
 import {getAllProperties} from '../common/utils/FetchCoinData';
+import SentimentAnalysis from './subcomponents/sentimentanalysis/SentimentAnalysis';
 
 const mapReduxStateToComponentProps = state => ({
   selectedCoin: state.user.userPreferences.selectedCoin,
@@ -115,6 +116,9 @@ export class CoinDetailView extends Component {
             <Grid container spacing={16}>
               <Grid item xs={12}>
                 <OrderInfo order={sellOrder} previous={previousSellOrder} message="Sell order" coinPrice={price} />
+              </Grid>
+              <Grid item xs={12}>
+                <SentimentAnalysis/>
               </Grid>
             </Grid>
           </Grid>

@@ -14,6 +14,12 @@ router.get('/all', async(req, res) => {
 });
 
 // define the home page route
+router.post('/tweets', async ({ body }, res) => {
+  const { coinID = '' } = body;
+  const key:any = await redis.getLastTweets(coinID);
+  res.send({ value: key.map(tweet => JSON.parse(tweet)) });
+});
+// define the home page route
 router.post('/property', async ({ body }, res) => {
   const { coinID = '', property = '' } = body;
   const key = await redis.getKeyValue(`${coinID}_${property}`);

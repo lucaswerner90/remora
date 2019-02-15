@@ -51,7 +51,6 @@ class SocketIOServer {
         if (err) {
           reject(err);
         }
-        console.log(reply);
         resolve(reply);
       });
     });
@@ -91,6 +90,9 @@ class SocketIOServer {
       const finalChannel = messageParsed.coin.id;
       let finalData: any = {};
       switch (channel) {
+        case 'tweets':
+          finalData = messageParsed;
+          break;
         case 'count_orders':
           finalData = messageParsed;
           break;

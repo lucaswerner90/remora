@@ -60,4 +60,4 @@ typings/
 .vscode/
 dist/
 node_modules/
-docker-compose-dev.yml
+./docker-compose-dev.yml
