@@ -13,13 +13,20 @@ router.get('/all', async(req, res) => {
   }
 });
 
-// define the home page route
 router.post('/tweets', async ({ body }, res) => {
-  const { coinID = '' } = body;
-  const key:any = await redis.getLastTweets(coinID);
-  res.send({ value: key.map(tweet => JSON.parse(tweet)) });
+  const { coinName = '' } = body;
+  const key: any = await redis.getTweets(coinName.trim().toLowerCase());
+  res.send({ value: key });
 });
-// define the home page route
+
+router.post('/news', async ({ body }, res) => {
+  const { coinName = '' } = body;
+  const redisKey = `${coinName.trim().toLowerCase()}_last_news`;
+  // ethereum_last_news
+  const key: any = await redis.getKeyValue(redisKey);
+  res.send({ value: key });
+});
+
 router.post('/property', async ({ body }, res) => {
   const { coinID = '', property = '' } = body;
   const key = await redis.getKeyValue(`${coinID}_${property}`);

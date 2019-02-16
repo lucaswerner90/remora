@@ -9,8 +9,8 @@ services:
 variables:
   DOCKER_DRIVER: overlay2
   PROJECT_NAME: remora
-  NUM_SOCKET_SERVERS: 5
-  NUM_WEB_SERVERS: 5
+  NUM_SOCKET_SERVERS: "5"
+  NUM_WEB_SERVERS: "5"
 
 stages:
   - test
@@ -44,9 +44,8 @@ step-deploy-production:
     - master
   script:
     - docker image prune -f
-    - docker-compose build
     - docker-compose stop
-    - docker-compose -p $PROJECT_NAME up -d --scale socketio=$NUM_SOCKET_SERVERS --scale nextjs=$NUM_WEB_SERVERS
+    - docker-compose -p $PROJECT_NAME up --build -d --scale socketio=$NUM_SOCKET_SERVERS --scale nextjs=$NUM_WEB_SERVERS
   tags:
     - production
   when: manual

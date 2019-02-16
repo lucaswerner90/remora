@@ -86,11 +86,14 @@ class SocketIOServer {
 
   private redisOnMessage(channel:string, message:string) {
     const messageParsed = JSON.parse(message);
-    if (messageParsed.coin && messageParsed.coin.exchange) {
+    if (messageParsed.coin && messageParsed.coin.id) {
       const finalChannel = messageParsed.coin.id;
       let finalData: any = {};
       switch (channel) {
         case 'tweets':
+          finalData = messageParsed;
+          break;
+        case 'last_news':
           finalData = messageParsed;
           break;
         case 'count_orders':

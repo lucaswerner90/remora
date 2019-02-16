@@ -1,6 +1,6 @@
 import store from '../../../redux/store';
 import { timelineChartValues } from '../constants';
-import { UPDATE_SELECTED_PRICES_LIST, UPDATE_SELECTED_VOLUME_DIFFERENCE, UPDATE_SELECTED_PRICE, UPDATE_SELECTED_PRICE_CHANGE, UPDATE_SELECTED_PREVIOUS_ORDER, UPDATE_SELECTED_TWEETS } from '../../../redux/actions/types';
+import { UPDATE_SELECTED_PRICES_LIST, UPDATE_SELECTED_VOLUME_DIFFERENCE, UPDATE_SELECTED_PRICE, UPDATE_SELECTED_PRICE_CHANGE, UPDATE_SELECTED_PREVIOUS_ORDER } from '../../../redux/actions/types';
 
 
 import getConfig from 'next/config';
@@ -9,16 +9,32 @@ const { api } = publicRuntimeConfig;
 
 
 
-const getLastTweets = async (coinID) => {
-  if (coinID) {
+export const getLastTweets = async(coinName) => {
+  if (coinName) {
     const userRequestData = {
       method: 'POST',
-      body: JSON.stringify({ coinID }),
+      body: JSON.stringify({ coinName }),
       headers: {
         'Content-Type': 'application/json'
       }
     };
     const response = await fetch(`${api}/api/coin/tweets`, userRequestData);
+    const { value = {} } = await response.json();
+    return value;
+  } else {
+    return {};
+  }
+}
+export const getLastNews = async(coinName) => {
+  if (coinName) {
+    const userRequestData = {
+      method: 'POST',
+      body: JSON.stringify({ coinName }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+    const response = await fetch(`${api}/api/coin/news`, userRequestData);
     const { value = {} } = await response.json();
     return value;
   } else {
@@ -42,11 +58,6 @@ const getCoinProperty = async (coinID, property) => {
   }
 }
 
-export const getTweets = async (coinID) => {
-  const coinName = store.getState().coins.all[coinID].name.toLowerCase();
-  const value = await getLastTweets(coinName);
-  return value;
-}
 const getCoinPricesList = async (coinID) => {
   const timeline = store.getState().dashboard.chartTimeline;
   let value = [];
@@ -111,7 +122,6 @@ const getPreviousOrders = async (coinID) => {
 export const getAllProperties = async (coinID) => {
   try {
     await Promise.all([
-      getTweets(coinID),
       getPreviousOrders(coinID),
       getCoinPricesList(coinID),
       getCoinPrice(coinID),

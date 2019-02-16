@@ -1,5 +1,7 @@
 import * as NewsAPI from 'newsapi';
 import RedisClient from './RedisClient';
+const Sentiment = require('sentiment');
+const sentiment = new Sentiment();
 
 const newsapi = new NewsAPI('148617c833c4406c80320ba99a8b6770');
 
@@ -40,16 +42,6 @@ interface INewsResponse {
  * @class NewsAPIServer
  */
 export default class NewsAPIServer {
-
-  /**
-   *
-   *
-   * @private
-   * @type {string}
-   * @memberof NewsAPIServer
-   */
-  private keywords: string = 'ethereum,bitcoin,cryptocurrency,blockchain,litecoin,ripple,dollar,wall street';
-
   /**
    *
    *
@@ -57,7 +49,7 @@ export default class NewsAPIServer {
    * @type {number}
    * @memberof NewsAPIServer
    */
-  private intervalTimeout: number = 5 * 60 * 1000;
+  // private intervalTimeout: number = 5 * 60 * 1000;
 
   /**
    *
@@ -73,17 +65,16 @@ export default class NewsAPIServer {
    * @memberof NewsAPIServer
    */
   constructor() {
-    setInterval(async () => {
-      try {
-        const response = await this.getHeadlines();
-        console.log(response.articles);
-        if (response.status === 'ok' && response.articles.length) {
-          this.redisClient.setLastNews(JSON.stringify(response.articles));
-        }
-      } catch (error) {
-
+    this.redisClient.getAllCoins().then((coins) => {
+      const coinsValues: any = Object.values(coins);
+      for (let i = 0; i < coinsValues.length; i++) {
+        const { name = '' } = JSON.parse(coinsValues[i]);
+        this.getHeadlines(JSON.parse(coinsValues[i]), name.toLowerCase());
+        setInterval(() => {
+          this.getHeadlines(JSON.parse(coinsValues[i]), name.toLowerCase());
+        }, 60 * 60 * 1000);
       }
-    }, this.intervalTimeout);
+    });
   }
 
   /**
@@ -92,17 +83,21 @@ export default class NewsAPIServer {
    * @returns {Promise<INewsResponse>}
    * @memberof NewsAPIServer
    */
-  public async getHeadlines(): Promise<INewsResponse> {
+  public async getHeadlines(coin, coinName:string = '') {
+    const lastMonth = new Date(Date.now() - (30 * 24 * 60 * 60 * 1000));
     try {
-      // const response: INewsResponse = await newsapi.v2.topHeadlines({ q: this.keywords, category: 'business' });
-      const response: INewsResponse = await newsapi.v2.everything({
-        q: 'cryptomarket',
-        // from: '2019-01-01',
-        // to: '2019-02-12',
-        language: 'en',
-        sortBy: 'relevancy',
+      const response: INewsResponse = await newsapi.v2.topHeadlines({
+        from: `${lastMonth.getFullYear()}-${lastMonth.getMonth() + 1}-${lastMonth.getDate()}`,
+        q: coinName,
+        language:'en',
+        category:'business',
+        sortBy: 'relevance',
       });
-      return response;
+      if (response.status === 'ok' && response.articles.length) {
+        const { articles = [] } = response;
+        const sentimentalArticles = articles.map(article => ({ ...article, sentiment: sentiment.analyze(article.description).score }));
+        this.redisClient.setLastNews(coinName, JSON.stringify({ coin, articles: sentimentalArticles }));
+      }
     } catch (error) {
       throw error;
     }

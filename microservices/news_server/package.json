@@ -6,7 +6,8 @@
   "dependencies": {
     "fast-json-stringify": "^1.9.1",
     "newsapi": "^2.4.0",
-    "redis": "^2.8.0"
+    "redis": "^2.8.0",
+    "sentiment": "^5.0.1"
   },
   "devDependencies": {
     "@types/chai": "^4.1.6",

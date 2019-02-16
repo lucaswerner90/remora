@@ -50,9 +50,20 @@ export default class RedisClient {
    * @param {string} value
    * @memberof RedisClient
    */
-  public setLastNews(value: string) {
-    const key = 'last_news';
-    this.clientPublisher.publish(key, value);
+  public setLastNews(coinName:string, value: string = '') {
+    const key = `${coinName}_last_news`;
+    this.clientPublisher.publish('last_news', value);
     this.client.set(key, value);
+  }
+
+  public async getAllCoins(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.client.hgetall('coins', (err, reply) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(reply);
+      });
+    });
   }
 }

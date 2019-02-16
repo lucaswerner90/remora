@@ -1,9 +1,4 @@
 import * as redis from 'redis';
-const config: redis.ClientOpts = {
-  host: process.env.REDIS_HOST || 'redis',
-  port: parseInt(process.env.REDIS_PORT) || 6379,
-};
-
 /**
  *
  *
@@ -11,7 +6,10 @@ const config: redis.ClientOpts = {
  * @class RedisClient
  */
 export default class RedisClient {
-
+  private static config: redis.ClientOpts = {
+    host: process.env.REDIS_HOST || 'redis',
+    port: parseInt(process.env.REDIS_PORT) || 6379,
+  };
   /**
    *
    *
@@ -27,15 +25,15 @@ export default class RedisClient {
    * @memberof RedisClient
    */
   constructor() {
-    this.client = redis.createClient(config.port, config.host);
-    this.clientPublisher = redis.createClient(config.port, config.host);
+    this.client = redis.createClient(RedisClient.config.port, RedisClient.config.host);
+    this.clientPublisher = redis.createClient(RedisClient.config.port, RedisClient.config.host);
     this.clientPublisher.on('error', (err) => {
       console.log(`REDIS CLIENT ERROR: ${err}`);
-      this.clientPublisher = redis.createClient(config.port, config.host);
+      this.clientPublisher = redis.createClient(RedisClient.config.port, RedisClient.config.host);
     });
     this.client.on('error', (err) => {
       console.log(`REDIS CLIENT ERROR: ${err}`);
-      this.client = redis.createClient(config.port, config.host);
+      this.client = redis.createClient(RedisClient.config.port, RedisClient.config.host);
     });
   }
   public async getAllCoins(): Promise<any> {
@@ -52,6 +50,8 @@ export default class RedisClient {
     this.clientPublisher.publish('tweets', value);
   }
   public addTweet(coin: string = '', value: string = '') {
-    this.client.lpush(`${coin.toLowerCase()}_tweets`, value);
+    this.client.lpush(`${coin.toLowerCase()}_tweets`, value, () => {
+      this.client.ltrim(`${coin.toLowerCase()}_tweets`, 0, 50);
+    });
   }
 }

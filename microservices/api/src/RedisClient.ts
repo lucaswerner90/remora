@@ -35,7 +35,7 @@ export default class RedisClient {
 
   public async getKeyValue(key: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.client.get(key, (err, reply) => {
+      this.client.get(key.trim(), (err, reply) => {
         if (err) {
           reject(err);
         }
@@ -53,9 +53,9 @@ export default class RedisClient {
       });
     });
   }
-  public async getChatMessages(chat = ''): Promise<any> {
+  public async getTweets(coinName = ''): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.client.lrange(`${chat}_messages`, -20, -1, (err, reply) => {
+      this.client.lrange(`${coinName}_tweets`, 0, 20, (err, reply) => {
         if (err) {
           reject(err);
         }
@@ -63,9 +63,9 @@ export default class RedisClient {
       });
     });
   }
-  public getLastTweets(coin: string = '') {
+  public async getChatMessages(chat = ''): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.client.lrange(`${coin}_tweets`, 0, 20, (err, reply) => {
+      this.client.lrange(`${chat}_messages`, 0, 20, (err, reply) => {
         if (err) {
           reject(err);
         }

@@ -8,8 +8,8 @@ services:
   ###################################################################### 
   ######################################################################
   ######################################################################
-  sentimentalnalysis:
-    build: ./microservices/sentimentalnalysis
+  twitter:
+    build: ./microservices/twitter
     restart: always
     command: yarn run start
     environment:

@@ -10,9 +10,9 @@ type TCoin = {
 };
 
 import RedisClient from '../RedisClient';
-const redis = new RedisClient();
 
 export default class Tweet {
+  private static redis = new RedisClient();
   private _coin: TCoin;
   private _id: number;
   private _sentiment: number;
@@ -44,9 +44,7 @@ export default class Tweet {
     };
   }
   appendToTweetList() {
-    redis.addTweet(this._coin.name.toLowerCase(), JSON.stringify(this.toJSON()));
-  }
-  publishToRedis() {
-    redis.publishTweet(JSON.stringify(this.toJSON()));
+    Tweet.redis.addTweet(this._coin.name.toLowerCase(), JSON.stringify(this.toJSON()));
+    Tweet.redis.publishTweet(JSON.stringify(this.toJSON()));
   }
 }
