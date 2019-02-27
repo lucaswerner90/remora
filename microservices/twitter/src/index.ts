@@ -21,6 +21,7 @@ const COIN_PROFILES = {
   litecoin: 'satoshilite',
   tron: 'tronfoundation',
   eos: 'block_one',
+  icon: 'helloiconworld',
 };
 
 const config_twitter = {

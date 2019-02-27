@@ -14,19 +14,15 @@ const mapReduxStateToComponentProps = state => ({
 });
 
 export class BasicInfo extends Component {
-  shouldComponentUpdate() {
-    const { volumeDifference = 0, price = 0, priceChange = 0 } = this.props;
-    return volumeDifference !== 0 && price !== 0 && priceChange !== 0;
-  }
   render() {
-    const { volumeDifference = 0, price = 0, priceChange = 0 } = this.props;
+    const { volumeDifference, price, priceChange } = this.props;
     return (
       <Grid container spacing={16} alignItems="center" alignContent="space-around">
         <Grid item xs={12} sm={12} md={4}>
           <Typography align="center" variant="body1">
-            SELL/BUY
+            VOLUME COMPARISON
             </Typography>
-          <Fade in={volumeDifference!==0} timeout={{enter:animationTime}}>
+          <Fade in={volumeDifference !== undefined} timeout={{enter:animationTime}}>
             <Typography align="center" color={volumeDifference >= 0 ? 'primary' : 'secondary'} variant="h3">
               {volumeDifference}
               <span style={{ fontSize: '20px' }}>%</span>
@@ -37,7 +33,7 @@ export class BasicInfo extends Component {
           <Typography align="center" variant="body1">
             PRICE
             </Typography>
-          <Fade in={price !== 0} timeout={{ enter: animationTime }}>
+          <Fade in={price !== undefined} timeout={{ enter: animationTime }}>
             <Typography align="center" variant="h3">
               {formatPrice(price)}
               <span style={{ fontSize: '20px' }}>$</span>
@@ -49,7 +45,7 @@ export class BasicInfo extends Component {
           <Typography align="center" variant="body1">
             PRICE 24HR
           </Typography>
-          <Fade in={priceChange !== 0} timeout={{ enter: animationTime }}>
+          <Fade in={priceChange !== undefined} timeout={{ enter: animationTime }}>
             <Typography align="center" variant="h3" color={priceChange >= 0 ? 'primary' : 'secondary'}>
               {priceChange}
               <span style={{ fontSize: '20px' }}>%</span>

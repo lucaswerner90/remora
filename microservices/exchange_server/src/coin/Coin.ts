@@ -355,21 +355,22 @@ export default class Coin {
     return whaleOrders;
   }
 
-  public calculateVolumeDifference() {
-    const buyVolume = this._lastBuyVolume;
-    const sellVolume = this._lastSellVolume;
-    let currentVolumeDifference = Math.abs(Math.round(((buyVolume >= sellVolume ? buyVolume / sellVolume : sellVolume / buyVolume)) * 100) - 100);
-    if (buyVolume < sellVolume) {
-      currentVolumeDifference = currentVolumeDifference * -1;
-    }
-    if (currentVolumeDifference !== this._currentVolumeDifference) {
-      this._currentVolumeDifference = currentVolumeDifference;
+  public calculateVolumeDifference(volumes:number[]= [], last:number = 0) {
+    return new Promise(() => {
+      const numStepsBefore = 120;
+      const cuttedVolumes = volumes.splice(volumes.length - numStepsBefore, volumes.length - 1);
+      const mean = cuttedVolumes.reduce((a, b) => a + b) / numStepsBefore;
+      const newDifference = Math.round(((last - mean) / mean) * 100);
+      if (this._currentVolumeDifference !== newDifference) {
+        this._currentVolumeDifference = newDifference;
 
-      const redisValue = { ...this._commonRedisProperties, volumeDifference: this._currentVolumeDifference };
-      redis.setVolumeDifferenceValue(this._redisKeys.VOLUME_DIFFERENCE, JSON.stringify(redisValue));
-    }
-
-    return currentVolumeDifference;
+        const redisValue = { ...this._commonRedisProperties, volumeDifference: this._currentVolumeDifference };
+        redis.setVolumeDifferenceValue(this._redisKeys.VOLUME_DIFFERENCE, JSON.stringify(redisValue));
+        if (last > mean) {
+          console.log(this._name, mean, last, this._currentVolumeDifference);
+        }
+      }
+    });
   }
 
   public _detectWhaleOrders(newOrders = {}, minOrderValue = 0) {

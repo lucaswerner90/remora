@@ -57,19 +57,32 @@ export default class BinanceConnection extends ExchangeConnection{
     });
     return prices;
   }
+  createVolumeList(chart) {
+    const volumes = [];
+    const keys = Object.keys(chart);
+    for (let i = 0; i < keys.length - 1; i++) {
+      const tick = keys[i];
+      const chartTick = chart[tick];
+      const volume = parseFloat(chartTick.volume);
+      volumes.push(volume);
+    }
+    return volumes;
+  }
   createCoinWebSockets(coin: Coin) {
     // Gets the last chart price of the coin
     coin.webSockets.price['1MIN'] = Binance.websockets.chart(coin.symbol, BinanceConnection.TIMES.MIN['1MIN'], (_symbol: string, _interval: any, chart: { [x: string]: any; }) => {
       const tick = Binance.last(chart);
+      const keys = Object.keys(chart);
       if (tick && chart[tick] && chart[tick].close) {
         const last = chart[tick].close;
         coin.actualPrice = parseFloat(last);
         // Update coin prices.
         const prices = this.createPricesList(chart);
-
         if (prices.length) {
           coin.pricesList1min = prices;
         }
+        coin.calculateVolumeDifference(this.createVolumeList(chart), chart[keys[keys.length - 2]].volume);
+        // coin.calculateVolumeDifference(this.createVolumeList(chart), chart[tick].volume);
       }
 
     });

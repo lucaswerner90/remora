@@ -61,5 +61,23 @@
             "order": 100000,
             "volume": 50
         }
+    },
+    "ICXUSDT": {
+        "acronym": "ICX",
+        "url": "https://www.binance.com/en/trade/pro/ICX_USDT",
+        "name": "ICON",
+        "alarm": {
+            "order": 100000,
+            "volume": 50
+        }
+    },
+    "BTTUSDT": {
+        "acronym": "BTT",
+        "url": "https://www.binance.com/en/trade/pro/BTT_USDT",
+        "name": "BitTorrent",
+        "alarm": {
+            "order": 100000,
+            "volume": 50
+        }
     }
 }

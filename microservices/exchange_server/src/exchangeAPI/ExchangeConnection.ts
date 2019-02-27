@@ -102,7 +102,7 @@ export default class ExchangeConnection {
     const updateTime: number = 5 * 1000;
     return setInterval(() => {
       if (coin.actualPrice) {
-        coin.calculateVolumeDifference();
+        // coin.calculateVolumeDifference();
       }
     }, updateTime);
   }
