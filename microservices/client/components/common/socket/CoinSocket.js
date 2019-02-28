@@ -5,7 +5,7 @@ const { publicRuntimeConfig } = getConfig();
 const { api } = publicRuntimeConfig;
 
 import store from '../../../redux/store';
-import { UPDATE_SELECTED_PRICES_LIST, UPDATE_SELECTED_VOLUME_DIFFERENCE, UPDATE_SELECTED_PRICE, UPDATE_SELECTED_PRICE_CHANGE, UPDATE_SELECTED_ORDER, UPDATE_SELECTED_PREVIOUS_ORDER } from '../../../redux/actions/types';
+import { UPDATE_SELECTED_PRICES_LIST, UPDATE_SELECTED_VOLUME_DIFFERENCE, UPDATE_SELECTED_PRICE, UPDATE_SELECTED_PRICE_CHANGE, UPDATE_SELECTED_ORDER, UPDATE_SELECTED_PREVIOUS_ORDER, UPDATE_SELECTED_COIN_MACD_DIFFERENCE } from '../../../redux/actions/types';
 import { timelineChartValues } from '../constants';
 
 const commonChannels = [
@@ -13,6 +13,7 @@ const commonChannels = [
   'order',
   'count_orders',
   'previous_order',
+  'macd_difference',
   'price_change_24hr',
   'latest_price',
 ];
@@ -75,6 +76,12 @@ class CoinSocket{
 
   onSocketData({ info = {}, message = '' }) {
     switch (message) {
+      case 'macd_difference':
+        store.dispatch({
+          payload: info.macdDifference,
+          type: UPDATE_SELECTED_COIN_MACD_DIFFERENCE,
+        });
+        break;
       case 'volume_difference':
         store.dispatch({
           payload: info.volumeDifference,

@@ -48,6 +48,31 @@ export default class BinanceConnection extends ExchangeConnection{
         break;
     }
   }
+
+  /**
+   *
+   * Returns the list of prices that is going to be used to calculate the MACD and similar indicators
+   * @param {*} chart
+   * @returns
+   * @memberof BinanceConnection
+   */
+  createOnlyPricesList(chart) {
+    const prices = [];
+    Object.keys(chart).forEach((tick, _i) => {
+      const chartTick = chart[tick];
+      const price = parseFloat(chartTick.close);
+      prices.push(price);
+    });
+    return prices.splice(prices.length - 26, prices.length - 1);
+  }
+
+  /**
+   *
+   * This method returns the data suitable for the client chart, so it includes both the timestamp and the price value for each one.
+   * @param {*} chart
+   * @returns
+   * @memberof BinanceConnection
+   */
   createPricesList(chart) {
     const prices = [];
     Object.keys(chart).forEach((tick, _i) => {
@@ -77,12 +102,15 @@ export default class BinanceConnection extends ExchangeConnection{
         const last = chart[tick].close;
         coin.actualPrice = parseFloat(last);
         // Update coin prices.
-        const prices = this.createPricesList(chart);
-        if (prices.length) {
-          coin.pricesList1min = prices;
-        }
-        coin.calculateVolumeDifference(this.createVolumeList(chart), chart[keys[keys.length - 2]].volume);
-        // coin.calculateVolumeDifference(this.createVolumeList(chart), chart[tick].volume);
+        new Promise(() => {
+          const prices = this.createPricesList(chart);
+          if (prices.length) {
+            coin.pricesList1min = prices;
+            coin.MACD = this.createOnlyPricesList(chart);
+            // coin.calculateVolumeDifference(this.createVolumeList(chart), chart[keys[keys.length - 2]].volume);
+            coin.calculateVolumeDifference(this.createVolumeList(chart), chart[tick].volume);
+          }
+        });
       }
 
     });

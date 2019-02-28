@@ -90,6 +90,9 @@ class SocketIOServer {
       const finalChannel = messageParsed.coin.id;
       let finalData: any = {};
       switch (channel) {
+        case 'macd_difference':
+          finalData = messageParsed;
+          break;
         case 'tweets':
           finalData = messageParsed;
           break;

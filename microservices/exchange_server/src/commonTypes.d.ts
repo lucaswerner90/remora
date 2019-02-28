@@ -28,6 +28,7 @@ export type TCoinRedisKeys = {
   PRICES_LIST_2HOUR: string,
   VOLUME_DIFFERENCE: string,
   LATEST_PRICE: string,
+  MACD_DIFFERENCE: string,
   MEAN_ORDER_VALUE: string,
   PRICE_CHANGE_24HR: string,
 };

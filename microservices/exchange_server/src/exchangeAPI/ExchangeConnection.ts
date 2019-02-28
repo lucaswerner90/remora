@@ -86,25 +86,7 @@ export default class ExchangeConnection {
    */
   private createCoinConfiguration(coin: string = '', coinProperties: TCoinProperties) {
     this.coinsArray[coin] = new Coin(coin, coinProperties, this.mainCoin, this.name);
-    this.createCoinIntervals(this.coinsArray[coin]);
     this.createCoinWebSockets(this.coinsArray[coin]);
-  }
-
-  /**
-   *
-   * Creates the different coin intervals to update its different properties.
-   * @private
-   * @param {Coin} coin
-   * @returns {NodeJS.Timeout}
-   * @memberof ExchangeConnection
-   */
-  private createCoinIntervals(coin: Coin): NodeJS.Timeout {
-    const updateTime: number = 5 * 1000;
-    return setInterval(() => {
-      if (coin.actualPrice) {
-        // coin.calculateVolumeDifference();
-      }
-    }, updateTime);
   }
   /**
    *

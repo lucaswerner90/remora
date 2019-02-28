@@ -27,6 +27,7 @@ import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import { connect } from 'react-redux';
 import { updateUserSelectedCoin, updateUserFavorites } from '../../../redux/actions/userPreferencesActions';
 import { Fade } from '@material-ui/core';
+import Coin from './coinslist/Coin';
 
 
 const mapReduxStateToComponentProps = state => ({
@@ -97,37 +98,14 @@ class CoinsList extends React.Component {
     const { favorites } = this.props;
     return coins.map(coin => {
       const isFavorite = favorites.indexOf(coin.id) > -1;
-      const color = isFavorite ? 'textPrimary' : 'textSecondary';
       return (        
-        <ListItem key={coin.id} onClick={() => this.selectCoin(coin.id)} dense button>
-          <ListItemText
-            primary={
-              <React.Fragment>
-                <Grid container alignItems="flex-end">
-                  <Grid item xs={12} sm={6} md={6}>
-                    <Typography color={color} component="h5" variant="h5">
-                      {coin.name}
-                      <span style={{ fontSize: '12px', color:'white' }}>  ({coin.symbol})  </span>
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </React.Fragment>
-            }
-            secondary={
-              <React.Fragment>
-                <Typography component="span" style={{ textTransform: 'uppercase' }} variant="body2" style={{ color }}>
-                  {coin.exchange.toString().toUpperCase()}
-                </Typography>
-              </React.Fragment>
-            }
-          />
-          <ListItemSecondaryAction>
-            <IconButton aria-label="Favorite" disabled={favorites.length === 1 && isFavorite} onClick={() => this.markAsFavorite(coin.id)}>
-              {isFavorite && <StarIcon />}
-              {!isFavorite && <StarBorderIcon />}
-            </IconButton>
-          </ListItemSecondaryAction>
-        </ListItem>
+        <Coin
+          coin={coin}
+          isFavorite={isFavorite}
+          markAsFavorite={this.markAsFavorite.bind(this)} 
+          selectCoin={this.selectCoin.bind(this)}
+          howManyFavorites={favorites.length}
+        />
       );
     });
   }

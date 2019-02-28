@@ -1,6 +1,6 @@
 import store from '../../../redux/store';
 import { timelineChartValues } from '../constants';
-import { UPDATE_SELECTED_PRICES_LIST, UPDATE_SELECTED_VOLUME_DIFFERENCE, UPDATE_SELECTED_PRICE, UPDATE_SELECTED_PRICE_CHANGE, UPDATE_SELECTED_PREVIOUS_ORDER } from '../../../redux/actions/types';
+import { UPDATE_SELECTED_PRICES_LIST, UPDATE_SELECTED_VOLUME_DIFFERENCE, UPDATE_SELECTED_PRICE, UPDATE_SELECTED_PRICE_CHANGE, UPDATE_SELECTED_PREVIOUS_ORDER, UPDATE_SELECTED_COIN_MACD_DIFFERENCE } from '../../../redux/actions/types';
 
 
 import getConfig from 'next/config';
@@ -97,6 +97,13 @@ const getPriceChange = async (coinID) => {
     type: UPDATE_SELECTED_PRICE_CHANGE,
   });
 }
+const getMACDDifference = async (coinID) => {
+  const { macdDifference } = await getCoinProperty(coinID, 'macd_difference');
+  store.dispatch({
+    payload: macdDifference,
+    type: UPDATE_SELECTED_COIN_MACD_DIFFERENCE,
+  });
+}
 const getPreviousOrders = async (coinID) => {
   const [previousBuyOrder, previousSellOrder] = await Promise.all([
     getCoinProperty(coinID, 'buy_order_previous'),
@@ -122,6 +129,7 @@ const getPreviousOrders = async (coinID) => {
 export const getAllProperties = async (coinID) => {
   try {
     await Promise.all([
+      getMACDDifference(coinID),
       getPreviousOrders(coinID),
       getCoinPricesList(coinID),
       getCoinPrice(coinID),

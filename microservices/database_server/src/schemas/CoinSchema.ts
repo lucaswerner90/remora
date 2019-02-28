@@ -32,8 +32,12 @@ const schema = {
     enum: ['buy', 'sell'],
   },
   currentVolumeDifference: {
-    type: Number,
-    default: 0,
+    type: Object,
+    default: {
+      difference: 0,
+      current: 0,
+      mean: 0,
+    },
   },
 };
 

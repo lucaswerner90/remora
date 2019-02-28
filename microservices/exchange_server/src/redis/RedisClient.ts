@@ -36,6 +36,10 @@ export default class RedisClient {
     this.clientPublisher.publish('latest_price', value);
     this.client.set(key, value);
   }
+  public setMACDDifference(key: string, value: string) {
+    this.clientPublisher.publish('macd_difference', value);
+    this.client.set(key, value);
+  }
   public setPricesList1min(key: string, value: string) {
     this.clientPublisher.publish('price_list_1min', value);
     this.client.set(key, value);

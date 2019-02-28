@@ -26,7 +26,7 @@ export default class Coin {
   private _whaleOrders: TCoinWhaleOrders = { buy: {}, sell:{} };
   private _alarm: TCoinAlarm;
   private _exchange: string;
-  private _currentVolumeDifference: number = 0;
+  private _volumeDifference: { difference: number, mean: number, current: number } = { difference: 0, mean: 0, current: 0 };
   private _lastBuyVolume: number = 0;
   private _lastSellVolume: number = 0;
   private _priceChange24hr: number = -1;
@@ -36,6 +36,7 @@ export default class Coin {
   private _minTimesHigher: number = 20;
   private sellMaximumQuantityPrice: number;
   private buyMaximumQuantityPrice: number;
+  private _macdDifference: { difference: number, macd12: number, macd26: number } = { difference: 0, macd12: 0, macd26: 0 };
 
   constructor(symbol: string = '', { acronym = '', url = '', name = '', alarm = { order : 0, volume : 0 } }, against = 'USD', exchange: string = '') {
     this.symbol = symbol;
@@ -49,6 +50,7 @@ export default class Coin {
     this._redisKeys = {
       PREVIOUS_SELL_ORDER: `${this.id}_sell_order_previous`,
       PREVIOUS_BUY_ORDER: `${this.id}_buy_order_previous`,
+      MACD_DIFFERENCE: `${this.id}_macd_difference`,
       BUY_ORDER: `${this.id}_buy_order`,
       SELL_ORDER: `${this.id}_sell_order`,
       PRICES_LIST_1MIN: `${this.id}_price_list_1min`,
@@ -148,10 +150,6 @@ export default class Coin {
     this._whaleOrders = newValue;
   }
 
-  public get existsVolumeDifference() {
-    return this._currentVolumeDifference > this.alarm.volume;
-  }
-
   public get tendency() {
     return this._lastBuyVolume > this._lastSellVolume ? 'buy' : 'sell';
   }
@@ -171,7 +169,23 @@ export default class Coin {
   public get actualPrice() {
     return this._actualPrice;
   }
-
+  public set MACD(prices: number[]) {
+    new Promise(() => {
+      const macd26 = (prices.reduce((a, b) => a + b) / 26);
+      const macd12 = (prices.splice(prices.length - 12, prices.length - 1).reduce((a, b) => a + b) / 12);
+      const difference = ((macd12 - macd26) / macd26) * 100;
+      this._macdDifference = {
+        difference,
+        macd12,
+        macd26,
+      };
+      const redisValue = {
+        ...this._commonRedisProperties,
+        macdDifference: this._macdDifference,
+      };
+      redis.setMACDDifference(this._redisKeys.MACD_DIFFERENCE, JSON.stringify(redisValue));
+    });
+  }
   /**
    * Updates the prices list for the coin and updates the Redis key that contains the list
    *
@@ -360,16 +374,14 @@ export default class Coin {
       const numStepsBefore = 120;
       const cuttedVolumes = volumes.splice(volumes.length - numStepsBefore, volumes.length - 1);
       const mean = cuttedVolumes.reduce((a, b) => a + b) / numStepsBefore;
-      const newDifference = Math.round(((last - mean) / mean) * 100);
-      if (this._currentVolumeDifference !== newDifference) {
-        this._currentVolumeDifference = newDifference;
-
-        const redisValue = { ...this._commonRedisProperties, volumeDifference: this._currentVolumeDifference };
-        redis.setVolumeDifferenceValue(this._redisKeys.VOLUME_DIFFERENCE, JSON.stringify(redisValue));
-        if (last > mean) {
-          console.log(this._name, mean, last, this._currentVolumeDifference);
-        }
-      }
+      const difference = ((last - mean) / mean) * 100;
+      this._volumeDifference = {
+        difference,
+        mean,
+        current: last,
+      };
+      const redisValue = { ...this._commonRedisProperties, volumeDifference: this._volumeDifference };
+      redis.setVolumeDifferenceValue(this._redisKeys.VOLUME_DIFFERENCE, JSON.stringify(redisValue));
     });
   }
 

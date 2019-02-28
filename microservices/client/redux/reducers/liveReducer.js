@@ -1,5 +1,5 @@
 
-import { UPDATE_SELECTED_PRICES_LIST, UPDATE_SELECTED_VOLUME_DIFFERENCE, UPDATE_SELECTED_PRICE, UPDATE_SELECTED_PRICE_CHANGE, UPDATE_SELECTED_PREVIOUS_ORDER, UPDATE_SELECTED_ORDER, UPDATE_LOADING_INFO } from '../actions/types';
+import { UPDATE_SELECTED_PRICES_LIST, UPDATE_SELECTED_VOLUME_DIFFERENCE, UPDATE_SELECTED_PRICE, UPDATE_SELECTED_PRICE_CHANGE, UPDATE_SELECTED_PREVIOUS_ORDER, UPDATE_SELECTED_ORDER, UPDATE_LOADING_INFO, UPDATE_SELECTED_COIN_MACD_DIFFERENCE } from '../actions/types';
 
 const initialState = {
   volumeDifference: 0,
@@ -23,6 +23,8 @@ export default (state = initialState, action) => {
       return { ...state, volumeDifference: action.payload};
     case UPDATE_SELECTED_PRICE:
       return { ...state, price: action.payload};
+    case UPDATE_SELECTED_COIN_MACD_DIFFERENCE:
+      return { ...state, macdDifference: action.payload};
     case UPDATE_SELECTED_PRICE_CHANGE:
       return { ...state, priceChange: action.payload};
     case UPDATE_SELECTED_ORDER:
