@@ -9,15 +9,6 @@ import { connect } from 'react-redux';
 import { timelineChartValues } from '../../../common/constants';
 const Chart = dynamic(import('react-apexcharts'), { ssr: false });
 
-const extendedMins = 60 * 1000 * 201;
-const extent = {
-  min: extendedMins,
-  five: extendedMins * 5,
-  fifteen: extendedMins * 15,
-  hour: extendedMins * 60,
-  twohours: extendedMins * 120
-};
-
 const mapReduxStateToComponentProps = state => ({
   prices: state.live.pricesList,
   buy: state.live.buyOrder,
@@ -49,14 +40,14 @@ class PriceChart extends React.Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    const { prices = [], buy, sell, price } = nextProps;
+    const { prices = [], buy, sell, price, timeline } = nextProps;
 
     // The price has changed
-    if (nextProps.price !== this.props.price) {
+    if (price !== this.props.price) {
       return true;
     }
     // The user has modified the scale
-    if (nextProps.timeline !== this.props.timeline) {
+    if (timeline !== this.props.timeline) {
       return true;
     }
 
@@ -127,19 +118,11 @@ class PriceChart extends React.Component {
 
     if (prices.length > 0 && buyOrder.price && sellOrder.price && price) {
       let offsetX = 60;
-      let extended = extent.min;
-      if (this.props.timeline === timelineChartValues.FIVE) {
+      let extended = prices[prices.length-1][0] - prices[0][0];
+      if (this.props.timeline === timelineChartValues.FIVE || this.props.timeline === timelineChartValues.FIFTEEN) {
         offsetX = 40;
-        extended = extent.five;
-      } else if (this.props.timeline === timelineChartValues.FIFTEEN){
-        offsetX = 40;
-        extended = extent.fifteen;
-      } else if (this.props.timeline === timelineChartValues.HOUR) {
+      } else if (this.props.timeline === timelineChartValues.HOUR || this.props.timeline === timelineChartValues.TWOHOURS) {
         offsetX = 30;
-        extended = extent.hour;
-      } else if (this.props.timeline === timelineChartValues.TWOHOURS) {
-        offsetX = 30;
-        extended = extent.twohours;
       }
 
       const priceAnnotation = price > 0 ? {
@@ -236,7 +219,7 @@ class PriceChart extends React.Component {
               fontWeight:100
             }
           },
-          format: 'HH:mm',
+          format: 'dd:HH:mm',
           max: prices[prices.length - 1][0] + extended
         },
         annotations: {
@@ -255,11 +238,15 @@ class PriceChart extends React.Component {
           ]
         },
         yaxis: {
+          opposite: true,
           axisBorder: {
             show: false
           },
+          tooltip:{
+            enabled:true
+          },
           labels: {
-            show: false
+            show: true
           },
           min: buy.price ? Math.min(buy.price*0.99, Math.min(...values)) : Math.min(...values),
           max: sell.price ? Math.max(sell.price*1.01, Math.max(...values)) : Math.max(...values),

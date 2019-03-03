@@ -11,7 +11,6 @@ import { timelineChartValues } from '../constants';
 const commonChannels = [
   'volume_difference',
   'order',
-  'count_orders',
   'previous_order',
   'macd_difference',
   'price_change_24hr',
@@ -20,7 +19,7 @@ const commonChannels = [
 
 class CoinSocket{
   constructor() {
-    this.socket = io(api, { forceNew: true });
+    this.socket = io(api);
   }
   getTimelineChannelValue(timeline){
     if (timeline === timelineChartValues.MINUTE) {
@@ -41,12 +40,10 @@ class CoinSocket{
       const timeline = store.getState().dashboard.chartTimeline;
       for (let i = 0; i < commonChannels.length; i++) {
         const channel = commonChannels[i];
-        this.socket.off(`${coinID}_${channel}`);
+        this.socket.removeAllListeners(`${coinID}_${channel}`);
       }
       const priceChannel = this.getTimelineChannelValue(timeline);
-      this.socket.off(`${coinID}_${priceChannel}`);
-
-      this.socket.removeAllListeners();
+      this.socket.removeAllListeners(`${coinID}_${priceChannel}`);
     }
   }
   openCoinConnections(coinID = '') {
@@ -64,7 +61,7 @@ class CoinSocket{
   }
 
   closeSpecificConnection(coinID, channel) {
-    this.socket.off(`${coinID}_${channel}`);
+    this.socket.removeAllListeners(`${coinID}_${channel}`);
   }
 
   onPricesSocketData({ info = {} }) {

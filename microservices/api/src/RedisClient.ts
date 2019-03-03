@@ -53,6 +53,16 @@ export default class RedisClient {
       });
     });
   }
+  public async getNotifications(coinName = ''): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.client.lrange(`${coinName}_notifications`, 0, 20, (err, reply) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(reply);
+      });
+    });
+  }
   public async getTweets(coinName = ''): Promise<any> {
     return new Promise((resolve, reject) => {
       this.client.lrange(`${coinName}_tweets`, 0, 20, (err, reply) => {

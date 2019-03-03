@@ -15,12 +15,14 @@ import StarBorderIcon from '@material-ui/icons/StarBorder';
 
 import coinSocket from '../../../common/socket/CoinSocket';
 import { formatPrice } from '../../../common/utils/Format';
+import { getCoinProperty } from '../../../common/utils/FetchCoinData';
 
 export class Coin extends Component {
-  
+  constructor(props) {
+    super(props);
+    this.health = undefined;
+  }
   state = {
-    macd: 0,
-    volume: 0,
     price: 0,
     priceChange: 0
   }
@@ -32,40 +34,46 @@ export class Coin extends Component {
     selectCoin: PropTypes.func.isRequired,
     howManyFavorites: PropTypes.number.isRequired
   }
-  macdDifferenceCallback = ({info}) =>{
-    const { macdDifference } = info;
-    this.setState({ ...this.state, macd: macdDifference.difference });
-  }
-  volumeDifferenceCallback = ({info}) =>{
-    const { volumeDifference } = info;
-    this.setState({ ...this.state, volume: volumeDifference.difference });
+  checkHealthConnection = (channel = '', cb = () => { }) => {
+    if(this.health){
+      clearTimeout(this.health);
+    }
+    this.health = setTimeout(() => {
+      const { coin } = this.props;
+      coinSocket.closeSpecificConnection(coin.id, channel);
+      coinSocket.openSpecificConnection(coin.id, channel, cb);
+    }, 30 * 1000);
   }
   priceCallback = ({info}) => {
+    this.checkHealthConnection('latest_price', this.priceCallback.bind(this));
     const { price } = info;
     this.setState({ ...this.state, price });
   }
-  priceChangeCallback = ({info}) => {
+  priceChangeCallback = ({ info }) => {
+    this.checkHealthConnection('price_change_24hr', this.priceChangeCallback.bind(this));
     const { price } = info;
     this.setState({ ...this.state, priceChange: price });
+  }
+  getInitialProperties = async() => {
+    const { coin } = this.props;
+    const [price, priceChange] = await Promise.all([getCoinProperty(coin.id, 'latest_price'), getCoinProperty(coin.id, 'price_change_24hr')]);
+    this.setState({ ...this.state, price: price.price, priceChange: parseFloat(priceChange.price) });
   }
 
   componentDidMount(){
     const { coin } = this.props;
-    // coinSocket.openSpecificConnection(coin.id, 'macd_difference', this.macdDifferenceCallback);
-    // coinSocket.openSpecificConnection(coin.id, 'volume_difference', this.volumeDifferenceCallback);
+    this.getInitialProperties();
     coinSocket.openSpecificConnection(coin.id, 'latest_price', this.priceCallback);
     coinSocket.openSpecificConnection(coin.id, 'price_change_24hr', this.priceChangeCallback);
   }
   componentWillUnmount() {
     const { coin } = this.props;
-    // coinSocket.closeSpecificConnection(coin.id, 'macd_difference');
-    // coinSocket.closeSpecificConnection(coin.id, 'volume_difference');
     coinSocket.closeSpecificConnection(coin.id, 'latest_price');
     coinSocket.closeSpecificConnection(coin.id, 'price_change_24hr');
   }
   render() {
     const { isFavorite, coin, markAsFavorite, selectCoin, howManyFavorites = 1 } = this.props;
-    const { price, volume = 0, macd = 0, priceChange } = this.state;
+    const { price, priceChange } = this.state;
     const color = isFavorite ? 'textPrimary' : 'textSecondary';
     if (coin) {
       return (

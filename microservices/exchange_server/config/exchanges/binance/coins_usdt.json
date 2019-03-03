@@ -79,5 +79,14 @@
             "order": 100000,
             "volume": 50
         }
+    },
+    "FETUSDT": {
+        "acronym": "FET",
+        "url": "https://www.binance.com/en/trade/pro/FET_USDT",
+        "name": "FetchAI",
+        "alarm": {
+            "order": 100000,
+            "volume": 50
+        }
     }
 }

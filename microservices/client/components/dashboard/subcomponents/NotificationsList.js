@@ -2,44 +2,39 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import ListItemText from '@material-ui/core/ListItemText';
-import Avatar from '@material-ui/core/Avatar';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import TrendingUpIcon from '@material-ui/icons/TrendingUp';
-import TrendingDownIcon from '@material-ui/icons/TrendingDown';
-
-import io from 'socket.io-client';
-import getConfig from 'next/config';
-
-const { publicRuntimeConfig } = getConfig();
-const { api } = publicRuntimeConfig;
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 
 import { connect } from 'react-redux';
 import { updateUserSelectedCoin, updateUserNotifications} from '../../../redux/actions/userPreferencesActions';
+import OrderNotification from './notifications/OrderNotification';
+import coinSocket from '../../common/socket/CoinSocket';
+import { getLastNotifications } from '../../common/utils/FetchCoinData';
+import VolumeNotification from './notifications/VolumeNotification';
+import MANotification from './notifications/MANotification';
+import PriceDifferenceNotification from './notifications/PriceDifferenceNotification';
 
 const mapReduxStateToComponentProps = state => ({
   selected: state.user.userPreferences.selectedCoin,
   favorites: state.user.userPreferences.favorites,
   notifications: state.user.userPreferences.notifications
 });
-
-const notificationTypes = {
-  COIN: {
-    WHALE_ORDER: 'COIN_WHALE_ORDER'
+const sortNotifications = (a,b) => {
+  if(a.createdAt > b.createdAt){
+    return -1;
   }
-};
-
+  if (a.createdAt < b.createdAt) {
+    return 1;
+  }
+  return 0;
+}
 const styles = theme => ({
   root: {
     flexGrow: 1,
     maxWidth: '100%',
-  },
-  warningColor:{
-    color: theme.palette.sell,
   },
   list: {
     backgroundColor: 'transparent',
@@ -52,138 +47,116 @@ const styles = theme => ({
   },
 });
 
-
 class NotificationsList extends React.Component {
   state = {
-    dense: true,
-    pendingNotifications: 0,
-    secondary: true,
-    notifications:[]
+    notifications: [],
+    onlySelected: true,
   };
+  handleShowOnlySelected = (e, onlySelected) => {
+    this.setState({ ...this.state, onlySelected });
+  }
   componentWillUnmount() {
     const currentCoins = this.props.favorites;
     for (let i = 0; i < currentCoins.length; i++) {
-      this.socket.off(currentCoins[i]);
+      coinSocket.closeSpecificConnection(currentCoins[i], 'notifications');
     }
   }
   componentDidMount() {
-    this.socket = io(api, { forceNew: true });
     const currentCoins = this.props.favorites;
     for (let i = 0; i < currentCoins.length; i++) {
-      this.socket.on(currentCoins[i], this.onSocketData);
+      coinSocket.openSpecificConnection(currentCoins[i], 'notifications', this.onSocketData);
     }
+    this.loadInitialNotifications(currentCoins);
+  }
+  loadInitialNotifications = async(coins = []) => {
+    const notifArray = []
+    for (let i = 0; i < coins.length; i++) {
+      notifArray.push(getLastNotifications(coins[i]));
+    }
+    const notifications = await Promise.all(notifArray);
+
+    let finalNotifications = [];
+    for (let i = 0; i < notifications.length; i++) {
+      const coinNotifications = notifications[i];
+      for (let j = 0; j < coinNotifications.length; j++) {
+        finalNotifications.push(JSON.parse(coinNotifications[j]));
+      }
+    }
+    finalNotifications = finalNotifications.sort(sortNotifications);
+    this.setState({ ...this.state, notifications: finalNotifications.sort(sortNotifications) });
   }
   componentWillReceiveProps({ favorites = []}) {
     const currentCoins = this.props.favorites;
     const newCoins = favorites;
     if (currentCoins.length !== newCoins.length) {
+      this.loadInitialNotifications(newCoins);
       for (let i = 0; i < currentCoins.length; i++) {
-        this.socket.off(currentCoins[i]);
+        coinSocket.closeSpecificConnection(currentCoins[i], 'notifications');
       }
       for (let i = 0; i < newCoins.length; i++) {
-        this.socket.on(newCoins[i], this.onSocketData);
+        coinSocket.openSpecificConnection(currentCoins[i],'notifications', this.onSocketData);
       }
     }
     return true;
   }
-  onSocketData = ({ info = {}, message = '' }) => {
-    const { notifications = {} } = this.props;
-    const { notifications: currentNotifications = [] } = this.state;
-    switch (message) {
-      case 'order':
-        const { coin = {}, order = {}, type = '' } = info;
-        if (type) {
-          const { id: orderID } = order;
-          const { id = '' } = coin;
-          const notificationInfo = {
-            coin,
-            info: order,
-            type: notificationTypes.COIN.WHALE_ORDER
-          }
-          if (!notifications[id]) {
-            notifications[id] = {
-              orders: {
-                buy: {},
-                sell: {}
-              }
-            };
-          }
-          if (orderID && currentNotifications.findIndex(notif => notif.info.id === orderID) === -1) {
-            this.setState({
-              ...this.state,
-              notifications: [notificationInfo, ...currentNotifications].sort((a, b) =>
-                new Date(a.createdAt).getTime() > new Date(b.createdAt).getTime())
-            });
-            notifications[id]['orders'][type] = notificationInfo;
-          }
-
-          this.props.updateUserNotifications(notifications);
-        }
-        break;
-      default:
-        break;
-    }
+  onSocketData = ({ info = {} }) => {
+    const { notifications } = this.state;
+    notifications.pop();
+    this.setState({ ...this.state, notifications: [info, ...notifications] });
   }
   selectCoin = (coinID = '') => {
-    this.props.updateUserSelectedCoin(coinID);
+    const { selected } = this.props;
+    if (selected !== coinID) {
+      this.props.updateUserSelectedCoin(coinID);
+    } 
   }
   generateItems = (notifications = []) => {
-    return notifications.map(notification => {
-      const { coin, type, info } = notification;
-      const time = new Date(info.createdAt);
-      const parsedMinutes = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes();
-      const parsedHours = time.getHours() < 10 ? `0${time.getHours()}` : time.getHours();
-      const parsedTime = `${parsedHours}:${parsedMinutes}`;
-      const goodNews = notificationTypes.COIN.WHALE_ORDER && info.type === 'buy';
-      return (
-        <ListItem key={Math.random()} onClick={() => this.selectCoin(coin.id)} dense button>
-          <ListItemAvatar>
-            <Avatar style={{ color:'#fff', background: 'transparent'}}>
-              {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'buy' && <TrendingUpIcon color="primary" />}
-              {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'sell' && <TrendingDownIcon color="secondary"/>}
-            </Avatar>
-          </ListItemAvatar>
-          <ListItemText
-            primary={
-              <React.Fragment>
-                <Grid container alignItems="flex-end">
-                  <Grid item xs={12} sm={12} md={12}>
-                    <Typography component="span" variant="h5" color={goodNews ? 'primary' : 'secondary'}>
-                      {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'buy' && `BUY ORDER`}
-                      {type === notificationTypes.COIN.WHALE_ORDER && info.type === 'sell' && `SELL ORDER`}
-                      <span style={{ fontSize: '12px', color: 'white' }}>  {parsedTime}  </span>
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </React.Fragment>
-            }
-            secondary={
-              <React.Fragment>
-                <Typography component="span" variant="h6" color="textPrimary">
-                  {coin.symbol} - <span style={{fontSize:'10px', textTransform:'uppercase'}}>{coin.exchange}</span>
-                </Typography>
-              </React.Fragment>
-            }
-          />
-        </ListItem>
-
-      );
+    return notifications.map((notification,i) => {
+      const { type } = notification;
+      if (type === 'order') {
+        return <OrderNotification key={i} notification={notification} selectCoin={this.selectCoin}/>
+      } else if (type === 'volume') {
+        return <VolumeNotification key={i} notification={notification} selectCoin={this.selectCoin}/>
+      } else if (type === 'macd') {
+        return <MANotification key={i} notification={notification} selectCoin={this.selectCoin}/>
+      } else if (type === 'price_difference') {
+        return <PriceDifferenceNotification key={i} notification={notification} selectCoin={this.selectCoin}/>
+      }
+      return null;
     });
 
   }
   render() {
-    const { classes, filter = '' } = this.props;
-    const { notifications = [] } = this.state;
-    const filteredNotifications = filter.length ? notifications.filter(notif => 
-      notif.info.type.includes(filter) ||
-      notif.coin.symbol.includes(filter)
-    ) : notifications;
+    const { classes, filter = '', selected } = this.props;
+    const { notifications = [], onlySelected = false } = this.state;
+    let filteredNotifications = notifications;
+    if (onlySelected) {
+      filteredNotifications = filteredNotifications.filter(notification => notification.coin.id === selected);
+    }
+    if (filter.length) {
+      filteredNotifications = filteredNotifications.filter(notif =>
+        notif.type.toLowerCase().includes(filter.toLowerCase()) ||
+        notif.coin.symbol.toLowerCase().includes(filter.toLowerCase())
+      );
+    }
     return (
-      <Grid container spacing={16} style={{ height: '40vh' }}>
-        <Grid item xs={12} sm={12} md={12}>
+      <Grid container spacing={16} style={{ height: '40vh' }} alignItems="center" justify="space-between">
+        <Grid item>
           <Typography className={classes.padding} variant="h6">
             NOTIFICATIONS
           </Typography>
+        </Grid>
+        <Grid item>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={onlySelected}
+                onChange={this.handleShowOnlySelected}
+              />
+            }
+            labelPlacement="start"
+            label={onlySelected ? 'Selected' : 'Favorites'}
+          />
         </Grid>
         <Grid item xs={12} sm={12} md={12} md={12}>
           <Paper elevation={0}>

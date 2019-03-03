@@ -18,14 +18,9 @@ export class CallbackPage extends Component {
           <Grid item xs={12} sm={12} md={12}>
             <Typography align="center" variant="h3">
               rémora
-            </Typography>
+          </Typography>
           </Grid>
-          <Loading/>
-          <Grid item xs={12} sm={12} md={12}>
-            <Typography align="center" variant="h6">
-              Reading your data to find the best whales for you...
-            </Typography>
-          </Grid>
+          <Loading />
         </Grid>
       </Fade>
     )

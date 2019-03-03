@@ -6,20 +6,13 @@ import PropTypes from 'prop-types';
 // Material UI
 import { withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from '@material-ui/core/Avatar';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
-import IconButton from '@material-ui/core/IconButton';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 
-// Icons
-import StarIcon from '@material-ui/icons/Star';
-import StarBorderIcon from '@material-ui/icons/StarBorder';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 
@@ -96,14 +89,15 @@ class CoinsList extends React.Component {
   }
   showCoins = (coins = this.state.coins) => {
     const { favorites } = this.props;
-    return coins.map(coin => {
+    return coins.map((coin,i) => {
       const isFavorite = favorites.indexOf(coin.id) > -1;
       return (        
         <Coin
+          key={i}
           coin={coin}
           isFavorite={isFavorite}
-          markAsFavorite={this.markAsFavorite.bind(this)} 
-          selectCoin={this.selectCoin.bind(this)}
+          markAsFavorite={this.markAsFavorite} 
+          selectCoin={this.selectCoin}
           howManyFavorites={favorites.length}
         />
       );
@@ -130,7 +124,7 @@ class CoinsList extends React.Component {
   }
   
   render() {
-    const { classes, coins = [], filter = '', favorites = [], specific } = this.props;
+    const { classes, coins = [], filter = '', favorites = [] } = this.props;
     const { onlyFavorites = false } = this.state;
     let filteredCoins = filter.length ? Object.values(coins).filter(this.filterCoin) : Object.values(coins);
     if (onlyFavorites) {

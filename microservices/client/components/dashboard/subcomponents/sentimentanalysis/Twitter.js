@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import LensIcon from '@material-ui/icons/LensRounded';
@@ -8,8 +7,9 @@ import { getLastTweets } from '../../../common/utils/FetchCoinData';
 
 import Loading from '../../../common/utils/Loading';
 
-import { Typography, Paper, List, ListItem, ListItemAvatar, ListItemText, Avatar, Fade } from '@material-ui/core';
+import { Typography, Paper, List, Fade } from '@material-ui/core';
 import { connect } from 'react-redux';
+import Tweet from './Tweet';
 
 
 const TWITTER_CHANNEL = 'tweets';
@@ -49,35 +49,20 @@ const calculateSentimentAnalysis = (tweets = []) => {
   return sentiment;
 };
 
+const sortTweets = (a,b) => {
+  const dateA = new Date(a.created).getTime();
+  const dateB = new Date(b.created).getTime();
+  if (dateA > dateB) {
+    return -1;
+  }
+  if(dateA < dateB){
+    return 1;
+  }
+  return 0;
+}
 const renderTweets = (tweets = []) => {
-  return tweets.map((tweet, i) => {
-    const { created, id, text, user } = tweet;
-    const time = new Date(created);
-    return (
-      <ListItem key={i} alignItems="flex-start" dense button onClick={() => window.open(`https://twitter.com/${user.screen_name}`, '_blank')}>
-        <ListItemAvatar>
-          <Avatar alt={user.screen_name} src={user.profile_image_url} />
-        </ListItemAvatar>
-        <ListItemText
-          primary={
-            <React.Fragment>
-              <Grid item>
-                <Typography variant="h6">
-                  {user.screen_name}
-                </Typography>
-              </Grid>
-            </React.Fragment>
-          }
-          secondary={
-            <React.Fragment>
-              <Typography variant="body2">
-                {text}
-              </Typography>
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-    );
+  return tweets.sort(sortTweets).map((tweet,i) => {
+    return <Tweet key={i} tweet={tweet}/>
   });
 };
 

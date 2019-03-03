@@ -21,6 +21,8 @@ const COIN_PROFILES = {
   litecoin: 'satoshilite',
   tron: 'tronfoundation',
   eos: 'block_one',
+  fetchai: 'fetch_ai',
+  bittorrent: 'BitTorrent',
   icon: 'helloiconworld',
 };
 

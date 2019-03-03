@@ -1,6 +1,9 @@
 import Order from './Order';
 import RedisClient from '../redis/RedisClient';
 import { TCoinRedisKeys, TPricesList, TCoinWhaleOrder, TCoinWhaleOrders, TCoinAlarm } from '../commonTypes';
+import MANotification from '../notifications/MANotification';
+import VolumeNotification from '../notifications/VolumeNotification';
+import PriceDifferenceNotification from '../notifications/PriceDifferenceNotification';
 
 const redis: RedisClient = new RedisClient();
 
@@ -36,7 +39,8 @@ export default class Coin {
   private _minTimesHigher: number = 20;
   private sellMaximumQuantityPrice: number;
   private buyMaximumQuantityPrice: number;
-  private _macdDifference: { difference: number, macd12: number, macd26: number } = { difference: 0, macd12: 0, macd26: 0 };
+  private _macdDifference: { difference: number, ma12: number, ma26: number } = { difference: 0, ma12: 0, ma26: 0 };
+  private _priceDifference: number = 0;
 
   constructor(symbol: string = '', { acronym = '', url = '', name = '', alarm = { order : 0, volume : 0 } }, against = 'USD', exchange: string = '') {
     this.symbol = symbol;
@@ -46,7 +50,6 @@ export default class Coin {
     this._url = url;
     this._name = name;
     this._exchange = exchange;
-
     this._redisKeys = {
       PREVIOUS_SELL_ORDER: `${this.id}_sell_order_previous`,
       PREVIOUS_BUY_ORDER: `${this.id}_buy_order_previous`,
@@ -169,16 +172,40 @@ export default class Coin {
   public get actualPrice() {
     return this._actualPrice;
   }
-  public set MACD(prices: number[]) {
+  public calculatePriceDifference(_prices:number[]) {
+    const priceDifference = ((_prices[_prices.length - 1] - _prices[_prices.length - 5]) / _prices[_prices.length - 5]) * 100;
+    if (Math.abs(this._priceDifference) < 1 && Math.abs(priceDifference) > 1) {
+      const info = { ...this._commonRedisProperties, data: Math.round(priceDifference * 100) / 100 };
+      const notification = new PriceDifferenceNotification(info);
+      notification.sendNotification();
+    }
+    this._priceDifference = priceDifference;
+  }
+  public set MACD(_prices: number[]) {
     new Promise(() => {
-      const macd26 = (prices.reduce((a, b) => a + b) / 26);
-      const macd12 = (prices.splice(prices.length - 12, prices.length - 1).reduce((a, b) => a + b) / 12);
-      const difference = ((macd12 - macd26) / macd26) * 100;
-      this._macdDifference = {
-        difference,
-        macd12,
-        macd26,
-      };
+      this.calculatePriceDifference(_prices);
+      const prices26 = _prices.splice(_prices.length - 26);
+      const prices12 = _prices.splice(_prices.length - 12);
+      const ma26 = (prices26.reduce((a, b) => a + b) / 26);
+      const ma12 = (prices12.reduce((a, b) => a + b) / 12);
+      const difference = ((ma12 - ma26) / ma26) * 100;
+      if ((this._macdDifference.difference > 0 && difference < 0) || (this._macdDifference.difference < 0 && difference > 0)) {
+        this._macdDifference = {
+          difference,
+          ma12,
+          ma26,
+        };
+        const info = { ...this._commonRedisProperties,  data: this._macdDifference };
+        const notification = new MANotification(info);
+        notification.sendNotification();
+      } else {
+        this._macdDifference = {
+          difference,
+          ma12,
+          ma26,
+        };
+      }
+
       const redisValue = {
         ...this._commonRedisProperties,
         macdDifference: this._macdDifference,
@@ -371,15 +398,21 @@ export default class Coin {
 
   public calculateVolumeDifference(volumes:number[]= [], last:number = 0) {
     return new Promise(() => {
-      const numStepsBefore = 120;
-      const cuttedVolumes = volumes.splice(volumes.length - numStepsBefore, volumes.length - 1);
+      const numStepsBefore = 60;
+      const cuttedVolumes = volumes.splice(volumes.length - numStepsBefore);
       const mean = cuttedVolumes.reduce((a, b) => a + b) / numStepsBefore;
       const difference = ((last - mean) / mean) * 100;
+      const anomaly = (this._volumeDifference.difference < 200 && difference > 200);
       this._volumeDifference = {
         difference,
         mean,
         current: last,
       };
+      if (anomaly) {
+        const info = { ...this._commonRedisProperties, data: this._volumeDifference };
+        const notification = new VolumeNotification(info);
+        notification.sendNotification();
+      }
       const redisValue = { ...this._commonRedisProperties, volumeDifference: this._volumeDifference };
       redis.setVolumeDifferenceValue(this._redisKeys.VOLUME_DIFFERENCE, JSON.stringify(redisValue));
     });

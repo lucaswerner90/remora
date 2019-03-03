@@ -48,24 +48,6 @@ export default class BinanceConnection extends ExchangeConnection{
         break;
     }
   }
-
-  /**
-   *
-   * Returns the list of prices that is going to be used to calculate the MACD and similar indicators
-   * @param {*} chart
-   * @returns
-   * @memberof BinanceConnection
-   */
-  createOnlyPricesList(chart) {
-    const prices = [];
-    Object.keys(chart).forEach((tick, _i) => {
-      const chartTick = chart[tick];
-      const price = parseFloat(chartTick.close);
-      prices.push(price);
-    });
-    return prices.splice(prices.length - 26, prices.length - 1);
-  }
-
   /**
    *
    * This method returns the data suitable for the client chart, so it includes both the timestamp and the price value for each one.
@@ -82,34 +64,36 @@ export default class BinanceConnection extends ExchangeConnection{
     });
     return prices;
   }
-  createVolumeList(chart) {
+  createArraysFromChartArray(chart: { [x: string]: any; } = {}) {
+    const pricesTimeStamp = [];
+    const prices = [];
     const volumes = [];
-    const keys = Object.keys(chart);
-    for (let i = 0; i < keys.length - 1; i++) {
-      const tick = keys[i];
+    Object.keys(chart).forEach((tick, _i) => {
       const chartTick = chart[tick];
-      const volume = parseFloat(chartTick.volume);
-      volumes.push(volume);
-    }
-    return volumes;
+      const price = parseFloat(chartTick.close);
+      pricesTimeStamp.push([parseFloat(tick), price]);
+      prices.push(price);
+      volumes.push(parseFloat(chartTick.volume));
+    });
+    return { pricesTimeStamp, prices, volumes };
   }
   createCoinWebSockets(coin: Coin) {
-    // Gets the last chart price of the coin
+    // Gets the updated coin chart
     coin.webSockets.price['1MIN'] = Binance.websockets.chart(coin.symbol, BinanceConnection.TIMES.MIN['1MIN'], (_symbol: string, _interval: any, chart: { [x: string]: any; }) => {
       const tick = Binance.last(chart);
       if (tick && chart[tick] && chart[tick].close) {
+
+        // Update current coin price
         const last = chart[tick].close;
         coin.actualPrice = parseFloat(last);
-        // Update coin prices.
-        new Promise(() => {
-          const prices = this.createPricesList(chart);
-          if (prices.length) {
-            coin.pricesList1min = prices;
-            coin.MACD = this.createOnlyPricesList(chart);
-            // coin.calculateVolumeDifference(this.createVolumeList(chart), chart[keys[keys.length - 2]].volume);
-            coin.calculateVolumeDifference(this.createVolumeList(chart), chart[tick].volume);
-          }
-        });
+
+        // Parse the chart information and assign the values to its own variables
+        const { pricesTimeStamp, prices, volumes } = this.createArraysFromChartArray(chart);
+        if (prices.length) {
+          coin.pricesList1min = pricesTimeStamp;
+          coin.MACD = prices;
+          coin.calculateVolumeDifference(volumes, parseFloat(chart[tick].volume));
+        }
       }
 
     });

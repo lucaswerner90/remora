@@ -3,7 +3,7 @@ import { Grid, Typography, Fade } from '@material-ui/core';
 import { formatPrice } from '../../../common/utils/Format';
 
 const animationTime = 2 * 1000;
-
+const INITIAL_VALUE = '...';
 
 import { connect } from 'react-redux';
 
@@ -17,29 +17,22 @@ const roundValue = (value) => {
   return Math.round(value * 100) / 100;
 }
 export class BasicInfo extends Component {
-  shouldComponentUpdate(nextProps){
-    const { price, volumeDifference, priceChange, macdDifference } = this.props;
-    return price !== nextProps.price
-      || JSON.stringify(volumeDifference) !== JSON.stringify(nextProps.volumeDifference)
-      || priceChange !== nextProps.priceChange
-      || JSON.stringify(macdDifference) !== JSON.stringify(nextProps.macdDifference);
-  }
   render() {
-    const { volumeDifference = {difference: 0, mean:0, current: 0}, price, priceChange, macdDifference = { difference: 0, macd12: 0, macd26: 0 } } = this.props;
+    const { volumeDifference = { difference: INITIAL_VALUE, mean: INITIAL_VALUE, current: INITIAL_VALUE }, price = INITIAL_VALUE, priceChange = INITIAL_VALUE, macdDifference = { difference: INITIAL_VALUE, ma12: INITIAL_VALUE, ma26: INITIAL_VALUE } } = this.props;
     return (
       <Grid container spacing={16} alignItems="center" alignContent="space-around">
         <Grid item xs={12} sm={12} md={4}>
           <Typography align="center" variant="body1">
             CURRENT / MEAN VOLUME
             </Typography>
-          <Fade in={volumeDifference.mean > 0} timeout={{enter:animationTime}}>
+          <Fade in={volumeDifference.mean !== INITIAL_VALUE} timeout={{enter:animationTime}}>
             <React.Fragment>
-              <Typography align="center" color={volumeDifference.difference >= 100 ? 'primary' : 'secondary'} variant="h3">
-                {roundValue(volumeDifference.difference)}
+              <Typography align="center" color={volumeDifference.difference >= 0 ? 'primary' : 'secondary'} variant="h3">
+                {!isNaN(volumeDifference.difference) ? roundValue(volumeDifference.difference) : INITIAL_VALUE}
                 <span style={{ fontSize: '20px' }}>%</span>
               </Typography>
               <Typography align="center" variant="body2">
-                {formatPrice(roundValue(volumeDifference.current/1000)) || 0}k / {formatPrice(roundValue(volumeDifference.mean/1000)) || 0}k
+                {volumeDifference.current !== INITIAL_VALUE ? formatPrice(roundValue(volumeDifference.current / 1000)) : INITIAL_VALUE} / {volumeDifference.mean !== INITIAL_VALUE ? formatPrice(roundValue(volumeDifference.mean / 1000)) : INITIAL_VALUE} (K)
               </Typography>
             </React.Fragment>
           </Fade>
@@ -48,15 +41,15 @@ export class BasicInfo extends Component {
           <Typography align="center" variant="body1">
             PRICE
           </Typography>
-          <Fade in={price !== undefined} timeout={{ enter: animationTime }}>
+          <Fade in={price !== INITIAL_VALUE} timeout={{ enter: animationTime, exit: animationTime }}>
             <React.Fragment>
               <Typography align="center" variant="h3">
-                {formatPrice(price)}
+                {price !== INITIAL_VALUE ? formatPrice(price): '...'}
                 <span style={{ fontSize: '20px' }}>$</span>
               </Typography>
               <Typography align="center" variant="body1" color={priceChange >= 0 ? 'primary' : 'secondary'}>
                 <span style={{ fontSize: '15px' }}>{priceChange > 0 ? '+':''}</span>
-                {formatPrice(priceChange) || 0}
+                {priceChange !== INITIAL_VALUE ? formatPrice(priceChange) : INITIAL_VALUE}
                 <span style={{ fontSize: '15px' }}>%</span>
               </Typography>
             </React.Fragment>
@@ -65,16 +58,16 @@ export class BasicInfo extends Component {
         </Grid>
         <Grid item xs={12} sm={12} md={4}>
           <Typography align="center" variant="body1">
-            MOV. AVERAGE DIFFERENCE
+            MACD
           </Typography>
-          <Fade in={macdDifference.difference !== undefined} timeout={{ enter: animationTime }}>
+          <Fade in={macdDifference.difference !== INITIAL_VALUE} timeout={{ enter: animationTime }}>
             <React.Fragment>
               <Typography align="center" variant="h3" color={macdDifference.difference >= 0 ? 'primary' : 'secondary'}>
-                {roundValue(macdDifference.difference)}
+                {!isNaN(macdDifference.difference) ? roundValue(macdDifference.difference) : macdDifference.difference}
                 <span style={{ fontSize: '20px' }}>%</span>
               </Typography>
               <Typography align="center" variant="body2">
-                MA 12: {formatPrice(roundValue(macdDifference.macd12)) || 0}$ / MA 26: {formatPrice(roundValue(macdDifference.macd26)) || 0}$
+                MA 12: {!isNaN(macdDifference.ma12) ? roundValue(macdDifference.ma12) : 0}$ / MA 26: {!isNaN(macdDifference.ma26) ? roundValue(macdDifference.ma26) : 0}$
               </Typography>
             </React.Fragment>
           </Fade>

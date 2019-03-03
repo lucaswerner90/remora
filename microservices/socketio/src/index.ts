@@ -1,7 +1,4 @@
 import * as redis from 'redis';
-import * as express from 'express';
-import * as socketIo from 'socket.io';
-
 const configJson = require('./../config/config.json');
 const PORT:number = parseInt(process.env.PORT) || 5000;
 
@@ -9,9 +6,6 @@ const REDIS_CONFIGURATION = {
   host: 'redis',
   port: parseInt(process.env.REDIS_PORT) || 6379,
 };
-
-const app: express.Express = express();
-const server = app.listen(PORT);
 /**
  *
  *
@@ -25,7 +19,7 @@ class SocketIOServer {
    * @private
    * @memberof SocketIOServer
    */
-  private ioServer = socketIo.listen(server);
+  private ioServer = require('socket.io')({ transports:['pooling'] });
 
   /**
    *
@@ -41,8 +35,11 @@ class SocketIOServer {
   private channelList: string[] = configJson.channelList;
 
   constructor() {
-    this.initConnection();
+    this.ioServer.on('connection', (socket) => {
+      this.initChat(socket);
+    });
     this.initRedisSubscriber();
+    this.ioServer.listen(PORT);
   }
 
   public async getAllCoins(): Promise<any> {
@@ -56,24 +53,16 @@ class SocketIOServer {
     });
   }
   private initRedisSubscriber() {
-
+    console.log('Initializing redis suscriber...');
     this.redisSubscriber.on('ready', this.redisOnConnect.bind(this));
-    this.redisSubscriber.on('message', this.redisOnMessage.bind(this));
-    for (let i = 0; i < this.channelList.length; i++) {
-      this.redisSubscriber.subscribe(this.channelList[i]);
-    }
-  }
-  private initConnection() {
-    this.ioServer.on('connection', (socket) => {
-      this.initChat(socket);
-    });
   }
 
-  private async initChat(socket:socketIo.Socket) {
+  private async initChat(socket) {
     const coins = await this.getAllCoins();
     const coinsID = Object.keys(coins);
     for (let i = 0; i < coinsID.length; i++) {
       socket.on(`${coinsID[i]}_chat`, (msg) => {
+        console.log(`${coinsID[i]}_chat :`, msg);
         this.redisPublisher.rpush(`${coinsID[i]}_chat_messages`, JSON.stringify(msg));
         this.ioServer.emit(`${coinsID[i]}_chat`, msg);
       });
@@ -82,6 +71,10 @@ class SocketIOServer {
 
   private redisOnConnect() {
     console.log('SocketIO redis publisher has been connected! :D ');
+    this.redisSubscriber.on('message', this.redisOnMessage.bind(this));
+    for (let i = 0; i < this.channelList.length; i++) {
+      this.redisSubscriber.subscribe(this.channelList[i]);
+    }
   }
 
   private redisOnMessage(channel:string, message:string) {
@@ -90,16 +83,16 @@ class SocketIOServer {
       const finalChannel = messageParsed.coin.id;
       let finalData: any = {};
       switch (channel) {
+        case 'notifications':
+          finalData = messageParsed;
+          break;
         case 'macd_difference':
-          finalData = messageParsed;
-          break;
         case 'tweets':
-          finalData = messageParsed;
-          break;
         case 'last_news':
-          finalData = messageParsed;
-          break;
         case 'count_orders':
+        case 'order':
+        case 'previous_order':
+        case 'mean_order_value':
           finalData = messageParsed;
           break;
         case 'latest_price':
@@ -115,24 +108,17 @@ class SocketIOServer {
         case 'price_list_2hour':
           finalData = { pricesList: messageParsed.prices };
           break;
-        case 'order':
-          finalData = messageParsed;
-          break;
-        case 'previous_order':
-          finalData = messageParsed;
-          break;
-        case 'mean_order_value':
-          finalData = messageParsed;
-          break;
         case 'volume_difference':
           finalData = { volumeDifference: messageParsed.volumeDifference };
           break;
         default:
           break;
       }
-      this.ioServer.sockets.emit(finalChannel, { message: channel, info: finalData });
-      this.ioServer.sockets.emit(`${finalChannel}_${channel}`, { message: channel, info: finalData });
-
+      if (channel === 'tweets' || channel === 'last_news') {
+        this.ioServer.emit(finalChannel, { message: channel, info: finalData });
+      } else {
+        this.ioServer.emit(`${finalChannel}_${channel}`, { message: channel, info: finalData });
+      }
     }
   }
 }

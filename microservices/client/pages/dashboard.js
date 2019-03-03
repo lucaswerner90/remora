@@ -12,11 +12,10 @@ import Auth from '../components/authentication/Auth';
 
 import fetch from 'isomorphic-unfetch';
 import getConfig from 'next/config';
-
+import Head from 'next/head';
 import {connect} from 'react-redux';
 import { updateUserPreferences, updateUserInfo } from '../redux/actions/userPreferencesActions';
 import { updateAllCoins } from '../redux/actions/coinsActions';
-import { updateChartTimeline } from '../redux/actions/dashboardActions';
 import Loading from '../components/common/utils/Loading';
 
 const { publicRuntimeConfig } = getConfig();
@@ -27,14 +26,10 @@ const styles = () => ({
     flexGrow: 1,
   },
 });
-
-const introMessages = [
-  "I'll show you their footprints my captain...",
-  "We're making the impossible...possible! Help us!",
-  "Don't forget to chat with the other remoras in the sea!",
-  "Let them work for us for once...",
-  "We make it easy...",
-];
+const mapReduxStateToComponentProps = state => ({
+  price: state.live.price,
+  coinInfo: state.coins.all[state.user.userPreferences.selectedCoin],
+});
 
 class Dashboard extends React.Component {
   
@@ -83,37 +78,45 @@ class Dashboard extends React.Component {
   }
   render() {
     const { loading = true } = this.state;
+    const { price = 0, coinInfo = {name: ''} } = this.props;
     if (loading) {
       return (
-        <Fade in={loading} timeout={{ enter: 2 * 1000, exit: 2 * 1000 }}>
-          <Grid container justify="center" direction="row" alignContent="center" style={{ flexGrow: 1, height: '110vh' }} spacing={40}>
-            <Grid item xs={12} sm={12} md={12}>
-              <Typography align="center" variant="h3">
-                rémora
-              </Typography>
+        <React.Fragment>
+          <Fade in={loading} timeout={{ enter: 2 * 1000, exit: 2 * 1000 }}>
+            <Grid container justify="center" direction="row" alignContent="center" style={{ flexGrow: 1, height: '110vh' }} spacing={40}>
+              <Grid item xs={12} sm={12} md={12}>
+                <Typography align="center" variant="h3">
+                  rémora
+                </Typography>
+              </Grid>
+              <Loading/>
             </Grid>
-            <Loading/>
-          </Grid>
-        </Fade>
+          </Fade>
+        </React.Fragment>
       );
     } else {
       return (
-        <Fade in={!loading} timeout={{ enter: 2 * 1000, exit: 5 * 1000 }}>
-          <Layout>
-            <Grid container style={{ flexGrow: 1, height: '150vh' }} spacing={24}>
-              <Grid item xs={12} sm={12} md={9} style={{ borderRight: '1px solid #ffffff40'}}>
-                <CoinDetailView />
+        <React.Fragment>
+          <Head>
+            <title>Rémora 🐋 {coinInfo.name} - {price}$</title>
+          </Head>
+          <Fade in={!loading} timeout={{ enter: 2 * 1000, exit: 5 * 1000 }}>
+            <Layout>
+              <Grid container style={{ flexGrow: 1, height: '150vh' }} spacing={24}>
+                <Grid item xs={12} sm={12} md={9} style={{ borderRight: '1px solid #ffffff40'}}>
+                  <CoinDetailView />
+                </Grid>
+                <Grid item xs={12} sm={12} md={3}>
+                  <RightSideView />
+                </Grid>
               </Grid>
-              <Grid item xs={12} sm={12} md={3}>
-                <RightSideView />
-              </Grid>
-            </Grid>
-            <CoinChat />
-          </Layout>
-        </Fade>
+              <CoinChat />
+            </Layout>
+          </Fade>
+        </React.Fragment>
       );
     }
   }
 }
 
-export default connect(null, { updateUserPreferences, updateUserInfo, updateAllCoins, updateChartTimeline })(withStyles(styles)(Dashboard));
+export default connect(mapReduxStateToComponentProps, { updateUserPreferences, updateUserInfo, updateAllCoins })(withStyles(styles)(Dashboard));

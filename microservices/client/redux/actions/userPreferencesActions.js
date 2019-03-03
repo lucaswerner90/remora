@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-unfetch';
 import store from '../store';
 
-import { UPDATE_USER_PREFERENCES, UPDATE_USER_FAVORITE_COINS, UPDATE_USER_SELECTED_COIN, UPDATE_USER_INFO, UPDATE_USER_NOTIFICATIONS } from './types';
+import { UPDATE_USER_PREFERENCES, UPDATE_USER_FAVORITE_COINS, UPDATE_USER_SELECTED_COIN, UPDATE_USER_INFO, UPDATE_USER_NOTIFICATIONS, RESET_INFO } from './types';
 
 import getConfig from 'next/config';
 
@@ -31,6 +31,9 @@ export const updateUserSelectedCoin = payload => async dispatch => {
   try {
     const response = await sendPostRequest(payload, 'selected');
     if (!response.error) {
+      dispatch({
+        type: RESET_INFO,
+      });
       dispatch({
         payload,
         type: UPDATE_USER_SELECTED_COIN,

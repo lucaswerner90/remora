@@ -41,7 +41,23 @@ export const getLastNews = async(coinName) => {
     return {};
   }
 }
-const getCoinProperty = async (coinID, property) => {
+export const getLastNotifications = async(coinName) => {
+  if (coinName) {
+    const userRequestData = {
+      method: 'POST',
+      body: JSON.stringify({ coinName }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+    const response = await fetch(`${api}/api/coin/notifications`, userRequestData);
+    const { value = {} } = await response.json();
+    return value;
+  } else {
+    return {};
+  }
+}
+export const getCoinProperty = async (coinID, property) => {
   if (coinID) {
     const userRequestData = {
       method: 'POST',
@@ -58,23 +74,27 @@ const getCoinProperty = async (coinID, property) => {
   }
 }
 
-const getCoinPricesList = async (coinID) => {
-  const timeline = store.getState().dashboard.chartTimeline;
-  let value = [];
-  if (timeline === timelineChartValues.MINUTE || timeline === timelineChartValues.REALTIME) {
-    value = await getCoinProperty(coinID, 'price_list_1min');
+export const getCoinPricesList = async (coinID, timeline = store.getState().dashboard.chartTimeline) => {
+  let property = ''
+  if (timeline === timelineChartValues.MINUTE) {
+    property = 'price_list_1min';
   } else if (timeline === timelineChartValues.FIVE) {
-    value = await getCoinProperty(coinID, 'price_list_5min');
+    property = 'price_list_5min';
+  } else if (timeline === timelineChartValues.FIFTEEN){
+    property = 'price_list_15min';
+  } else if (timeline === timelineChartValues.HOUR){
+    property = 'price_list_1hour';
   } else {
-    value = await getCoinProperty(coinID, 'price_list_15min');
+    property = 'price_list_2hour';
   }
+  const value = await getCoinProperty(coinID, property);
   store.dispatch({
     payload: value.prices,
     type: UPDATE_SELECTED_PRICES_LIST,
   });
 }
 const getCoinPrice = async (coinID) => {
-  const value = await getCoinProperty(coinID, 'price');
+  const value = await getCoinProperty(coinID, 'latest_price');
   const price = value && value.price ? value.price : 0;
   store.dispatch({
     payload: price,

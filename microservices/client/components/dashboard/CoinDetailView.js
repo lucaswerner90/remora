@@ -29,14 +29,6 @@ const mapReduxStateToComponentProps = state => ({
   previousSellOrder: state.live.previousSellOrder
 });
 
-const timelineChartValues = {
-  REALTIME: 'REAL',
-  MINUTE: 'MINUTE',
-  FIVE: 'FIVE',
-  FIFTEEN: 'FIFTEEN'
-}
-
-
 export class CoinDetailView extends Component {
 
   static propTypes = {
@@ -62,6 +54,7 @@ export class CoinDetailView extends Component {
     const { selectedCoin = '' } = this.props;
     coinSocket.closeCoinConnections(selectedCoin);
   }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.selectedCoin && nextProps.selectedCoin !== this.props.selectedCoin) {
       coinSocket.closeCoinConnections(this.props.selectedCoin);
@@ -85,7 +78,8 @@ export class CoinDetailView extends Component {
                       {`${coinInfo.exchange}`}
                     </Typography>
                     <Typography align="center" variant="h4">
-                      {`${coinInfo.name} (${coinInfo.symbol})`}
+                      {coinInfo.name}
+                      <span style={{fontSize:'0.75rem'}}> ({coinInfo.symbol}) </span>
                       <IconButton aria-label="Open coin url" onClick={() => window.open(coinInfo.url, 'blank')}>
                         <OpenInNew />
                       </IconButton>

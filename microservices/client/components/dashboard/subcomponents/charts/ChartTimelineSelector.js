@@ -6,6 +6,7 @@ import { updateChartTimeline } from '../../../../redux/actions/dashboardActions'
 
 import { timelineChartValues } from '../../../common/constants';
 import coinSocket from '../../../common/socket/CoinSocket';
+import { getCoinPricesList } from '../../../common/utils/FetchCoinData';
 
 const mapReduxStateToComponentProps = state => ({
   selected: state.dashboard.chartTimeline,
@@ -59,12 +60,12 @@ class ChartTimelineSelector extends Component {
       default:
         break;
     }
-    // Change the channel where we receive the price data
-    const { coin } = this.props;
-    coinSocket.closeSpecificConnection(coin, coinSocket.getTimelineChannelValue(this.props.selected));
-    coinSocket.openSpecificConnection(coin, coinSocket.getTimelineChannelValue(timeline), coinSocket.onPricesSocketData);
-
+    const { coin = '',selected } = this.props;
+    getCoinPricesList(coin, timeline);
     this.props.updateChartTimeline(timeline);
+    // Change the channel where we receive the price data
+    coinSocket.closeSpecificConnection(coin, coinSocket.getTimelineChannelValue(selected));
+    coinSocket.openSpecificConnection(coin, coinSocket.getTimelineChannelValue(timeline), coinSocket.onPricesSocketData);
   }
   render() {
     const { selected } = this.props;

@@ -13,6 +13,11 @@ router.get('/all', async(req, res) => {
   }
 });
 
+router.post('/notifications', async ({ body }, res) => {
+  const { coinName = '' } = body;
+  const key: any = await redis.getNotifications(coinName.trim());
+  res.send({ value: key });
+});
 router.post('/tweets', async ({ body }, res) => {
   const { coinName = '' } = body;
   const key: any = await redis.getTweets(coinName.trim().toLowerCase());

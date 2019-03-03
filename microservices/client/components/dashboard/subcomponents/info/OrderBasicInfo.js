@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Grid, Typography, Fade } from '@material-ui/core';
-import { formatPriceToFixed, formatPriceToFixed0 } from '../../../common/utils/Format';
+import { formatPrice, formatPriceToFixed } from '../../../common/utils/Format';
 
 
 import { connect } from 'react-redux';
@@ -38,7 +38,7 @@ export class OrderBasicInfo extends Component {
                 </Typography>
                 <Fade in={price > 0} timeout={{ enter: animationTime }}>
                   <Typography align="left" variant="h4" color={color}>
-                    {price > 0 ? formatPriceToFixed(parseFloat(price)) : ' - '}
+                    {price > 0 ? formatPrice(parseFloat(price)) : ' - '}
                     <span style={{ fontSize: '12px' }}>$</span>
                   </Typography>
                 </Fade>
@@ -50,7 +50,7 @@ export class OrderBasicInfo extends Component {
                 </Typography>
                 <Fade in={!isNaN(currentValues.quantity)} timeout={{ enter: animationTime }}>
                   <Typography align="left" variant="h4" color={color}>
-                    {!isNaN(currentValues.quantity) ? formatPriceToFixed0(parseFloat(currentValues.quantity)) : currentValues.quantity}
+                  {!isNaN(currentValues.quantity) ? formatPriceToFixed(parseFloat(currentValues.quantity)) : currentValues.quantity}
                     <span style={{ fontSize: '12px' }}>$</span>
                   </Typography>
                 </Fade>

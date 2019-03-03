@@ -18,10 +18,10 @@ import { connect } from 'react-redux';
 
 import fetch from 'isomorphic-unfetch';
 
-import io from 'socket.io-client';
 import getConfig from 'next/config';
 import { Divider, Avatar, ClickAwayListener, Fade } from '@material-ui/core';
 import { cyan } from '@material-ui/core/colors';
+import coinSocket from '../../../common/socket/CoinSocket';
 
 const mapReduxStateToComponentProps = state => ({
   selectedCoin: state.user.userPreferences.selectedCoin,
@@ -40,8 +40,6 @@ const welcomeMessage = {
 }
 const { publicRuntimeConfig } = getConfig();
 const { api } = publicRuntimeConfig;
-
-const socket = io(api, { forceNew: true });
 
 export class Chat extends Component {
   state = {
@@ -86,14 +84,14 @@ export class Chat extends Component {
       created: Date.now(),
       avatar: this.props.avatar || '',
     };
-    socket.emit(`${this.props.selectedCoin}_chat`, info);
+    coinSocket.socket.emit(`${this.props.selectedCoin}_chat`, info);
     this.setState({ ...this.state, message: '' });
     
   }
   componentWillReceiveProps(nextProps) {
     const newChannel = `${nextProps.selectedCoin}_chat`;
-    socket.off(`${this.props.selectedCoin}_chat`);
-    socket.on(newChannel, this.onReceiveChatMessage);
+    coinSocket.socket.off(`${this.props.selectedCoin}_chat`);
+    coinSocket.socket.on(newChannel, this.onReceiveChatMessage);
     this.setState({
       ...this.state,
       open: false,
@@ -121,20 +119,20 @@ export class Chat extends Component {
     } else {
       this.setState({
         ...this.state,
-        pendingNotifications: messages.length,
+        pendingNotifications: messages.filter(msg => msg.created > this.state.lastTimeSeen).length,
         chatMessages: messages.length ? messages : [welcomeMessage]
       });
       
     }
   }
   componentDidMount() {
-    socket.on(`${this.props.selectedCoin}_chat`, this.onReceiveChatMessage);
+    coinSocket.socket.on(`${this.props.selectedCoin}_chat`, this.onReceiveChatMessage);
     this.getInitialMessages(`${this.props.selectedCoin}_chat`);
 
   }
 
   componentWillUnmount() {
-    socket.off(`${this.props.selectedCoin}_chat`);
+    coinSocket.socket.off(`${this.props.selectedCoin}_chat`);
   }
 
   renderMessages = (chatMessages) => {
@@ -176,6 +174,13 @@ export class Chat extends Component {
       );
     });
   }
+  handleOpenCloseChat = () => {
+    const isOpened = !this.state.open;
+    this.setState({ ...this.state, open: isOpened, lastTimeSeen: Date.now()});
+  }
+  handleClickAwayListener = () => {
+    this.setState({ ...this.state, open: false, lastTimeSeen: Date.now() });
+  }
   render() {
     const { chatMessages = [] } = this.state;
     const { coinInfo = { name: '', exchange: '', symbol: '', against: '' } } = this.props;
@@ -183,67 +188,62 @@ export class Chat extends Component {
     if (open) {
       return (
         <div style={{ ...chatStyle, maxWidth: '350px' }}>
-          <ClickAwayListener onClickAway={() => this.setState({ ...this.state, open: false })}>
+          <ClickAwayListener onClickAway={this.handleClickAwayListener}>
             <Fade in={open} timeout={{ enter: 1 * 1000, exit: 1 * 1000 }}>
-            
-            <Grid container spacing={16} style={{ background: 'rgba(4, 21, 51, 0.85)', padding: 20, borderRadius: 10 }}>
-              <Grid item xs={12} sm={12} md={12}>
-                <Typography variant="h6">
-                  {coinInfo.name} ({coinInfo.symbol})
-                </Typography>
-                <Typography variant="body2" style={{ textTransform: 'uppercase' }}>
-                  {coinInfo.exchange}
-                </Typography>
-                <Divider style={{ marginTop: '10px' }} />
+              <Grid container spacing={16} style={{ background: 'rgba(4, 21, 51, 0.85)', padding: 20, borderRadius: 10 }}>
+                <Grid item xs={12} sm={12} md={12}>
+                  <Typography variant="h6">
+                    {coinInfo.name} ({coinInfo.symbol})
+                  </Typography>
+                  <Typography variant="body2" style={{ textTransform: 'uppercase' }}>
+                    {coinInfo.exchange}
+                  </Typography>
+                  <Divider style={{ marginTop: '10px' }} />
+                </Grid>
+                <Grid item xs={12} sm={12} md={12}>
+                  <List dense={true} style={{ overflowY: 'auto', height: '40vh' }}>
+                    {this.renderMessages(chatMessages)}
+                    <div ref={this.ref} id="lastListItem"></div>
+                  </List>
+                </Grid>
+                <Grid item xs={12} sm={12} md={12}>
+                  <TextField
+                    placeholder="Send a message"
+                    fullWidth
+                    value={this.state.message}
+                    onKeyPress={({ key }) => {
+                      if (key === 'Enter') this.onSendMessage();
+                    }}
+                    autoFocus={true}
+                    onChange={this.handleMessageChange}
+                    margin="dense"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => this.onSendMessage()} aria-label="Send message">
+                            <SendIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12} sm={12} md={12}>
-                <List dense={true} style={{ overflowY: 'auto', height: '40vh' }}>
-                  {this.renderMessages(chatMessages)}
-                  <div ref={this.ref} id="lastListItem"></div>
-                </List>
-              </Grid>
-              <Grid item xs={12} sm={12} md={12}>
-                <TextField
-                  placeholder="Send a message"
-                  fullWidth
-                  value={this.state.message}
-                  onKeyPress={({ key }) => {
-                    if (key === 'Enter') this.onSendMessage();
-                  }}
-                  autoFocus={true}
-                  onChange={this.handleMessageChange}
-                  margin="dense"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={() => this.onSendMessage()} aria-label="Send message">
-                          <SendIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-            </Grid>
             </Fade>
           </ClickAwayListener>
-          <IconButton style={{ float: 'right', background: '#0000001f' }} onClick={() => {
-            this.setState({ ...this.state, open: !this.state.open, pendingNotifications: 0 });
-          }
-          }>
+          <IconButton style={{ float: 'right', background: '#0000001f' }} onClick={this.handleOpenCloseChat}>
             <ChatIcon />
           </IconButton>
-              
         </div>
       );
     } else {
       return (
         <div style={chatStyle}>
           <Badge badgeContent={pendingNotifications > 1 ? '+1' : pendingNotifications} color="secondary">
-            <IconButton style={{ background: '#0000001f'}} onClick={() => this.setState({...this.state, open: !this.state.open})}>
+            <IconButton style={{ background: '#0000001f'}} onClick={this.handleOpenCloseChat}>
               <ChatIcon />
             </IconButton>
           </Badge>
