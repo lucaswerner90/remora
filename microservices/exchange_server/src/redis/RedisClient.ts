@@ -30,7 +30,7 @@ export default class RedisClient {
   public sendNotification(value:string, coinID:string) {
     this.clientPublisher.publish('notifications', value);
     this.client.lpush(`${coinID}_notifications`, value, () => {
-      this.client.ltrim(`${coinID}_notifications`, 0, 19);
+      this.client.ltrim(`${coinID}_notifications`, 0, 99);
     });
   }
   public setVolumeDifferenceValue(key: string, value: string) {

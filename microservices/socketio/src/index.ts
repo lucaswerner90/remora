@@ -90,10 +90,8 @@ class SocketIOServer {
           break;
         case 'macd_difference':
         case 'tweets':
-        case 'count_orders':
         case 'order':
         case 'previous_order':
-        case 'mean_order_value':
           finalData = messageParsed;
           break;
         case 'latest_price':
@@ -117,7 +115,7 @@ class SocketIOServer {
       }
       if (channel === 'tweets' || channel === 'last_news') {
         const globalChannel = `${messageParsed.coin.name.toLowerCase()}_${channel}`;
-        this.ioServer.emit(globalChannel, { message: channel, info: finalData });
+        this.ioServer.emit(globalChannel, { info: finalData });
       } else {
         this.ioServer.emit(`${finalChannel}_${channel}`, { message: channel, info: finalData });
       }

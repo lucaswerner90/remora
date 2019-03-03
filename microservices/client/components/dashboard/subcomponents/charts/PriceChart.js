@@ -156,7 +156,7 @@ class PriceChart extends React.Component {
       } : {};
 
       const priceAnnotation = price > 0 ? {
-        y: price,
+        y: pricesFiltered[pricesFiltered.length-1][1],
         strokeDashArray: 0,
         borderColor: '#ffffff7a'
       } : {};

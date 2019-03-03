@@ -128,8 +128,8 @@ class NotificationsList extends React.Component {
   }
   onSocketData = ({ info = {} }) => {
     let { notifications } = this.state;
-    if(notifications.length > 50){
-      notifications = notifications.splice(notifications.length - 50);
+    if(notifications.length > 100){
+      notifications = notifications.splice(notifications.length - 100);
     }
     this.setState({ ...this.state, notifications: [info, ...notifications] });
   }
