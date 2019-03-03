@@ -26,9 +26,8 @@ router.post('/tweets', async ({ body }, res) => {
 
 router.post('/news', async ({ body }, res) => {
   const { coinName = '' } = body;
-  const redisKey = `${coinName.trim().toLowerCase()}_last_news`;
   // ethereum_last_news
-  const key: any = await redis.getKeyValue(redisKey);
+  const key = await redis.getNews(coinName.trim().toLowerCase());
   res.send({ value: key });
 });
 

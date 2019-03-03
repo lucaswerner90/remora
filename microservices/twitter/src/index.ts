@@ -20,7 +20,8 @@ const COIN_PROFILES = {
   'binance coin': 'binance',
   litecoin: 'satoshilite',
   tron: 'tronfoundation',
-  eos: 'block_one',
+  eos: 'block_one_',
+  'ethereum classic':'eth_classic',
   fetchai: 'fetch_ai',
   bittorrent: 'BitTorrent',
   icon: 'helloiconworld',
@@ -38,6 +39,7 @@ const api = new twit(config_twitter);
 const initTwitterStream = (coin = { name: '' }, account = '') => {
   api.get('statuses/user_timeline', { screen_name: account, count: TWITTER_COUNT, language: 'en', tweet_mode: 'extended', result_type: 'recent' }, (err, data, response) => {
     const tweets: any[] = data || [];
+    console.log(account, new Date(Date.now()).toLocaleString(), tweets.length);
     for (let i = 0; i < tweets.length; i++) {
       const tweet = tweets[i];
       const { user = {}, created_at = '', id } = tweet.retweeted_status ? tweet.retweeted_status : tweet;

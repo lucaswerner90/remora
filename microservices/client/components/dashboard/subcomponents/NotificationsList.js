@@ -16,6 +16,7 @@ import { getLastNotifications } from '../../common/utils/FetchCoinData';
 import VolumeNotification from './notifications/VolumeNotification';
 import MANotification from './notifications/MANotification';
 import PriceDifferenceNotification from './notifications/PriceDifferenceNotification';
+import Loading from '../../common/utils/Loading';
 
 const mapReduxStateToComponentProps = state => ({
   selected: state.user.userPreferences.selectedCoin,
@@ -54,19 +55,39 @@ class NotificationsList extends React.Component {
   };
   handleShowOnlySelected = (e, onlySelected) => {
     this.setState({ ...this.state, onlySelected });
+    if (onlySelected) {
+      const { selected } = this.props;
+      this.loadInitialNotifications([selected]);
+    } else {
+      const { favorites } = this.props;
+      this.loadInitialNotifications(favorites);
+    }
   }
   componentWillUnmount() {
-    const currentCoins = this.props.favorites;
-    for (let i = 0; i < currentCoins.length; i++) {
-      coinSocket.closeSpecificConnection(currentCoins[i], 'notifications');
+    const { onlySelected } = this.state;
+    if (onlySelected) {
+      const { selected } = this.props;
+      coinSocket.closeSpecificConnection(selected, 'notifications');
+    } else {
+      const currentCoins = this.props.favorites;
+      for (let i = 0; i < currentCoins.length; i++) {
+        coinSocket.closeSpecificConnection(currentCoins[i], 'notifications');
+      }
     }
   }
   componentDidMount() {
-    const currentCoins = this.props.favorites;
-    for (let i = 0; i < currentCoins.length; i++) {
-      coinSocket.openSpecificConnection(currentCoins[i], 'notifications', this.onSocketData);
+    const { onlySelected } = this.state;
+    if (onlySelected) {
+      const { selected } = this.props;
+      coinSocket.openSpecificConnection(selected, 'notifications', this.onSocketData);
+      this.loadInitialNotifications([selected]);
+    } else {
+      const currentCoins = this.props.favorites;
+      for (let i = 0; i < currentCoins.length; i++) {
+        coinSocket.openSpecificConnection(currentCoins[i], 'notifications', this.onSocketData);
+      }
+      this.loadInitialNotifications(currentCoins);
     }
-    this.loadInitialNotifications(currentCoins);
   }
   loadInitialNotifications = async(coins = []) => {
     const notifArray = []
@@ -85,8 +106,9 @@ class NotificationsList extends React.Component {
     finalNotifications = finalNotifications.sort(sortNotifications);
     this.setState({ ...this.state, notifications: finalNotifications.sort(sortNotifications) });
   }
-  componentWillReceiveProps({ favorites = []}) {
+  componentWillReceiveProps({ favorites = [],selected}) {
     const currentCoins = this.props.favorites;
+    const { onlySelected } = this.state;
     const newCoins = favorites;
     if (currentCoins.length !== newCoins.length) {
       this.loadInitialNotifications(newCoins);
@@ -97,11 +119,18 @@ class NotificationsList extends React.Component {
         coinSocket.openSpecificConnection(currentCoins[i],'notifications', this.onSocketData);
       }
     }
+    if (selected !== this.props.selected && onlySelected) {
+      coinSocket.closeSpecificConnection(this.props.selected, 'notifications');
+      coinSocket.openSpecificConnection(selected, 'notifications', this.onSocketData);
+      this.loadInitialNotifications([selected]);
+    }
     return true;
   }
   onSocketData = ({ info = {} }) => {
     const { notifications } = this.state;
-    notifications.pop();
+    if(notifications.length > 50){
+      notifications = notifications.splice(notifications.length - 50);
+    }
     this.setState({ ...this.state, notifications: [info, ...notifications] });
   }
   selectCoin = (coinID = '') => {
@@ -140,7 +169,7 @@ class NotificationsList extends React.Component {
       );
     }
     return (
-      <Grid container spacing={16} style={{ height: '40vh' }} alignItems="center" justify="space-between">
+      <Grid container spacing={16} alignItems="center" justify="space-between">
         <Grid item>
           <Typography className={classes.padding} variant="h6">
             NOTIFICATIONS

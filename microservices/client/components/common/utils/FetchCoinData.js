@@ -35,7 +35,7 @@ export const getLastNews = async(coinName) => {
       }
     };
     const response = await fetch(`${api}/api/coin/news`, userRequestData);
-    const { value = {} } = await response.json();
+    const { value } = await response.json();
     return value;
   } else {
     return {};

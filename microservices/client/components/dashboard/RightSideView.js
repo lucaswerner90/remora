@@ -52,7 +52,7 @@ class RightSideView extends React.Component {
           <CoinsList filter={this.state.filter} style={{height:'30vh'}}/>
         </Grid>
         <Grid item xs={12} sm={12} md={12} style={{ paddingTop: 0 }}>
-          <NotificationsList filter={this.state.filter} style={{ height: '40vh' }}/>
+          <NotificationsList filter={this.state.filter} style={{ height: '30vh' }}/>
         </Grid>
       </Grid>
     );

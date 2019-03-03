@@ -88,5 +88,14 @@
             "order": 100000,
             "volume": 50
         }
+    },
+    "ETCUSDT": {
+        "acronym": "ETC",
+        "url": "https://www.binance.com/en/trade/pro/ETC_USDT",
+        "name": "Ethereum Classic",
+        "alarm": {
+            "order": 100000,
+            "volume": 50
+        }
     }
 }

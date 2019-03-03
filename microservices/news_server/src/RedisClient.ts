@@ -43,7 +43,16 @@ export default class RedisClient {
     });
 
   }
-
+  public async getNews(coinName = ''): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.client.lrange(`${coinName}_last_news`, 0, 19, (err, reply) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(reply.map(article => JSON.parse(article)));
+      });
+    });
+  }
   /**
    *
    *
@@ -53,7 +62,10 @@ export default class RedisClient {
   public setLastNews(coinName:string, value: string = '') {
     const key = `${coinName}_last_news`;
     this.clientPublisher.publish('last_news', value);
-    this.client.set(key, value);
+    const { info = {} } = JSON.parse(value);
+    this.client.lpush(key, JSON.stringify(info), () => {
+      this.client.ltrim(key, 0, 19);
+    });
   }
 
   public async getAllCoins(): Promise<any> {

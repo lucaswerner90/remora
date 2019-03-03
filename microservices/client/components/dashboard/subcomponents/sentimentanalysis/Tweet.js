@@ -8,7 +8,7 @@ const Tweet = ({ tweet }) => {
   return (
     <ListItem alignItems="flex-start" dense button onClick={() => window.open(`https://twitter.com/${user.screen_name}`, '_blank')}>
       <ListItemAvatar>
-        <Avatar alt={user.screen_name} src={user.profile_image_url} />
+        <Avatar alt={user.screen_name} style={{width:40,height:40}} src={user.profile_image_url} />
       </ListItemAvatar>
       <ListItemText
         primary={

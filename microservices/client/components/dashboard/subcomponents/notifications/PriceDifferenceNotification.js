@@ -30,7 +30,7 @@ function PriceDifferenceNotification({ notification, selectCoin }) {
         primary={
           <Grid container justify="space-between" alignItems="center">
             <Grid item>
-              <Typography variant="h5" color={good ? 'primary' : 'secondary'}>
+              <Typography variant="h5" component="p" color={good ? 'primary' : 'secondary'}>
                 Price anomaly
               </Typography>
             </Grid>
@@ -44,7 +44,7 @@ function PriceDifferenceNotification({ notification, selectCoin }) {
         secondary={
           <Grid container justify="flex-start" alignItems="center" spacing={24}>
             <Grid item>
-              <Typography align="left" variant="body2">
+              <Typography align="left" component="p" variant="body2">
                 {coin.symbol} | <strong>{data > 0 ? '+' : ''}{data}</strong>%
               </Typography>
             </Grid>

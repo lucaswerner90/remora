@@ -2,32 +2,32 @@ version: "3"
 
 services:
 
-  # twitter:
-  #   build: ./microservices/twitter
-  #   restart: always
-  #   command: yarn run start-dev
-  #   environment:
-  #     - NODE_ENV=development
-  #   volumes:
-  #     - ./microservices/twitter/src:/src
-  #     - ./microservices/twitter/node_modules:/node_modules
-  #     - ./microservices/twitter/package.json:/package.json
-  #   depends_on:
-  #     - redis
+  twitter:
+    build: ./microservices/twitter
+    restart: always
+    command: yarn run start-dev
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./microservices/twitter/src:/src
+      - ./microservices/twitter/node_modules:/node_modules
+      - ./microservices/twitter/package.json:/package.json
+    depends_on:
+      - redis
 
 
-  # news_server:
-  #   build: ./microservices/news_server
-  #   restart: always
-  #   command: yarn run start-dev
-  #   environment:
-  #     - NODE_ENV=development
-  #   volumes:
-  #     - ./microservices/news_server/src:/src
-  #     - ./microservices/news_server/node_modules:/node_modules
-  #     - ./microservices/news_server/package.json:/package.json
-  #   depends_on:
-  #     - redis
+  news_server:
+    build: ./microservices/news_server
+    restart: always
+    command: yarn run start-dev
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./microservices/news_server/src:/src
+      - ./microservices/news_server/node_modules:/node_modules
+      - ./microservices/news_server/package.json:/package.json
+    depends_on:
+      - redis
 
   redis-commander:
     container_name: redis-commander

@@ -24,6 +24,7 @@ import Coin from './coinslist/Coin';
 
 
 const mapReduxStateToComponentProps = state => ({
+  selected: state.user.userPreferences.selectedCoin,
   favorites: state.user.userPreferences.favorites,
   coins: Object.values(state.coins.all)
 });
@@ -58,7 +59,10 @@ class CoinsList extends React.Component {
   }
 
   selectCoin = (coinID = '') => {
-    this.props.updateUserSelectedCoin(coinID);
+    const { selected } = this.props;
+    if (coinID !== selected) {
+      this.props.updateUserSelectedCoin(coinID);
+    }
   }
   componentWillReceiveProps({ coins = [] }) {
     this.setState({ ...this.state, coins });
@@ -112,7 +116,15 @@ class CoinsList extends React.Component {
     return true;
   }
   
-  sortCoin = (a, b) => a.name < b.name;
+  sortCoin = (a, b) => {
+    if (a.name.toLowerCase() < b.name.toLowerCase()){
+      return -1;
+    }
+    if (a.name.toLowerCase() > b.name.toLowerCase()) {
+      return 1;
+    }
+    return 0;
+  };
 
 
   handlerFilterChange = (event = new Event()) => {

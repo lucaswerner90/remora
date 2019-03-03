@@ -84,19 +84,29 @@ export default class NewsAPIServer {
    * @memberof NewsAPIServer
    */
   public async getHeadlines(coin, coinName:string = '') {
-    const lastMonth = new Date(Date.now() - (30 * 24 * 60 * 60 * 1000));
     try {
-      const response: INewsResponse = await newsapi.v2.topHeadlines({
-        from: `${lastMonth.getFullYear()}-${lastMonth.getMonth() + 1}-${lastMonth.getDate()}`,
+      const response: INewsResponse = await newsapi.v2.everything({
         q: coinName,
-        language:'en',
-        category:'business',
+        sources: 'fortune, abc-news, bloomberg, business-insider, cnbc, crypto-coins-news, engadget, financial-post, financial-times, hacker-news, the-economist',
         sortBy: 'relevance',
       });
       if (response.status === 'ok' && response.articles.length) {
+        const existentNews = await this.redisClient.getNews(coinName);
         const { articles = [] } = response;
-        const sentimentalArticles = articles.map(article => ({ ...article, sentiment: sentiment.analyze(article.description).score }));
-        this.redisClient.setLastNews(coinName, JSON.stringify({ coin, articles: sentimentalArticles }));
+        const sentimentalArticles = articles
+          .filter((article) => {
+            if (existentNews.length > 0) {
+              return existentNews.filter(existentNew => existentNew.publishedAt === article.publishedAt).length === 0;
+            }
+            return true;
+          })
+          .filter(article => article.title.toLowerCase().includes(coinName.toLowerCase()))
+          .map(article => ({ ...article, sentiment: sentiment.analyze(article.description || article.title).score }));
+        console.log(coinName, sentimentalArticles.length);
+        for (let i = 0; i < sentimentalArticles.length; i++) {
+          const element = sentimentalArticles[i];
+          this.redisClient.setLastNews(coinName.toLowerCase(), JSON.stringify({ coin, info: element }));
+        }
       }
     } catch (error) {
       throw error;
