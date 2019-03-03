@@ -16,3 +16,20 @@ export const getTimeAgo = (time = Date.now()) => {
     return `${seconds+1}sec`;
   }
 };
+
+export const timeParser = (notificationTime = Date.now()) => {
+  const time = new Date(notificationTime);
+  const now = Date.now();
+  const difference = (now - time.getTime()) / 1000;
+  if (difference < 60) {
+    return 'Now';
+  }
+  if (difference < 3600) {
+    return `${Math.round(difference / 60)} min ago`;
+  }
+  const parsedMinutes = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes();
+  const parsedHours = time.getHours() < 10 ? `0${time.getHours()}` : time.getHours();
+  return `${parsedHours}:${parsedMinutes}`;
+}
+
+export const intervalTime = 60 * 1000;

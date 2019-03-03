@@ -8,64 +8,85 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import SwapVertIcon from '@material-ui/icons/SwapVert';
 
-const timeParser = (notificationTime = Date.now()) => {
-  const time = new Date(notificationTime);
-  const parsedMinutes = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes();
-  const parsedHours = time.getHours() < 10 ? `0${time.getHours()}` : time.getHours();
-  return `${parsedHours}:${parsedMinutes}`;
+import { connect } from 'react-redux';
+import { hoverNotification } from '../../../../redux/actions/dashboardActions';
+import { timeParser, intervalTime } from '../../../common/utils/Time';
+
+const mapReduxStateToComponentProps = state => ({
+  selected: state.user.userPreferences.selectedCoin
+});
+class MANotification extends React.Component {
+  static propTypes = {
+    notification: PropTypes.object.isRequired,
+    selectCoin: PropTypes.func.isRequired
+  }
+  static defaultProps = {
+    notification: {
+      coin: {},
+      type: '',
+      info: {}
+    },
+    selectCoin: () => { }
+  }
+  componentDidMount() {
+    this.interval = setInterval(() => {
+      this.setState({ time: Date.now() });
+    }, intervalTime);
+  }
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+  handleMouseLeave = () => {
+    const { hoverNotification } = this.props;
+    hoverNotification({});
+  }
+  handleMouseEnter = () => {
+    const { notification, hoverNotification, selected } = this.props;
+    if (selected === notification.coin.id) {
+      hoverNotification({ ...notification, good: notification.data.difference > 0, message: 'MACD' });
+    }
+  }
+  render() {
+    const { notification, selectCoin } = this.props;
+    const { data = {}, createdAt = Date.now(), coin = { symbol: '' } } = notification;
+    const { difference = 0 } = data;
+    const time = timeParser(createdAt);
+    const good = difference > 0;
+    return (
+      <ListItem key={Math.random()} onClick={() => selectCoin(coin.id)} dense button onMouseLeave={this.handleMouseLeave} onMouseEnter={this.handleMouseEnter}>
+        <ListItemAvatar>
+          <Avatar style={{ color: '#fff', background: 'transparent' }}>
+            <SwapVertIcon color={good ? 'primary' : 'secondary'} style={{ width: 40, height: 40 }} />
+          </Avatar>
+        </ListItemAvatar>
+        <ListItemText
+          primary={
+            <Grid container justify="space-between" alignItems="center">
+              <Grid item>
+                <Typography variant="h5" color={good ? 'primary' : 'secondary'}>
+                  MACD direction
+              </Typography>
+              </Grid>
+              <Grid item>
+                <Typography variant="body2">
+                  {time}
+                </Typography>
+              </Grid>
+            </Grid>
+          }
+          secondary={
+            <Grid container justify="flex-start" alignItems="center" spacing={24}>
+              <Grid item>
+                <Typography align="left" variant="body2">
+                  {coin.symbol} | <strong>{difference > 0 ? 'POSITIVE' : 'NEGATIVE'}</strong>
+              </Typography>
+              </Grid>
+            </Grid>
+          }
+        />
+      </ListItem>
+    );
+  }
 }
 
-function MANotification({ notification, selectCoin }) {
-  const { data = {}, createdAt = Date.now(), coin = {symbol:''} } = notification;
-  const { difference = 0 } = data;
-  const parsedTime = timeParser(createdAt);
-  const good = difference > 0;
-  return (
-    <ListItem key={Math.random()} onClick={() => selectCoin(coin.id)} dense button>
-      <ListItemAvatar>
-        <Avatar style={{ color: '#fff', background: 'transparent' }}>
-          <SwapVertIcon color={good ? 'primary':'secondary'} style={{ width: 40, height: 40}}/>
-        </Avatar>
-      </ListItemAvatar>
-      <ListItemText
-        primary={
-          <Grid container justify="space-between" alignItems="center">
-            <Grid item>
-              <Typography variant="h5" color={good ? 'primary':'secondary'}>
-                MACD direction
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography variant="body2">
-                {parsedTime}
-              </Typography>
-            </Grid>
-          </Grid>
-        }
-        secondary={
-          <Grid container justify="flex-start" alignItems="center" spacing={24}>
-            <Grid item>
-              <Typography align="left" variant="body2">
-                {coin.symbol} | <strong>{difference > 0 ? '+':''}{Math.round(difference*100)/100}</strong>% 
-              </Typography>
-            </Grid>
-          </Grid>
-        }
-      />
-    </ListItem>
-  )
-}
-MANotification.propTypes = {
-  notification: PropTypes.object.isRequired,
-  selectCoin: PropTypes.func.isRequired
-}
-MANotification.defaultProps = {
-  notification: {
-    coin: {},
-    type: '',
-    info: {}
-  },
-  selectCoin: () => { }
-}
-
-export default MANotification;
+export default connect(mapReduxStateToComponentProps, { hoverNotification })(MANotification);

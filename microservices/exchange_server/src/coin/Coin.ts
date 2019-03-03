@@ -29,7 +29,7 @@ export default class Coin {
   private _whaleOrders: TCoinWhaleOrders = { buy: {}, sell:{} };
   private _alarm: TCoinAlarm;
   private _exchange: string;
-  private _volumeDifference: { difference: number, mean: number, current: number } = { difference: 0, mean: 0, current: 0 };
+  private _volumeDifference: { priceDifference:number, difference: number, mean: number, current: number } = { priceDifference:0, difference: 0, mean: 0, current: 0 };
   private _lastBuyVolume: number = 0;
   private _lastSellVolume: number = 0;
   private _priceChange24hr: number = -1;
@@ -173,7 +173,7 @@ export default class Coin {
     return this._actualPrice;
   }
   public calculatePriceDifference(_prices:number[]) {
-    const priceDifference = ((_prices[_prices.length - 1] - _prices[_prices.length - 5]) / _prices[_prices.length - 5]) * 100;
+    const priceDifference = ((_prices[_prices.length - 1] - _prices[_prices.length - 2]) / _prices[_prices.length - 2]) * 100;
     if (Math.abs(this._priceDifference) < 1 && Math.abs(priceDifference) > 1) {
       const info = { ...this._commonRedisProperties, data: Math.round(priceDifference * 100) / 100 };
       const notification = new PriceDifferenceNotification(info);
@@ -184,10 +184,17 @@ export default class Coin {
   public set MACD(_prices: number[]) {
     new Promise(() => {
       this.calculatePriceDifference(_prices);
-      const prices26 = _prices.splice(_prices.length - 26);
-      const prices12 = _prices.splice(_prices.length - 12);
-      const ma26 = (prices26.reduce((a, b) => a + b) / 26);
-      const ma12 = (prices12.reduce((a, b) => a + b) / 12);
+      let ma26 = 0;
+      for (let i = _prices.length - 26; i < _prices.length; i++) {
+        ma26 += _prices[i];
+      }
+      ma26 = ma26 / 26;
+
+      let ma12 = 0;
+      for (let i = _prices.length - 12; i < _prices.length; i++) {
+        ma12 += _prices[i];
+      }
+      ma12 = ma12 / 12;
       const difference = ((ma12 - ma26) / ma26) * 100;
       if ((this._macdDifference.difference > 0 && difference < 0) || (this._macdDifference.difference < 0 && difference > 0)) {
         this._macdDifference = {
@@ -399,14 +406,20 @@ export default class Coin {
   public calculateVolumeDifference(volumes:number[]= [], last:number = 0) {
     return new Promise(() => {
       const numStepsBefore = 60;
-      const cuttedVolumes = volumes.splice(volumes.length - numStepsBefore);
+      const cuttedVolumes = [];
+      for (let i = volumes.length - 60; i < volumes.length; i++) {
+        cuttedVolumes.push(volumes[i]);
+      }
       const mean = cuttedVolumes.reduce((a, b) => a + b) / numStepsBefore;
       const difference = ((last - mean) / mean) * 100;
-      const anomaly = (this._volumeDifference.difference < 200 && difference > 200);
+      const anomaly = (this._volumeDifference.difference < 200 && difference > 200)
+        || (this._volumeDifference.difference < 500 && difference > 500)
+        || (this._volumeDifference.difference < 1000 && difference > 1000);
       this._volumeDifference = {
         difference,
         mean,
         current: last,
+        priceDifference: this._priceDifference,
       };
       if (anomaly) {
         const info = { ...this._commonRedisProperties, data: this._volumeDifference };

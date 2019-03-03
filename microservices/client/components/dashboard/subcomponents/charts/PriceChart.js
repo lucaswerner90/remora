@@ -16,7 +16,8 @@ const mapReduxStateToComponentProps = state => ({
   timeline: state.dashboard.chartTimeline,
   previousBuyOrder: state.live.previousBuyOrder,
   previousSellOrder: state.live.previousSellOrder,
-  price: state.live.price
+  price: state.live.price,
+  notification: state.dashboard.hoverNotification
 });
 
 
@@ -40,7 +41,12 @@ class PriceChart extends React.Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    const { prices = [], buy, sell, price, timeline } = nextProps;
+    const { prices = [], buy, sell, price, timeline, notification } = nextProps;
+
+    // Notification has been hovered
+    if (notification !== this.props.notification) {
+      return true;
+    }
 
     // The price has changed
     if (price !== this.props.price) {
@@ -71,12 +77,11 @@ class PriceChart extends React.Component {
   }
 
   render() {
-    const { sell = {}, buy = {}, prices = [], previousBuyOrder, previousSellOrder, price } = this.props;
+    const { sell = {}, buy = {}, prices = [], previousBuyOrder, previousSellOrder, price, notification, timeline } = this.props;
 
     // Either use the previous order or the current one checking if the price property exists
     const buyOrder = buy.price ? buy : previousBuyOrder;
     const sellOrder = sell.price ? sell : previousSellOrder;
-  
     const buyAnnotation = buyOrder && buyOrder.price ? {
       y: buyOrder.price,
       strokeDashArray: 0,
@@ -117,32 +122,50 @@ class PriceChart extends React.Component {
     } : {};
 
     if (prices.length > 0 && buyOrder.price && sellOrder.price && price) {
-      let offsetX = 60;
-      let extended = prices[prices.length-1][0] - prices[0][0];
-      if (this.props.timeline === timelineChartValues.FIVE || this.props.timeline === timelineChartValues.FIFTEEN) {
+      let pricesFiltered = prices;
+      if (notification && notification.createdAt && timeline === timelineChartValues.MINUTE) {
+        const minValue = notification.createdAt - (notification.createdAt % 60) - (100 * 60 * 1000);
+        pricesFiltered = pricesFiltered.filter(price => price[0] > minValue);
+      }
+      let extended = (pricesFiltered[pricesFiltered.length - 1][0] - pricesFiltered[0][0])/3;
+      let offsetX = 30;
+      if (timeline === timelineChartValues.FIVE || timeline === timelineChartValues.FIFTEEN) {
         offsetX = 40;
-      } else if (this.props.timeline === timelineChartValues.HOUR || this.props.timeline === timelineChartValues.TWOHOURS) {
+      } else if (timeline === timelineChartValues.HOUR || timeline === timelineChartValues.TWOHOURS) {
         offsetX = 30;
       }
+
+      const hoverNotification = notification && notification.createdAt ? {
+        x: notification.createdAt - (notification.createdAt % 60),
+        strokeDashArray: 2,
+        borderColor: notification.good ? 'rgb(102,255,255)' : 'rgb(255,0,102)',
+        label: {
+          position: 'right',
+          offsetX: 0,
+          offsetY: -150,
+          borderColor: 'none',
+          style: {
+            color: notification.good ? 'rgb(102,255,255)' : 'rgb(255,0,102)',
+            background: 'transparent',
+            fontFamily: 'Roboto',
+            fontWeight: 100,
+            fontSize: '0.75rem',
+          },
+          text: `${notification.message}`,
+        }
+      } : {};
 
       const priceAnnotation = price > 0 ? {
         y: price,
         strokeDashArray: 0,
         borderColor: '#ffffff7a'
       } : {};
-      const values = prices.map(price => price[1]);
+      const values = pricesFiltered.map(price => price[1]);
       const options = {
         chart: {
           foreColor: "#ffffff12",
           toolbar: {
             show: false
-          },
-          events: {
-            // click: function (event, chartContext, config) {
-            //   console.log(event)
-            //   console.log(chartContext)
-            //   console.log(config)
-            // }
           }
         },
         colors: ["white"],
@@ -220,13 +243,14 @@ class PriceChart extends React.Component {
             }
           },
           format: 'dd:HH:mm',
-          max: prices[prices.length - 1][0] + extended
+          max: pricesFiltered[pricesFiltered.length - 1][0] + extended
         },
         annotations: {
           yaxis: buyAnnotation || sellAnnotation ? [buyAnnotation, sellAnnotation, priceAnnotation] : [priceAnnotation],
+          xaxis: [hoverNotification],
           points: [
             {
-              x: prices[prices.length-1][0],
+              x: pricesFiltered[pricesFiltered.length-1][0],
               y: price,
               marker: {
                 size: 7,
@@ -248,17 +272,21 @@ class PriceChart extends React.Component {
           labels: {
             show: true
           },
-          min: buy.price ? Math.min(buy.price*0.99, Math.min(...values)) : Math.min(...values),
-          max: sell.price ? Math.max(sell.price*1.01, Math.max(...values)) : Math.max(...values),
+          min: Math.min(...values),
+          max: Math.max(...values)
+          // min: buy.price ? Math.min(buy.price*0.99, Math.min(...values)) : Math.min(...values),
+          // max: sell.price ? Math.max(sell.price*1.01, Math.max(...values)) : Math.max(...values),
         }
       };
+      
       const series = [{
         name: 'Price',
-        data: prices
+        data: pricesFiltered
       }];
       return (
         <Fade in={prices.length > 0} timeout={{ enter: 2 * 1000 }}>
           <Chart
+            id="priceChart"
             options={options}
             series={series}
             type="area"
