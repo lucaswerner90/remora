@@ -102,7 +102,6 @@ export default class NewsAPIServer {
           })
           .filter(article => article.title.toLowerCase().includes(coinName.toLowerCase()))
           .map(article => ({ ...article, sentiment: sentiment.analyze(article.description || article.title).score }));
-        console.log(coinName, sentimentalArticles.length);
         for (let i = 0; i < sentimentalArticles.length; i++) {
           const element = sentimentalArticles[i];
           this.redisClient.setLastNews(coinName.toLowerCase(), JSON.stringify({ coin, info: element }));

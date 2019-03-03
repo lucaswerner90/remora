@@ -62,7 +62,6 @@ class SocketIOServer {
     const coinsID = Object.keys(coins);
     for (let i = 0; i < coinsID.length; i++) {
       socket.on(`${coinsID[i]}_chat`, (msg) => {
-        console.log(`${coinsID[i]}_chat :`, msg);
         this.redisPublisher.rpush(`${coinsID[i]}_chat_messages`, JSON.stringify(msg));
         this.ioServer.emit(`${coinsID[i]}_chat`, msg);
       });
@@ -118,7 +117,6 @@ class SocketIOServer {
       }
       if (channel === 'tweets' || channel === 'last_news') {
         const globalChannel = `${messageParsed.coin.name.toLowerCase()}_${channel}`;
-        console.log(finalData);
         this.ioServer.emit(globalChannel, { message: channel, info: finalData });
       } else {
         this.ioServer.emit(`${finalChannel}_${channel}`, { message: channel, info: finalData });
