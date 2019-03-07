@@ -51,7 +51,17 @@ export default class RedisClient {
   }
   public addTweet(coin: string = '', value: string = '') {
     this.client.lpush(`${coin.toLowerCase()}_tweets`, value, () => {
-      this.client.ltrim(`${coin.toLowerCase()}_tweets`, 0, 50);
+      this.client.ltrim(`${coin.toLowerCase()}_tweets`, 0, 49);
+    });
+  }
+  public getTweets(coin: string = '') {
+    return new Promise((resolve, reject) => {
+      this.client.lrange(`${coin}_tweets`, 0, 20, (err, reply) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(reply);
+      });
     });
   }
 }

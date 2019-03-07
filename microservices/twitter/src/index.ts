@@ -41,10 +41,10 @@ const initTwitterStream = (coin = { name: '' }, account = '') => {
     const tweets: any[] = data || [];
     for (let i = 0; i < tweets.length; i++) {
       const tweet = tweets[i];
-      const { user = {}, created_at = '', id } = tweet.retweeted_status ? tweet.retweeted_status : tweet;
+      const { user = {}, created_at = '', id_str = '', entities = { urls:[] } } = tweet.retweeted_status ? tweet.retweeted_status : tweet;
       const text = tweet.retweeted_status && tweet.retweeted_status.full_text ? tweet.retweeted_status.full_text : tweet.full_text;
       const { screen_name = '', location = '', url = '', profile_image_url = '', followers_count = 0 } = user;
-      const twit = new Tweet(id, coin, text, { screen_name, location, url, profile_image_url, followers_count }, sentiment.analyze(text).score, created_at);
+      const twit = new Tweet(id_str, coin, text, entities, { screen_name, location, url, profile_image_url, followers_count }, sentiment.analyze(text).score, created_at);
       twit.appendToTweetList();
     }
   });
@@ -61,3 +61,4 @@ redis.getAllCoins().then((allCoins) => {
     }, 10 * 60 * 1000);
   }
 });
+initTwitterStream({ name:'' }, 'fetch_ai');

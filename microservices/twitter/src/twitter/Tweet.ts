@@ -8,6 +8,7 @@ type TUser = {
 type TCoin = {
   name: string,
 };
+type TEntities = { urls: any[] };
 
 import RedisClient from '../RedisClient';
 
@@ -19,11 +20,13 @@ export default class Tweet {
   private _text: string = '';
   private _user: TUser;
   private _created: string;
-  constructor(id:number, coin: TCoin, text: string = '', user: TUser, sentiment: number, createdAt:string = '') {
+  private _entities: TEntities;
+  constructor(id: number, coin: TCoin, text: string = '', entities: TEntities, user: TUser, sentiment: number, createdAt:string = '') {
     this._id = id;
     this._coin = coin;
     this._user = user;
     this._text = text;
+    this._entities = entities;
     this._created = createdAt;
     if (sentiment < 0) {
       this._sentiment = -1;
@@ -40,6 +43,7 @@ export default class Tweet {
       user: this._user,
       text: this._text,
       created: this._created,
+      entities: this._entities,
       sentiment: this._sentiment,
     };
   }
