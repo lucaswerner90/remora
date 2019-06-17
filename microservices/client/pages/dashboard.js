@@ -4,19 +4,19 @@ import Typography from '@material-ui/core/Typography';
 import Fade from '@material-ui/core/Fade';
 import { withStyles } from '@material-ui/core/styles';
 
-import Layout from '../components/Layout';
-import CoinDetailView from '../components/dashboard/CoinDetailView';
-import RightSideView from '../components/dashboard/RightSideView';
-import CoinChat from '../components/dashboard/subcomponents/chat/CoinChat';
-import Auth from '../components/authentication/Auth';
+import Layout from '../src/components/Layout';
+import CoinDetailView from '../src/components/dashboard/CoinDetailView';
+import RightSideView from '../src/components/dashboard/RightSideView';
+import CoinChat from '../src/components/dashboard/subcomponents/chat/CoinChat';
+import Auth from '../src/components/authentication/Auth';
 
 import fetch from 'isomorphic-unfetch';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import {connect} from 'react-redux';
-import { updateUserPreferences, updateUserInfo } from '../redux/actions/userPreferencesActions';
-import { updateAllCoins } from '../redux/actions/coinsActions';
-import Loading from '../components/common/utils/Loading';
+import { updateUserPreferences, updateUserInfo } from '../src/redux/actions/userPreferencesActions';
+import { updateAllCoins } from '../src/redux/actions/coinsActions';
+import Loading from '../src/components/common/utils/Loading';
 
 const { publicRuntimeConfig } = getConfig();
 const { api } = publicRuntimeConfig;

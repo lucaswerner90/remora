@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import Grid from '@material-ui/core/Grid';
 import { Typography } from '@material-ui/core';
-import Auth from '../components/authentication/Auth';
-import Loading from '../components/common/utils/Loading';
+import Auth from '../src/components/authentication/Auth';
+import Loading from '../src/components/common/utils/Loading';
 import Router from 'next/router';
 
 export class CallbackPage extends Component {

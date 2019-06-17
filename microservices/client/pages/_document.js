@@ -5,14 +5,7 @@ import flush from 'styled-jsx/server';
 
 
 class MyDocument extends Document {
-  componentDidMount(){
-    window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      window.dataLayer.push(arguments)
-    }
-    gtag('js', new Date());
-    gtag('config', 'UA-134152146-1');
-  }
+
   render() {
     const { pageContext } = this.props;
 
