@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Grid, Typography, Fade, Divider } from '@material-ui/core';
-import Layout from '../components/Layout';
+import Layout from '../src/components/Layout';
 
 export class Settings extends Component {
 

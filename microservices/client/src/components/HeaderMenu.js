@@ -13,12 +13,12 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Link from 'next/link';
 import { Divider, Typography } from '@material-ui/core';
-import Auth from '../components/authentication/Auth';
+import Auth from './authentication/Auth';
 const styles = {
   fullList: {
     width: 250,
     paddingTop: '40px',
-    height:'100vh',
+    height: '100vh',
     background: 'rgba(7, 16, 43, 0.56)'
   },
 };
@@ -39,7 +39,7 @@ class HeaderMenu extends React.Component {
 
     const fullList = (
       <div className={classes.fullList}>
-        <Typography variant="h4" style={{width:'90%', marginLeft:'20px', marginBottom:'20px'}}>
+        <Typography variant="h4" style={{ width: '90%', marginLeft: '20px', marginBottom: '20px' }}>
           rémora
         </Typography>
         <List>
@@ -58,7 +58,7 @@ class HeaderMenu extends React.Component {
             </ListItem>
           </Link>
 
-          <Divider style={{marginTop:'60px', marginBottom:'10px'}}/>
+          <Divider style={{ marginTop: '60px', marginBottom: '10px' }} />
           <ListItem button key="logout" onClick={() => new Auth().logout()} >
             <ListItemIcon><PowerSettingsNewIcon style={{ color: 'white' }} /></ListItemIcon>
             <ListItemText primary='Logout' />
@@ -70,7 +70,7 @@ class HeaderMenu extends React.Component {
     return (
       <div>
         <IconButton
-          style={{color:'white'}}
+          style={{ color: 'white' }}
           aria-label="Menu"
           onClick={this.toggleDrawer('left', true)}>
           <MenuIcon />
