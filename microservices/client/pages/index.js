@@ -3,11 +3,6 @@ import Button from '@material-ui/core/Button';
 import { Grid, Typography, Fade } from '@material-ui/core';
 import FloatingHeader from '../src/components/index/FloatingHeader';
 
-
-const lightBlueText = {
-    color: '#67FFFF'
-};
-
 const FirstRow = () => {
     const firstScreen = {
         height: '100vh',
