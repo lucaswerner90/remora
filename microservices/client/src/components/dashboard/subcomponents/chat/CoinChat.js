@@ -45,7 +45,7 @@ export class Chat extends Component {
   state = {
     open: false,
     chatMessages: [welcomeMessage],
-    message:'',
+    message: '',
     pendingNotifications: 0
   };
   constructor(props) {
@@ -62,14 +62,8 @@ export class Chat extends Component {
     this.setState({
       ...this.state,
       chatMessages: [...this.state.chatMessages, info],
-      pendingNotifications: this.state.pendingNotifications+1
+      pendingNotifications: this.state.pendingNotifications + 1
     });
-    this.newMessagePlayAudio();
-  }
-  
-  newMessagePlayAudio = () => {
-    const audio = new Audio('/static/sounds/new_chat_message.mp3');
-    audio.play();  
   }
 
   handleMessageChange = (event = new Event()) => {
@@ -86,7 +80,7 @@ export class Chat extends Component {
     };
     coinSocket.socket.emit(`${this.props.selectedCoin}_chat`, info);
     this.setState({ ...this.state, message: '' });
-    
+
   }
   componentWillReceiveProps(nextProps) {
     const newChannel = `${nextProps.selectedCoin}_chat`;
@@ -100,7 +94,7 @@ export class Chat extends Component {
     });
     this.getInitialMessages(newChannel);
   }
-  getInitialMessages = async(chatChannel) => {
+  getInitialMessages = async (chatChannel) => {
     const request = {
       method: 'POST',
       mode: 'cors',
@@ -122,7 +116,7 @@ export class Chat extends Component {
         pendingNotifications: messages.filter(msg => msg.created > this.state.lastTimeSeen).length,
         chatMessages: messages.length ? messages : [welcomeMessage]
       });
-      
+
     }
   }
   componentDidMount() {
@@ -146,37 +140,37 @@ export class Chat extends Component {
           <ListItemAvatar>
             <Avatar alt={name} src={avatar} />
           </ListItemAvatar>
-        <ListItemText
-          primary={
+          <ListItemText
+            primary={
               <Grid container alignItems="center">
                 <Grid item xs={12} sm={12} md={10}>
-                  <Typography component="span" variant="body1" color="textPrimary" align="left" style={{display: 'inline-block'}}>
+                  <Typography component="span" variant="body1" color="textPrimary" align="left" style={{ display: 'inline-block' }}>
                     {name}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={12} md={2}>
-                  <Typography component="span" variant="body2" color="textPrimary" align="right" style={{display: 'inline-block'}}>
+                  <Typography component="span" variant="body2" color="textPrimary" align="right" style={{ display: 'inline-block' }}>
                     {parsedTime}
                   </Typography>
                 </Grid>
-            </Grid>    
-          }
-          secondary={
-            <React.Fragment>
-              <Typography component="span" style={{color:cyan[500]}}>
-                {message}
-              </Typography>
+              </Grid>
+            }
+            secondary={
+              <React.Fragment>
+                <Typography component="span" style={{ color: cyan[500] }}>
+                  {message}
+                </Typography>
               </React.Fragment>
             }
-            />
-          <Divider/>
+          />
+          <Divider />
         </ListItem>
       );
     });
   }
   handleOpenCloseChat = () => {
     const isOpened = !this.state.open;
-    this.setState({ ...this.state, open: isOpened, lastTimeSeen: Date.now()});
+    this.setState({ ...this.state, open: isOpened, lastTimeSeen: Date.now() });
   }
   handleClickAwayListener = () => {
     this.setState({ ...this.state, open: false, lastTimeSeen: Date.now() });
@@ -184,7 +178,7 @@ export class Chat extends Component {
   render() {
     const { chatMessages = [] } = this.state;
     const { coinInfo = { name: '', exchange: '', symbol: '', against: '' } } = this.props;
-    const { open = false , pendingNotifications = 0} = this.state;
+    const { open = false, pendingNotifications = 0 } = this.state;
     if (open) {
       return (
         <div style={{ ...chatStyle, maxWidth: '350px' }}>
@@ -243,7 +237,7 @@ export class Chat extends Component {
       return (
         <div style={chatStyle}>
           <Badge badgeContent={pendingNotifications > 1 ? '+1' : pendingNotifications} color="secondary">
-            <IconButton style={{ background: '#0000001f'}} onClick={this.handleOpenCloseChat}>
+            <IconButton style={{ background: '#0000001f' }} onClick={this.handleOpenCloseChat}>
               <ChatIcon />
             </IconButton>
           </Badge>

@@ -45,15 +45,6 @@ class OrderInfo extends React.Component {
 
     if (currentOrder.price !== nextOrder.price) {
       this.setState({ ...this.state, order: currentOrder });
-      this.playAudioNotification();
-    }
-  }
-  playAudioNotification = () => {
-    try {
-      const audio = new Audio('/static/sounds/activate_order.mp3');
-      audio.play();
-    } catch (error) {
-      console.log(error);
     }
   }
 
