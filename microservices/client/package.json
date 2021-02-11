@@ -6,7 +6,7 @@
     "@material-ui/core": "latest",
     "@material-ui/icons": "^3.0.1",
     "@material-ui/lab": "^3.0.0-alpha.30",
-    "apexcharts": "^2.6.0",
+    "apexcharts": "^3.24.0",
     "auth0-js": "^9.10.0",
     "compression": "^1.7.3",
     "express": "^4.16.4",
