@@ -9,7 +9,7 @@
     "apexcharts": "^2.6.0",
     "auth0-js": "^9.10.0",
     "compression": "^1.7.3",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "isomorphic-unfetch": "^3.0.0",
     "jss": "latest",
     "jwt-decode": "^2.2.0",
